@@ -21,6 +21,12 @@
 ## 💰 Monetisation
 - [ ] IAP (in-app purchases)
 
+## 🚀 GTM
+- [ ] SEO
+- [ ] Domain name purchase
+- [ ] App Store description
+- [ ] App Store screenshots
+
 ## 👤 Profile
 - [ ] Progress tracking
 - [ ] Edit your details
