@@ -35,3 +35,9 @@
 - [ ] Progress tracking
 - [ ] Edit your details
 - [ ] Profile picture
+
+## 📋 Workflow notes
+- [ ] Security audit
+- [ ] SEO
+- [ ] Design system
+- [ ] Accessibility
