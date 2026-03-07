@@ -7,6 +7,10 @@
 - [ ] Improve legibility
 - [ ] Responsive layout
 
+## 🃏 Flashcard
+- [ ] Son
+- [ ] Dictionary infotip for each character
+
 ## 📖 Story
 - [ ] Add story reading experience
 
