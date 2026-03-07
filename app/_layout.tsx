@@ -28,6 +28,8 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="auth" options={{ animation: 'fade' }} />
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="session-setup" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="session" options={{ animation: 'slide_from_right' }} />
       </Stack>
     </AuthProvider>
   );

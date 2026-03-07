@@ -1,6 +1,16 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User, AuthError } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
+
+// Session keys scoped to a user — cleared when a DIFFERENT user signs in
+const USER_SESSION_KEYS = [
+  'hanziflash_active_session',
+  'hanziflash_resume_session',
+  'hanziflash_session_config',
+  'hanziflash_last_deck',
+];
+const LAST_USER_KEY = 'hanziflash_last_user_id';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,8 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Listen for auth state changes (login, logout, token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
+
+      // On sign-in: if a different user is logging in, wipe the previous user's session data
+      if (event === 'SIGNED_IN' && session?.user) {
+        const lastUserId = await AsyncStorage.getItem(LAST_USER_KEY);
+        if (lastUserId && lastUserId !== session.user.id) {
+          await AsyncStorage.multiRemove(USER_SESSION_KEYS);
+        }
+        await AsyncStorage.setItem(LAST_USER_KEY, session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();

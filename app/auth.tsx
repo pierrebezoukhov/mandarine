@@ -1,52 +1,14 @@
 import { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+  View, Text, TouchableOpacity, StyleSheet,
+  KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
-
-// ─── Design tokens (match web prototype) ────────────────────────────────────
-const T = {
-  bg:          '#131109',
-  surface:     '#1e1b12',
-  surface2:    '#252118',
-  border:      'rgba(255,248,220,0.08)',
-  borderFocus: 'rgba(255,248,220,0.22)',
-  textPrimary: '#F0EBE0',
-  textSecondary:'#A09880',
-  textMuted:   '#5C5646',
-  accent:      '#C0392B',
-  error:       '#E05252',
-  success:     '#4A9E6B',
-};
-
-// ─── Shared field component ──────────────────────────────────────────────────
-function Field({
-  label, value, onChange, placeholder, secureTextEntry = false, hasError = false,
-}: {
-  label: string; value: string; onChange: (v: string) => void;
-  placeholder?: string; secureTextEntry?: boolean; hasError?: boolean;
-}) {
-  const [focused, setFocused] = useState(false);
-  return (
-    <View style={s.fieldWrap}>
-      <Text style={s.fieldLabel}>{label}</Text>
-      <TextInput
-        style={[s.fieldInput, focused && s.fieldInputFocused, hasError && s.fieldInputError]}
-        value={value}
-        onChangeText={onChange}
-        placeholder={placeholder}
-        placeholderTextColor={T.textMuted}
-        secureTextEntry={secureTextEntry}
-        autoCapitalize="none"
-        autoCorrect={false}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-      />
-    </View>
-  );
-}
+import { T } from '@/theme/tokens';
+import { Field } from '@/components/Field';
+import { Button } from '@/components/Button';
+import { TabSwitcher } from '@/components/TabSwitcher';
 
 // ─── Login form ──────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () => void }) {
@@ -64,7 +26,6 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
     const err = await signIn(email, password);
     setLoading(false);
     if (err) {
-      // Supabase returns generic messages — map to friendly ones
       if (err.message.includes('Invalid login credentials')) {
         setError('Incorrect email or password.');
       } else if (err.message.includes('Email not confirmed')) {
@@ -87,22 +48,17 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
       <Text style={s.heading}>Welcome back</Text>
       <Text style={s.sub}>Sign in to continue your practice.</Text>
 
-      <Field label="EMAIL" value={email} onChange={setEmail}
+      <Field label="EMAIL"    value={email}    onChange={setEmail}
         placeholder="you@example.com" hasError={!!error && !email} />
       <Field label="PASSWORD" value={password} onChange={setPassword}
-        placeholder="••••••••" secureTextEntry hasError={!!error && !password} />
+        placeholder="••••••••" secureTextEntry hasError={!!error && !password}
+        errorText={error || undefined} />
 
       <TouchableOpacity onPress={onForgot} style={s.forgotBtn}>
         <Text style={s.forgotText}>Forgot password?</Text>
       </TouchableOpacity>
 
-      {!!error && <Text style={s.errorText}>{error}</Text>}
-
-      <TouchableOpacity style={[s.cta, loading && s.ctaDisabled]} onPress={submit} disabled={loading}>
-        {loading
-          ? <ActivityIndicator color="#fff" />
-          : <Text style={s.ctaText}>Sign in</Text>}
-      </TouchableOpacity>
+      <Button label="Sign in" onPress={submit} disabled={!email || !password} loading={loading} style={s.ctaTop} />
 
       <View style={s.divider}>
         <View style={s.dividerLine} />
@@ -110,9 +66,7 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
         <View style={s.dividerLine} />
       </View>
 
-      <TouchableOpacity style={s.oauthBtn} onPress={google}>
-        <Text style={s.oauthText}>Continue with Google</Text>
-      </TouchableOpacity>
+      <Button label="Continue with Google" onPress={google} variant="secondary" shape="rounded" />
 
       <Text style={s.footer}>
         No account?{' '}
@@ -144,7 +98,7 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
         setError(err.message);
       }
     } else {
-      onSuccess(email); // show confirmation screen
+      onSuccess(email);
     }
   };
 
@@ -158,19 +112,13 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
       <Text style={s.heading}>Start learning</Text>
       <Text style={s.sub}>Create your account to track progress across devices.</Text>
 
-      <Field label="EMAIL" value={email} onChange={setEmail}
+      <Field label="EMAIL"    value={email}    onChange={setEmail}
         placeholder="you@example.com" hasError={!!error && !email} />
       <Field label="PASSWORD" value={password} onChange={setPassword}
         placeholder="Min. 8 characters" secureTextEntry
-        hasError={!!error && password.length < 8} />
+        hasError={!!error && password.length < 8} errorText={error || undefined} />
 
-      {!!error && <Text style={s.errorText}>{error}</Text>}
-
-      <TouchableOpacity style={[s.cta, loading && s.ctaDisabled]} onPress={submit} disabled={loading}>
-        {loading
-          ? <ActivityIndicator color="#fff" />
-          : <Text style={s.ctaText}>Create account</Text>}
-      </TouchableOpacity>
+      <Button label="Create account" onPress={submit} disabled={!email || !password} loading={loading} style={s.ctaTop} />
 
       <View style={s.divider}>
         <View style={s.dividerLine} />
@@ -178,9 +126,7 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
         <View style={s.dividerLine} />
       </View>
 
-      <TouchableOpacity style={s.oauthBtn} onPress={google}>
-        <Text style={s.oauthText}>Continue with Google</Text>
-      </TouchableOpacity>
+      <Button label="Continue with Google" onPress={google} variant="secondary" shape="rounded" />
 
       <Text style={s.footer}>
         Already have an account?{' '}
@@ -203,8 +149,8 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
     setLoading(true);
     const err = await resetPassword(email);
     setLoading(false);
-    if (err) { setError(err.message); }
-    else { setSent(true); }
+    if (err) setError(err.message);
+    else     setSent(true);
   };
 
   if (sent) return (
@@ -229,17 +175,10 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
       <Text style={s.heading}>Reset password</Text>
       <Text style={s.sub}>Enter your email and we'll send you a reset link.</Text>
 
-      <Field label="EMAIL" value={email} onChange={setEmail} placeholder="you@example.com" />
-      {!!error && <Text style={s.errorText}>{error}</Text>}
+      <Field label="EMAIL" value={email} onChange={setEmail}
+        placeholder="you@example.com" errorText={error || undefined} />
 
-      <TouchableOpacity
-        style={[s.cta, (loading || !email) && s.ctaDisabled]}
-        onPress={submit} disabled={loading || !email}
-      >
-        {loading
-          ? <ActivityIndicator color="#fff" />
-          : <Text style={s.ctaText}>Send reset link</Text>}
-      </TouchableOpacity>
+      <Button label="Send reset link" onPress={submit} disabled={!email} loading={loading} style={s.ctaTop} />
     </>
   );
 }
@@ -266,13 +205,15 @@ function ConfirmScreen({ email, onBack }: { email: string; onBack: () => void })
 type Screen = 'login' | 'signup' | 'forgot' | 'confirm';
 
 export default function AuthScreen() {
-  const [screen, setScreen]         = useState<Screen>('login');
+  const [screen, setScreen]           = useState<Screen>('login');
   const [signupEmail, setSignupEmail] = useState('');
 
   const handleSignupSuccess = (email: string) => {
     setSignupEmail(email);
     setScreen('confirm');
   };
+
+  const showTabs = screen === 'login' || screen === 'signup';
 
   return (
     <KeyboardAvoidingView
@@ -291,28 +232,21 @@ export default function AuthScreen() {
         </View>
 
         {/* Tab switcher — hidden on forgot / confirm */}
-        {screen !== 'forgot' && screen !== 'confirm' && (
-          <View style={s.tabs}>
-            <TouchableOpacity
-              style={[s.tab, screen === 'login' && s.tabActive]}
-              onPress={() => setScreen('login')}
-            >
-              <Text style={[s.tabText, screen === 'login' && s.tabTextActive]}>Sign in</Text>
-              {screen === 'login' && <View style={s.tabUnderline} />}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[s.tab, screen === 'signup' && s.tabActive]}
-              onPress={() => setScreen('signup')}
-            >
-              <Text style={[s.tabText, screen === 'signup' && s.tabTextActive]}>Create account</Text>
-              {screen === 'signup' && <View style={s.tabUnderline} />}
-            </TouchableOpacity>
-          </View>
+        {showTabs && (
+          <TabSwitcher
+            tabs={[
+              { label: 'Sign in',        value: 'login'  },
+              { label: 'Create account', value: 'signup' },
+            ]}
+            value={screen}
+            onChange={v => setScreen(v as Screen)}
+            style={s.tabs}
+          />
         )}
 
-        {screen === 'login'   && <LoginForm  onSwitch={() => setScreen('signup')} onForgot={() => setScreen('forgot')} />}
-        {screen === 'signup'  && <SignupForm onSwitch={() => setScreen('login')}  onSuccess={handleSignupSuccess} />}
-        {screen === 'forgot'  && <ForgotForm onBack={() => setScreen('login')} />}
+        {screen === 'login'   && <LoginForm   onSwitch={() => setScreen('signup')} onForgot={() => setScreen('forgot')} />}
+        {screen === 'signup'  && <SignupForm   onSwitch={() => setScreen('login')}  onSuccess={handleSignupSuccess} />}
+        {screen === 'forgot'  && <ForgotForm   onBack={() => setScreen('login')} />}
         {screen === 'confirm' && <ConfirmScreen email={signupEmail} onBack={() => setScreen('login')} />}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -328,27 +262,12 @@ const s = StyleSheet.create({
   logoHanzi: { fontSize: 32, color: T.textPrimary, letterSpacing: 2, marginBottom: 4 },
   logoLabel: { fontSize: 11, color: T.textMuted, letterSpacing: 6 },
 
-  tabs:         { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: T.border, marginBottom: 32 },
-  tab:          { flex: 1, paddingVertical: 12, alignItems: 'center', position: 'relative' },
-  tabActive:    {},
-  tabText:      { fontSize: 14, fontWeight: '500', color: T.textMuted },
-  tabTextActive:{ color: T.textPrimary },
-  tabUnderline: { position: 'absolute', bottom: -1, left: 0, right: 0, height: 1, backgroundColor: T.textPrimary },
+  tabs: { marginBottom: 32 },
 
   heading: { fontSize: 26, color: T.textPrimary, marginBottom: 8, fontStyle: 'italic' },
   sub:     { fontSize: 14, color: T.textMuted, marginBottom: 28, lineHeight: 21 },
 
-  fieldWrap:       { marginBottom: 14 },
-  fieldLabel:      { fontSize: 10, color: T.textMuted, letterSpacing: 2, marginBottom: 6, textTransform: 'uppercase' },
-  fieldInput:      { backgroundColor: T.surface, borderWidth: 1, borderColor: T.border, borderRadius: 12, padding: 14, color: T.textPrimary, fontSize: 15 },
-  fieldInputFocused:{ borderColor: T.borderFocus, backgroundColor: T.surface2 },
-  fieldInputError: { borderColor: 'rgba(224,82,82,0.5)' },
-
-  errorText: { fontSize: 11, color: T.error, letterSpacing: 0.5, marginBottom: 8, marginTop: -6 },
-
-  cta:        { backgroundColor: T.accent, borderRadius: 100, padding: 15, alignItems: 'center', marginTop: 8 },
-  ctaDisabled:{ opacity: 0.4 },
-  ctaText:    { color: '#fff', fontSize: 15, fontWeight: '500' },
+  ctaTop: { marginTop: 8 },
 
   forgotBtn:  { alignSelf: 'flex-end', marginTop: -6, marginBottom: 8 },
   forgotText: { fontSize: 10, color: T.textMuted, letterSpacing: 1 },
@@ -356,9 +275,6 @@ const s = StyleSheet.create({
   divider:     { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 20 },
   dividerLine: { flex: 1, height: 1, backgroundColor: T.border },
   dividerText: { fontSize: 10, color: T.textMuted, letterSpacing: 2 },
-
-  oauthBtn:  { borderWidth: 1, borderColor: T.border, borderRadius: 12, padding: 13, alignItems: 'center', backgroundColor: T.surface },
-  oauthText: { color: T.textSecondary, fontSize: 13, fontWeight: '500' },
 
   footer:     { marginTop: 28, textAlign: 'center', fontSize: 13, color: T.textMuted },
   footerLink: { color: T.textSecondary, textDecorationLine: 'underline' },
