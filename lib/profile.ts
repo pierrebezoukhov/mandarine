@@ -32,6 +32,7 @@ export type SessionSummary = {
   id:           string;
   deck_name:    string | null;
   card_count:   number;
+  unique_cards: number | null;
   got_count:    number;
   forgot_count: number;
   completed_at: string;
@@ -172,7 +173,7 @@ export async function fetchRecentSessions(
 ): Promise<SessionSummary[]> {
   const { data, error } = await supabase
     .from('sessions')
-    .select('id, deck_name, card_count, got_count, forgot_count, completed_at')
+    .select('id, deck_name, card_count, unique_cards, got_count, forgot_count, completed_at')
     .eq('user_id', userId)
     .order('completed_at', { ascending: false })
     .limit(limit);

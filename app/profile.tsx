@@ -20,10 +20,10 @@ import {
 
 function relativeDate(iso: string): string {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
-  if (diff === 0) return "aujourd'hui";
-  if (diff === 1) return 'hier';
-  if (diff < 7)  return `il y a ${diff}j`;
-  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  if (diff === 0) return 'today';
+  if (diff === 1) return 'yesterday';
+  if (diff < 7)  return `${diff}d ago`;
+  return new Date(iso).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 }
 
 function pct(n: number): string {
@@ -124,9 +124,9 @@ export default function ProfileScreen() {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.headerBtn}>
-          <Text style={s.backText}>← Retour</Text>
+          <Text style={s.backText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={s.title}>Profil</Text>
+        <Text style={s.title}>Profile</Text>
         <TouchableOpacity onPress={() => router.push('/settings')} style={s.headerBtn}>
           <Text style={s.settingsIcon}>⚙️</Text>
         </TouchableOpacity>
@@ -146,12 +146,12 @@ export default function ProfileScreen() {
           />
           {uploading
             ? <ActivityIndicator size="small" color={T.textMuted} style={s.avatarHint} />
-            : <Text style={s.avatarHint}>tap pour changer</Text>
+            : <Text style={s.avatarHint}>tap to change</Text>
           }
         </View>
 
         {/* Global stats */}
-        <Section label="PROGRESSION GLOBALE">
+        <Section label="GLOBAL PROGRESS">
           <View style={s.grid}>
             <StatCard
               label="Sessions"
@@ -159,33 +159,33 @@ export default function ProfileScreen() {
               style={s.cell}
             />
             <StatCard
-              label="Cartes vues"
+              label="Cards seen"
               value={stats?.totalCards ?? 0}
               style={s.cell}
             />
           </View>
           <View style={[s.grid, s.gridGap]}>
             <StatCard
-              label="Maîtrisées"
-              value={stats?.uniqueCardsMastered ?? 0}
+              label="Guessed"
+              value={stats?.totalGot ?? 0}
               style={s.cell}
             />
             <StatCard
-              label="Moy. /ses."
-              value={stats ? pct(stats.avgSessionSuccessRate) : '—'}
+              label="Mastered"
+              value={stats?.uniqueCardsMastered ?? 0}
               style={s.cell}
             />
           </View>
           <StatCard
-            label="Réussite globale"
-            value={stats ? pct(stats.globalSuccessRate) : '—'}
+            label="Avg/session"
+            value={stats ? pct(stats.avgSessionSuccessRate) : '—'}
             style={s.gridGap}
           />
         </Section>
 
         {/* HSK breakdown */}
         {hasHskData && (
-          <Section label="PAR NIVEAU HSK">
+          <Section label="BY HSK LEVEL">
             {hskLevels.map(level => {
               const data = stats!.byHskLevel[level];
               if (!data) return null;
@@ -205,10 +205,11 @@ export default function ProfileScreen() {
 
         {/* Recent sessions */}
         {sessions.length > 0 && (
-          <Section label="SESSIONS RÉCENTES">
+          <Section label="RECENT SESSIONS">
             {sessions.map((session, i) => {
-              const rate = session.card_count > 0
-                ? pct(session.got_count / session.card_count)
+              const denom = session.unique_cards ?? session.card_count;
+              const rate = denom > 0
+                ? pct(session.got_count / denom)
                 : '—';
               return (
                 <View
@@ -219,7 +220,7 @@ export default function ProfileScreen() {
                     {session.deck_name ?? 'Session'}
                   </Text>
                   <Text style={s.sessionMeta}>
-                    {session.card_count} cartes · {rate} · {relativeDate(session.completed_at)}
+                    {session.unique_cards ?? session.card_count} cards · {rate} · {relativeDate(session.completed_at)}
                   </Text>
                 </View>
               );
