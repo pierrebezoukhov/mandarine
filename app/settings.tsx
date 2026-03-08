@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
 import { SegmentedControl } from '@/components/SegmentedControl';

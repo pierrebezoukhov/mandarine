@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, MONO } from '@/theme/tokens';
+import { T, MONO, FS } from '@/theme/tokens';
 
 interface ProgressBarProps {
   /** Current card index (1-based for display) */
@@ -48,7 +48,7 @@ const s = StyleSheet.create({
   },
   counter: {
     fontFamily: MONO,
-    fontSize: 12,
+    fontSize: FS.caption,
     color: T.textMuted,
   },
   counterTotal: {

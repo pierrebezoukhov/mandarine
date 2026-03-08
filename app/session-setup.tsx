@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 import { Section } from '@/components/Section';
 import { Chip } from '@/components/Chip';
 import { SegmentedControl } from '@/components/SegmentedControl';

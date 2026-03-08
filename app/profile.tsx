@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO } from '@/theme/tokens';
+import { T, MONO, FS } from '@/theme/tokens';
 import { Avatar } from '@/components/Avatar';
 import { StatCard } from '@/components/StatCard';
 import { Section } from '@/components/Section';
@@ -246,14 +246,14 @@ const s = StyleSheet.create({
     paddingBottom: 8,
   },
   headerBtn:   { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
-  backText:    { fontSize: 14, color: T.textSecondary },
-  title:       { fontSize: 16, color: T.textPrimary, fontWeight: '600' },
-  settingsIcon: { fontSize: 18, textAlign: 'right' },
+  backText:    { fontSize: FS.body, color: T.textSecondary },
+  title:       { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
+  settingsIcon: { fontSize: FS.sub, textAlign: 'right' },
 
   scroll: { paddingHorizontal: 20, paddingBottom: 48 },
 
   avatarWrap: { alignItems: 'center', paddingVertical: 28 },
-  avatarHint: { marginTop: 8, fontSize: 11, color: T.textMuted, letterSpacing: 0.5 },
+  avatarHint: { marginTop: 8, fontSize: FS.hint, color: T.textMuted, letterSpacing: 0.5 },
 
   grid:    { flexDirection: 'row', gap: 10 },
   gridGap: { marginTop: 10 },
@@ -266,7 +266,7 @@ const s = StyleSheet.create({
     marginBottom: 14,
   },
   hskLabel: {
-    fontSize: 12,
+    fontSize: FS.caption,
     color: T.textMuted,
     fontFamily: MONO,
     width: 44,

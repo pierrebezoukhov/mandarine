@@ -6,7 +6,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO } from '@/theme/tokens';
+import { T, MONO, FS } from '@/theme/tokens';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import type { SessionConfig } from './session-setup';

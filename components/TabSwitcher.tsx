@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 
 interface TabOption {
   label: string;
@@ -48,7 +48,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  tabText:       { fontSize: 14, fontWeight: '500', color: T.textMuted },
+  tabText:       { fontSize: FS.body, fontWeight: '500', color: T.textMuted },
   tabTextActive: { color: T.textPrimary },
   underline: {
     position: 'absolute',

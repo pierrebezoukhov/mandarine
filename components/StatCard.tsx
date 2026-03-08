@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { T, MONO } from '@/theme/tokens';
+import { T, MONO, FS } from '@/theme/tokens';
 
 interface StatCardProps {
   /** Short uppercase label below the value. */
@@ -32,12 +32,12 @@ const s = StyleSheet.create({
   },
   value: {
     fontFamily:  MONO,
-    fontSize:    28,
+    fontSize:    FS.stat,
     color:       T.textPrimary,
     marginBottom: 4,
   },
   label: {
-    fontSize:      10,
+    fontSize:      FS.label,
     color:         T.textMuted,
     letterSpacing: 2,
     textTransform: 'uppercase',
