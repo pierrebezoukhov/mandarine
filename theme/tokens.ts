@@ -37,3 +37,26 @@ export const T = {
 // ── Typography helpers ────────────────────────────────────────────────────────
 export const MONO: string =
   Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'monospace';
+
+// ── Font-size scale ───────────────────────────────────────────────────────────
+// Single source of truth for font sizes. Use FS.x everywhere instead of
+// raw numeric literals in StyleSheet.
+export const FS = {
+  micro:   9,   // logo tagline, tiny badges
+  label:   10,  // section labels, stat labels
+  hint:    11,  // inline hints, chip sublabels, avatar hint
+  caption: 12,  // metadata, session info rows
+  note:    13,  // secondary scores, auth footer
+  body:    14,  // standard body text, email, subtitles
+  input:   15,  // text inputs, buttons
+  ui:      16,  // screen headers, nav controls
+  sub:     18,  // sub-headings, score items
+  heading: 22,  // card icons, auth logo small
+  title:   26,  // auth headings
+  logo:    32,  // auth logo large hanzi
+  stat:    28,  // stat card values
+  display: 30,  // home greeting
+  score:   40,  // session end score number
+  seal:    48,  // session completion seal
+  hanzi:   96,  // main flashcard character
+} as const;

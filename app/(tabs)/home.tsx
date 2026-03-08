@@ -1,15 +1,34 @@
-import { useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 import { Card } from '@/components/Card';
+import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
+import { fetchProfile, updateProfile } from '@/lib/profile';
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
-  const [hasSession, setHasSession] = useState(false);
+  const [hasSession,   setHasSession]   = useState(false);
+  const [displayName,  setDisplayName]  = useState<string | null>(null);
+
+  // Fetch profile once; seed display_name from OAuth metadata if not set yet
+  useEffect(() => {
+    if (!user) return;
+    fetchProfile(user.id).then(p => {
+      if (p?.display_name) {
+        setDisplayName(p.display_name);
+      } else {
+        const fallback = user.user_metadata?.full_name ?? null;
+        setDisplayName(fallback);
+        if (fallback) {
+          updateProfile(user.id, { display_name: fallback });
+        }
+      }
+    });
+  }, [user?.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -31,7 +50,7 @@ export default function HomeScreen() {
     router.push('/session?resume=true');
   };
 
-  const name = user?.user_metadata?.full_name?.split(' ')[0]
+  const name = displayName?.split(' ')[0]
     ?? user?.email?.split('@')[0]
     ?? 'there';
 
@@ -43,9 +62,14 @@ export default function HomeScreen() {
           <Text style={s.logoHanzi}>漢字</Text>
           <Text style={s.logoLabel}>HANZIFLASH</Text>
         </View>
-        <TouchableOpacity onPress={signOut} style={s.signOutBtn}>
-          <Text style={s.signOutText}>Sign out</Text>
-        </TouchableOpacity>
+        <Avatar
+          initials={(
+            user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
+            user?.email?.[0] ?? '?'
+          ).toUpperCase()}
+          size={36}
+          onPress={() => router.push('/profile')}
+        />
       </View>
 
       {/* Greeting */}
@@ -83,14 +107,12 @@ const s = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'flex-start', paddingHorizontal: 28, paddingTop: 24, paddingBottom: 8,
   },
-  logoHanzi:   { fontSize: 22, color: T.textPrimary, letterSpacing: 2 },
-  logoLabel:   { fontSize: 9, color: T.textMuted, letterSpacing: 6, marginTop: 2 },
-  signOutBtn:  { paddingVertical: 6, paddingHorizontal: 2 },
-  signOutText: { fontSize: 11, color: T.textMuted, letterSpacing: 1 },
+  logoHanzi:   { fontSize: FS.heading, color: T.textPrimary, letterSpacing: 2 },
+  logoLabel:   { fontSize: FS.micro, color: T.textMuted, letterSpacing: 6, marginTop: 2 },
 
   greet:      { paddingHorizontal: 28, paddingTop: 48, paddingBottom: 40 },
-  greetTitle: { fontSize: 30, color: T.textPrimary, fontStyle: 'italic', marginBottom: 6 },
-  greetSub:   { fontSize: 14, color: T.textMuted, letterSpacing: 0.5 },
+  greetTitle: { fontSize: FS.display, color: T.textPrimary, fontStyle: 'italic', marginBottom: 6 },
+  greetSub:   { fontSize: FS.body, color: T.textMuted, letterSpacing: 0.5 },
 
   actions: { paddingHorizontal: 20, gap: 12 },
 });

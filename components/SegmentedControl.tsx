@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 
 interface SegmentOption {
   label: string;
@@ -115,7 +115,7 @@ const s = StyleSheet.create({
     backgroundColor: T.accentDim,
     borderColor: T.accentBorder,
   },
-  segmentText:       { fontSize: 14, color: T.textMuted, fontWeight: '500' },
+  segmentText:       { fontSize: FS.body, color: T.textMuted, fontWeight: '500' },
   segmentTextActive: { color: T.textPrimary },
 
   customInput: {
@@ -127,7 +127,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     color: T.textPrimary,
-    fontSize: 16,
+    fontSize: FS.ui,
     textAlign: 'center',
   },
 });

@@ -11,11 +11,13 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 2. [Typography](#2-typography)
 3. [Spacing & radius](#3-spacing--radius)
 4. [Components](#4-components)
+   - [Avatar](#avatar)
    - [Button](#button)
    - [Field](#field)
    - [Card](#card)
    - [Chip](#chip)
    - [SegmentedControl](#segmentedcontrol)
+   - [StatCard](#statcard)
    - [TabSwitcher](#tabswitcher)
    - [BottomSheetModal](#bottomsheetmodal)
    - [ProgressBar](#progressbar)
@@ -119,6 +121,52 @@ All other text uses the system default (San Francisco on iOS, Roboto on Android)
 ---
 
 ## 4. Components
+
+---
+
+### Avatar
+
+**File:** `components/Avatar.tsx`
+
+Circular profile photo with an initials fallback. Optionally tappable.
+
+#### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `uri` | `string \| null` | — | Public URL of the user's photo |
+| `initials` | `string` | `'?'` | 1–2 characters shown when no photo is available |
+| `size` | `number` | `80` | Diameter in pixels |
+| `onPress` | `() => void` | — | When provided, wraps the avatar in a `TouchableOpacity` |
+| `style` | `ViewStyle` | — | Override the outer container |
+
+#### Fallback behaviour
+
+When `uri` is absent or null, a dark circle (`T.surface2`) is rendered with the initials centered in `T.textSecondary`. The font size scales with `size` (`size × 0.35`).
+
+#### Usage
+
+```tsx
+import { Avatar } from '@/components/Avatar';
+
+// Header button (initials, small)
+<Avatar
+  initials="JD"
+  size={36}
+  onPress={() => router.push('/profile')}
+/>
+
+// Profile page (photo, large, tappable to change)
+<Avatar
+  uri={avatarUri}
+  initials={initials}
+  size={96}
+  onPress={pickAvatar}
+/>
+
+// Read-only display
+<Avatar uri={user.avatar_url} initials="AB" size={48} />
+```
 
 ---
 
@@ -317,6 +365,37 @@ import { Chip } from '@/components/Chip';
   active={difficulties.includes('new')}
   onPress={() => toggleDifficulty('new')}
 />
+```
+
+---
+
+### StatCard
+
+**File:** `components/StatCard.tsx`
+
+A metric tile displaying a large numeric value and a short uppercase label below. Used in the profile page stat grid.
+
+#### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `string` | — | Short uppercase label (e.g. `"Sessions"`, `"Moy. /ses."`) |
+| `value` | `string \| number` | — | The metric displayed prominently |
+| `style` | `ViewStyle` | — | Override the card container — use `flex: 1` for grid cells, or omit for full-width |
+
+#### Usage
+
+```tsx
+import { StatCard } from '@/components/StatCard';
+
+// In a 2-column grid (each cell takes equal width)
+<View style={{ flexDirection: 'row', gap: 10 }}>
+  <StatCard label="Sessions"    value={42}    style={{ flex: 1 }} />
+  <StatCard label="Cartes vues" value={380}   style={{ flex: 1 }} />
+</View>
+
+// Full-width (secondary metric)
+<StatCard label="Réussite globale" value="71%" />
 ```
 
 ---
@@ -533,3 +612,5 @@ Some patterns are intentionally **not** shared components because they are speci
 | SessionComplete stat display | `session.tsx` | One-off summary view |
 | LoginForm / SignupForm / ForgotForm | `auth.tsx` | Auth-specific composition |
 | Deck selector TouchableOpacity row | `session-setup.tsx` | One-off trigger for BottomSheetModal |
+| HSK level progress row             | `profile.tsx`       | Specific to profile breakdown layout |
+| Recent session row                 | `profile.tsx`       | One-off summary row, not reused elsewhere |
