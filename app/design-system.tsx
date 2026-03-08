@@ -19,6 +19,18 @@ import { BottomSheetModal } from '@/components/BottomSheetModal';
 // ── Nav anchors ───────────────────────────────────────────────────────────────
 const NAV_ITEMS = ['Colors', 'Typography', 'Spacing', 'Components'] as const;
 
+// ── Italic usage catalogue ────────────────────────────────────────────────────
+const ITALIC_USAGES = [
+  { token: 'FS.display', px: FS.display, sample: 'Hello, Pierre.', screen: 'home.tsx',          usage: 'Personalised greeting on the home screen' },
+  { token: 'FS.title',   px: FS.title,   sample: 'Welcome back',   screen: 'auth.tsx',           usage: 'Primary heading on login / signup forms' },
+  { token: 'FS.stat',    px: FS.stat,    sample: 'Session complete',screen: 'session.tsx',        usage: '"Session complete" congratulation title' },
+  { token: 'FS.heading', px: FS.heading, sample: 'To study',        screen: 'session.tsx',        usage: 'Flashcard word meaning (translation)' },
+  { token: 'FS.heading', px: FS.heading, sample: 'Email confirmed', screen: 'auth.tsx',           usage: 'Success confirmation heading' },
+  { token: 'FS.body',    px: FS.body,    sample: 'tā qù xuéxiào',   screen: 'session.tsx',        usage: 'Example sentence pinyin on flashcard back' },
+  { token: 'FS.body',    px: FS.body,    sample: 'user@email.com',  screen: 'settings.tsx',       usage: 'Read-only email in Personal Info section' },
+  { token: 'FS.hint',    px: FS.hint,    sample: 'No filter — all cards included', screen: 'session-setup.tsx', usage: 'Difficulty selection hint below chips' },
+] as const;
+
 export default function DesignSystemScreen() {
   // TabSwitcher demo state
   const [activeTab, setActiveTab] = useState('overview');
@@ -265,6 +277,33 @@ export default function DesignSystemScreen() {
                   <Text style={s.propValue}>Pinyin pronunciation, score counters, HSK badges, part-of-speech tags, session metadata</Text>
                 </View>
               </View>
+            </Section>
+
+            {/* Italic usage */}
+            <Section label="ITALIC USAGE">
+              <Text style={s.italicRule}>
+                Italic is applied to <Text style={s.italicRuleEm}>expressive headings</Text> and{' '}
+                <Text style={s.italicRuleEm}>soft/secondary text</Text> only — never to body copy,
+                buttons, or metadata.
+              </Text>
+              {ITALIC_USAGES.map(u => (
+                <View key={u.token + u.screen} style={s.italicRow}>
+                  <Text
+                    style={[s.italicSample, { fontSize: Math.min(u.px, 22) }]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                  >
+                    {u.sample}
+                  </Text>
+                  <View style={s.italicMeta}>
+                    <View style={s.italicMetaTop}>
+                      <Text style={s.italicToken}>{u.token}</Text>
+                      <Text style={s.italicScreen}>{u.screen}</Text>
+                    </View>
+                    <Text style={s.italicUsage}>{u.usage}</Text>
+                  </View>
+                </View>
+              ))}
             </Section>
           </View>
         )}
@@ -929,6 +968,37 @@ const s = StyleSheet.create({
   // Footer
   footer: { marginTop: space.huge, alignItems: 'center' },
   footerText: { fontSize: FS.caption, color: T.textMuted, fontFamily: MONO, letterSpacing: 1 },
+
+  // Italic section
+  italicRule: {
+    fontSize: FS.body,
+    color: T.textSecondary,
+    lineHeight: 21,
+    marginBottom: space.lg,
+  },
+  italicRuleEm: {
+    fontStyle: 'italic',
+    color: T.textPrimary,
+  },
+  italicRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+    paddingVertical: space.md,
+    gap: space.lg,
+    minHeight: 52,
+  },
+  italicSample: {
+    width: 160,
+    fontStyle: 'italic',
+    color: T.textPrimary,
+  },
+  italicMeta: { flex: 1, gap: 2 },
+  italicMetaTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  italicToken:  { fontSize: FS.caption, color: T.textPrimary, fontFamily: MONO },
+  italicScreen: { fontSize: FS.hint,    color: T.textMuted,   fontFamily: MONO },
+  italicUsage:  { fontSize: FS.hint,    color: T.textSecondary },
 });
 
 // doc-level typography styles
