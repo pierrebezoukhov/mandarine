@@ -92,6 +92,9 @@ fetchProfile(userId: string): Promise<Profile>
 updateProfile(userId: string, data: Partial<Profile>): Promise<void>
 uploadAvatar(userId: string, imageUri: string): Promise<string>  // retourne l'URL publique
 fetchProgressStats(userId: string): Promise<ProgressStats>
+// Calculs depuis la table sessions :
+//   avgSessionSuccessRate = AVG(got_count::float / NULLIF(unique_cards, 0))
+//   globalSuccessRate     = SUM(got_count)::float / NULLIF(SUM(unique_cards), 0)
 fetchRecentSessions(userId: string, limit?: number): Promise<SessionSummary[]>
 ```
 
@@ -108,10 +111,11 @@ type Profile = {
 
 type ProgressStats = {
   totalSessions: number;
-  totalCards: number;
+  totalCards: number;          // SUM(unique_cards) sur toutes les sessions
   totalGot: number;
   totalForgot: number;
-  successRate: number;
+  avgSessionSuccessRate: number; // AVG(got_count / unique_cards) par session — moyenne non pondérée
+  globalSuccessRate: number;     // SUM(got_count) / SUM(unique_cards) — pondérée par taille de session
   uniqueCardsMastered: number;  // consecutive_correct >= 3 (règle validée)
   byHskLevel: Record<number, { seen: number; got: number }>;
 };
@@ -147,9 +151,12 @@ type SessionSummary = {
 │  │   42     │  │  380     │         │
 │  └──────────┘  └──────────┘         │
 │  ┌──────────┐  ┌──────────┐         │
-│  │Réussite  │  │Maîtrisées│         │
-│  │  76%     │  │   94     │         │
+│  │Maîtrisées│  │Moy. /ses.│         │
+│  │   94     │  │  76%     │         │
 │  └──────────┘  └──────────┘         │
+│  ┌─────────────────────────┐         │
+│  │  Réussite globale  71%  │         │  ← pleine largeur, stat secondaire
+│  └─────────────────────────┘         │
 │                                     │
 ├─────────────────────────────────────┤
 │  PAR NIVEAU HSK                     │
@@ -169,7 +176,9 @@ type SessionSummary = {
 **Sections détaillées :**
 
 - **Avatar** : photo de profil centrée, tappable pour changer via `expo-image-picker` → compression → upload Supabase Storage. Fallback : cercle avec initiales (depuis `display_name` en Réglages, ou initiale d'email).
-- **Progression globale** : grille 2×2 de stat cards (sessions, cartes vues, taux de réussite, cartes maîtrisées)
+- **Progression globale** : grille 2×2 (sessions, cartes vues, cartes maîtrisées, moyenne de réussite par session) + une `StatCard` pleine largeur pour le taux de réussite global cumulé. Deux métriques distinctes :
+  - **Moy. /ses.** : `AVG(got_count / unique_cards)` — chaque session pèse autant, indépendamment de sa taille
+  - **Réussite globale** : `SUM(got_count) / SUM(unique_cards)` — pondérée par le nombre de cartes par session
 - **Par niveau HSK** : lignes HSK 1→6 avec `ProgressBar` existant + pourcentage
 - **Sessions récentes** : 5 dernières sessions avec deck, score, date relative — bouton "Voir toutes"
 
