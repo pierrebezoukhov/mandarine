@@ -112,7 +112,7 @@ type ProgressStats = {
   totalGot: number;
   totalForgot: number;
   successRate: number;
-  uniqueCardsMastered: number;  // consecutive_correct >= 3
+  uniqueCardsMastered: number;  // consecutive_correct >= 3 (règle validée)
   byHskLevel: Record<number, { seen: number; got: number }>;
 };
 
@@ -245,9 +245,10 @@ Les autres éléments visuels de la page profil (ligne HSK, ligne session récen
 
 ---
 
-## 11. Décisions d'architecture
+## 12. Décisions d'architecture
 
 - **Pas de nouveau Context** : fetch local dans chaque page avec `useState` + `useEffect`
 - **Compression obligatoire** avant upload (1080×1080 max, JPEG 80%) via `expo-image-manipulator`
 - **Cache CDN** : URL publique Supabase → mise en cache automatique, coût egress minimal
+- **Seuil de maîtrise : `consecutive_correct >= 3`** — une carte est considérée maîtrisée après 3 réussites consécutives sans aucun oubli entre les deux
 - **Optimistic update** sur l'avatar : affichage immédiat de l'image locale pendant l'upload
