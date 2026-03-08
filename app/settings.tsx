@@ -65,9 +65,9 @@ export default function SettingsScreen() {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Text style={s.backText}>← Retour</Text>
+          <Text style={s.backText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={s.title}>Réglages</Text>
+        <Text style={s.title}>Settings</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -76,16 +76,16 @@ export default function SettingsScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Section label="INFORMATIONS PERSONNELLES">
+        <Section label="PERSONAL INFO">
           <Field
-            label="NOM AFFICHÉ"
+            label="DISPLAY NAME"
             value={displayName}
             onChange={setDisplayName}
-            placeholder="Votre prénom"
+            placeholder="Your first name"
             style={{ marginBottom: 16 }}
           />
 
-          <Text style={s.fieldLabel}>LANGUE MATERNELLE</Text>
+          <Text style={s.fieldLabel}>NATIVE LANGUAGE</Text>
           <SegmentedControl
             options={LANG_OPTIONS}
             value={nativeLang}
@@ -93,7 +93,7 @@ export default function SettingsScreen() {
             style={{ marginBottom: 16 }}
           />
 
-          <Text style={s.fieldLabel}>OBJECTIF HSK</Text>
+          <Text style={s.fieldLabel}>HSK GOAL</Text>
           <SegmentedControl
             options={HSK_OPTIONS}
             value={targetHsk}
@@ -101,18 +101,18 @@ export default function SettingsScreen() {
           />
         </Section>
 
-        <Section label="COMPTE">
+        <Section label="ACCOUNT">
           <Text style={s.email}>{user?.email}</Text>
         </Section>
 
         <Button
-          label="Enregistrer"
+          label="Save"
           onPress={save}
           loading={saving}
           style={{ marginBottom: 12 }}
         />
         <Button
-          label="Se déconnecter"
+          label="Sign out"
           variant="ghost"
           onPress={signOut}
         />

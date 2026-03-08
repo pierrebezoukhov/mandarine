@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
@@ -7,10 +7,28 @@ import { T } from '@/theme/tokens';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
+import { fetchProfile, updateProfile } from '@/lib/profile';
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
-  const [hasSession, setHasSession] = useState(false);
+  const [hasSession,   setHasSession]   = useState(false);
+  const [displayName,  setDisplayName]  = useState<string | null>(null);
+
+  // Fetch profile once; seed display_name from OAuth metadata if not set yet
+  useEffect(() => {
+    if (!user) return;
+    fetchProfile(user.id).then(p => {
+      if (p?.display_name) {
+        setDisplayName(p.display_name);
+      } else {
+        const fallback = user.user_metadata?.full_name ?? null;
+        setDisplayName(fallback);
+        if (fallback) {
+          updateProfile(user.id, { display_name: fallback });
+        }
+      }
+    });
+  }, [user?.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -32,7 +50,7 @@ export default function HomeScreen() {
     router.push('/session?resume=true');
   };
 
-  const name = user?.user_metadata?.full_name?.split(' ')[0]
+  const name = displayName?.split(' ')[0]
     ?? user?.email?.split('@')[0]
     ?? 'there';
 
