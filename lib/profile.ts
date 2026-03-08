@@ -74,12 +74,12 @@ export async function updateProfile(
  */
 export async function uploadAvatar(userId: string, imageUri: string): Promise<string | null> {
   const response = await fetch(imageUri);
-  const blob = await response.blob();
+  const arrayBuffer = await response.arrayBuffer();
 
   const path = `${userId}.jpg`;
   const { error } = await supabase.storage
     .from('avatars')
-    .upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+    .upload(path, arrayBuffer, { contentType: 'image/jpeg', upsert: true });
 
   if (error) {
     console.warn('[profile] uploadAvatar:', error.message);
