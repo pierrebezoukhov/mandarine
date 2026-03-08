@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { T } from '@/theme/tokens';
 import { Card } from '@/components/Card';
+import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
 
 export default function HomeScreen() {
@@ -43,9 +44,14 @@ export default function HomeScreen() {
           <Text style={s.logoHanzi}>漢字</Text>
           <Text style={s.logoLabel}>HANZIFLASH</Text>
         </View>
-        <TouchableOpacity onPress={signOut} style={s.signOutBtn}>
-          <Text style={s.signOutText}>Sign out</Text>
-        </TouchableOpacity>
+        <Avatar
+          initials={(
+            user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
+            user?.email?.[0] ?? '?'
+          ).toUpperCase()}
+          size={36}
+          onPress={() => router.push('/profile')}
+        />
       </View>
 
       {/* Greeting */}
@@ -85,8 +91,6 @@ const s = StyleSheet.create({
   },
   logoHanzi:   { fontSize: 22, color: T.textPrimary, letterSpacing: 2 },
   logoLabel:   { fontSize: 9, color: T.textMuted, letterSpacing: 6, marginTop: 2 },
-  signOutBtn:  { paddingVertical: 6, paddingHorizontal: 2 },
-  signOutText: { fontSize: 11, color: T.textMuted, letterSpacing: 1 },
 
   greet:      { paddingHorizontal: 28, paddingTop: 48, paddingBottom: 40 },
   greetTitle: { fontSize: 30, color: T.textPrimary, fontStyle: 'italic', marginBottom: 6 },
