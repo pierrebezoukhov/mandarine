@@ -217,15 +217,31 @@ expo install expo-image-picker expo-image-manipulator
 
 ---
 
-## 10. Ordre d'implémentation
+## 10. Nouveaux composants design system
+
+**2 nouveaux composants** réutilisables seront créés et documentés :
+
+| Composant | Fichier | Description | Utilisé dans |
+|-----------|---------|-------------|--------------|
+| **`Avatar`** | `components/Avatar.tsx` | Photo de profil avec fallback initiales, tappable | Header accueil, page profil |
+| **`StatCard`** | `components/StatCard.tsx` | Tuile métrique : label + grande valeur chiffrée | Page profil (grille 2×2) |
+
+Les autres éléments visuels de la page profil (ligne HSK, ligne session récente) resteront internes à `profile.tsx` — trop spécifiques pour être extraits (cf. convention `DESIGN_SYSTEM.md` § "What stays in screens").
+
+---
+
+## 11. Ordre d'implémentation
 
 | Étape | Fichier | Description |
 |-------|---------|-------------|
 | 1 | `scripts/add-profile-table.sql` | Script SQL table `profiles` (à exécuter dans Supabase Dashboard) |
 | 2 | `lib/profile.ts` | Fonctions API fetch/update profil + upload avatar + stats |
-| 3 | `app/profile.tsx` | Page profil (avatar + progression uniquement) |
-| 4 | `app/settings.tsx` | Page réglages (infos perso + déconnexion) |
-| 5 | `app/(tabs)/home.tsx` | Bouton avatar + suppression sign-out |
+| 3 | `components/Avatar.tsx` | Nouveau composant design system |
+| 4 | `components/StatCard.tsx` | Nouveau composant design system |
+| 5 | `app/profile.tsx` | Page profil (avatar + progression uniquement) |
+| 6 | `app/settings.tsx` | Page réglages (infos perso + déconnexion) |
+| 7 | `app/(tabs)/home.tsx` | Bouton avatar + suppression sign-out |
+| 8 | `DESIGN_SYSTEM.md` | Documentation des composants `Avatar` et `StatCard` |
 
 ---
 
