@@ -232,7 +232,7 @@ export default function SessionScreen() {
   if (error) {
     return (
       <SafeAreaView style={[s.root, s.centered, { paddingHorizontal: 32 }]}>
-        <Text style={{ color: T.error, fontSize: 16, textAlign: 'center' }}>{error}</Text>
+        <Text style={{ color: T.error, fontSize: FS.ui, textAlign: 'center' }}>{error}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 24 }}>
           <Text style={{ color: T.textMuted }}>← Go back</Text>
         </TouchableOpacity>
@@ -359,16 +359,16 @@ const s = StyleSheet.create({
   },
   iconBtn:         { padding: 8, borderRadius: 8 },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: 18, color: T.textMuted },
+  iconBtnText:     { fontSize: FS.sub, color: T.textMuted },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 12, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: 13, fontWeight: '500' },
+  scoreItem:   { fontFamily: MONO, fontSize: FS.note, fontWeight: '500' },
   scoreForgot: { color: T.error },
   scoreGot:    { color: T.success },
-  scoreSep:    { color: T.textMuted, fontSize: 16 },
+  scoreSep:    { color: T.textMuted, fontSize: FS.ui },
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
@@ -381,35 +381,35 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: T.border,
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100,
   },
-  hskBadgeText: { fontFamily: MONO, fontSize: 10, color: T.textMuted, letterSpacing: 1.5 },
+  hskBadgeText: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
 
   hanziChar: {
-    fontSize: 96, color: T.textHanzi, lineHeight: 110,
+    fontSize: FS.hanzi, color: T.textHanzi, lineHeight: 110,
     textShadowColor: 'rgba(240,235,224,0.06)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 40,
   },
 
   pinyinText: {
-    fontFamily: MONO, fontSize: 18, letterSpacing: 3,
+    fontFamily: MONO, fontSize: FS.sub, letterSpacing: 3,
     color: T.accent, opacity: 0.85, marginTop: 18,
   },
 
   exampleBlock: { marginTop: 22, width: '100%', alignItems: 'center' },
   exDivider:    { width: 24, height: 1, backgroundColor: T.border, marginBottom: 14 },
-  exHanzi:      { fontSize: 24, color: '#C8BFA8', textAlign: 'center', lineHeight: 44 },
-  exPinyin:     { fontFamily: MONO, fontSize: 12, color: '#7A7060', textAlign: 'center', letterSpacing: 1 },
+  exHanzi:      { fontSize: FS.heading, color: '#C8BFA8', textAlign: 'center', lineHeight: 44 },
+  exPinyin:     { fontFamily: MONO, fontSize: FS.caption, color: '#7A7060', textAlign: 'center', letterSpacing: 1 },
 
   exMeaning: {
-    fontSize: 14, color: '#8C8070', textAlign: 'center',
+    fontSize: FS.body, color: '#8C8070', textAlign: 'center',
     lineHeight: 22, fontStyle: 'italic', marginTop: 10,
   },
 
   meaningBlock: { marginTop: 22, alignItems: 'center', gap: 6 },
-  posTag:       { fontFamily: MONO, fontSize: 10, fontWeight: '500', color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
-  meaningText:  { fontSize: 22, color: T.textPrimary, textAlign: 'center', lineHeight: 32, fontStyle: 'italic' },
+  posTag:       { fontFamily: MONO, fontSize: FS.label, fontWeight: '500', color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
+  meaningText:  { fontSize: FS.heading, color: T.textPrimary, textAlign: 'center', lineHeight: 32, fontStyle: 'italic' },
 
   tapHint: {
     position: 'absolute', bottom: 72,
-    fontFamily: MONO, fontSize: 10, color: T.textMuted,
+    fontFamily: MONO, fontSize: FS.label, color: T.textMuted,
     letterSpacing: 1.5, opacity: 0.6,
   },
 
@@ -430,7 +430,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(74,158,107,0.12)',
     borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)',
   },
-  fabIcon: { fontSize: 22 },
+  fabIcon: { fontSize: FS.heading },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
@@ -439,21 +439,21 @@ const sc = StyleSheet.create({
     flex: 1, backgroundColor: T.bg,
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
-  seal:      { fontSize: 48, color: T.accent, opacity: 0.3, marginBottom: 28 },
-  title:     { fontSize: 28, color: T.textPrimary, fontStyle: 'italic', marginBottom: 8, textAlign: 'center' },
-  sub:       { fontFamily: MONO, fontSize: 12, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
+  seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: 28 },
+  title:     { fontSize: FS.stat, color: T.textPrimary, fontStyle: 'italic', marginBottom: 8, textAlign: 'center' },
+  sub:       { fontFamily: MONO, fontSize: FS.caption, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
 
   stats:     { flexDirection: 'row', alignItems: 'center', gap: 24, marginBottom: 32 },
   stat:      { alignItems: 'center' },
-  statVal:   { fontSize: 40, lineHeight: 44, marginBottom: 6 },
-  statLabel: { fontFamily: MONO, fontSize: 10, color: T.textMuted, letterSpacing: 1.5 },
-  statSep:   { color: T.textMuted, fontSize: 24 },
+  statVal:   { fontSize: FS.score, lineHeight: 44, marginBottom: 6 },
+  statLabel: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
+  statSep:   { color: T.textMuted, fontSize: FS.heading },
 
   pctBadge: {
     borderWidth: 1, borderColor: T.border, borderRadius: 100,
     paddingHorizontal: 20, paddingVertical: 8, marginBottom: 48,
   },
-  pctText: { fontFamily: MONO, fontSize: 13, color: T.textMuted, letterSpacing: 1 },
+  pctText: { fontFamily: MONO, fontSize: FS.note, color: T.textMuted, letterSpacing: 1 },
 
   actions: { width: '100%', maxWidth: 280, gap: 10 },
 });

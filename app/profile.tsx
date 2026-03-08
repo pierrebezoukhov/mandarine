@@ -274,6 +274,6 @@ const s = StyleSheet.create({
 
   sessionRow: { paddingVertical: 12 },
   sessionDivider: { borderBottomWidth: 1, borderBottomColor: T.border },
-  sessionDeck: { fontSize: 14, color: T.textPrimary, marginBottom: 4 },
-  sessionMeta: { fontSize: 12, color: T.textMuted, fontFamily: MONO },
+  sessionDeck: { fontSize: FS.body, color: T.textPrimary, marginBottom: 4 },
+  sessionMeta: { fontSize: FS.caption, color: T.textMuted, fontFamily: MONO },
 });

@@ -133,18 +133,18 @@ const s = StyleSheet.create({
     paddingBottom: 8,
   },
   backBtn:  { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
-  backText: { fontSize: 14, color: T.textSecondary },
-  title:    { fontSize: 16, color: T.textPrimary, fontWeight: '600' },
+  backText: { fontSize: FS.body, color: T.textSecondary },
+  title:    { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
 
   scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 48 },
 
   fieldLabel: {
-    fontSize: 10,
+    fontSize: FS.label,
     color: T.textMuted,
     letterSpacing: 2.5,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
 
-  email: { fontSize: 14, color: T.textMuted, fontStyle: 'italic' },
+  email: { fontSize: FS.body, color: T.textMuted, fontStyle: 'italic' },
 });

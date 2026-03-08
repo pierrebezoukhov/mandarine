@@ -282,8 +282,8 @@ const s = StyleSheet.create({
     paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12,
   },
   backBtn:     { width: 60 },
-  backText:    { fontSize: 13, color: T.textMuted, letterSpacing: 0.5 },
-  headerTitle: { fontSize: 16, color: T.textPrimary, fontWeight: '600', letterSpacing: 0.5 },
+  backText:    { fontSize: FS.note, color: T.textMuted, letterSpacing: 0.5 },
+  headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600', letterSpacing: 0.5 },
 
   // Deck selector
   deckSelector: {
@@ -291,14 +291,14 @@ const s = StyleSheet.create({
     backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
     borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14,
   },
-  deckName:        { fontSize: 16, color: T.textPrimary, fontWeight: '500' },
-  deckDesc:        { fontSize: 12, color: T.textMuted, marginTop: 2 },
-  deckPlaceholder: { flex: 1, fontSize: 15, color: T.textMuted },
-  deckCaret:       { fontSize: 14, color: T.textMuted, marginLeft: 12 },
+  deckName:        { fontSize: FS.ui, color: T.textPrimary, fontWeight: '500' },
+  deckDesc:        { fontSize: FS.caption, color: T.textMuted, marginTop: 2 },
+  deckPlaceholder: { flex: 1, fontSize: FS.input, color: T.textMuted },
+  deckCaret:       { fontSize: FS.body, color: T.textMuted, marginLeft: 12 },
 
   // Difficulty chips container
   chips:    { gap: 8 },
-  diffHint: { fontSize: 11, color: T.textMuted, marginTop: 8, fontStyle: 'italic' },
+  diffHint: { fontSize: FS.hint, color: T.textMuted, marginTop: 8, fontStyle: 'italic' },
 
   // Footer
   footer: {
@@ -314,7 +314,7 @@ const s = StyleSheet.create({
     backgroundColor: T.surface2, borderWidth: 1, borderColor: T.border,
     borderRadius: 10, paddingHorizontal: 12, marginBottom: 8,
   },
-  searchInput: { color: T.textPrimary, fontSize: 15, paddingVertical: 10 },
+  searchInput: { color: T.textPrimary, fontSize: FS.input, paddingVertical: 10 },
 
   // Deck list rows
   row: {
@@ -322,8 +322,8 @@ const s = StyleSheet.create({
     paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: T.border,
   },
   rowActive:     {},
-  rowName:       { fontSize: 15, color: T.textSecondary, fontWeight: '500' },
+  rowName:       { fontSize: FS.input, color: T.textSecondary, fontWeight: '500' },
   rowNameActive: { color: T.textPrimary },
-  rowDesc:       { fontSize: 12, color: T.textMuted, marginTop: 2 },
-  checkmark:     { fontSize: 16, color: T.accent, marginLeft: 12 },
+  rowDesc:       { fontSize: FS.caption, color: T.textMuted, marginTop: 2 },
+  checkmark:     { fontSize: FS.ui, color: T.accent, marginLeft: 12 },
 });
