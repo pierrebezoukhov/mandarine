@@ -88,7 +88,7 @@ export async function uploadAvatar(userId: string, imageUri: string): Promise<st
     body = await response.blob();
   }
 
-  const path = `${userId}.jpg`;
+  const path = `${userId}/avatar.jpg`;
   const { error } = await supabase.storage
     .from('avatars')
     .upload(path, body, { contentType: 'image/jpeg', upsert: true });
