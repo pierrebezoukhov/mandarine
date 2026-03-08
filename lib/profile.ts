@@ -73,17 +73,28 @@ export async function updateProfile(
  * Requires: expo install expo-image-picker expo-image-manipulator
  */
 export async function uploadAvatar(userId: string, imageUri: string): Promise<string | null> {
-  const response = await fetch(imageUri);
-  const arrayBuffer = await response.arrayBuffer();
-  const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+  // On web, expo-image-manipulator returns a data URI (data:image/jpeg;base64,...).
+  // Fetching a data URI and re-wrapping produces an empty or mis-typed body.
+  // Decode base64 directly instead.
+  let body: Uint8Array | Blob;
+  if (imageUri.startsWith('data:')) {
+    const base64 = imageUri.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    body = bytes;
+  } else {
+    const response = await fetch(imageUri);
+    body = await response.blob();
+  }
 
   const path = `${userId}.jpg`;
   const { error } = await supabase.storage
     .from('avatars')
-    .upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+    .upload(path, body, { contentType: 'image/jpeg', upsert: true });
 
   if (error) {
-    console.warn('[profile] uploadAvatar:', error.message);
+    console.warn('[profile] uploadAvatar error:', error.message, (error as any).statusCode, (error as any).error);
     return null;
   }
 
