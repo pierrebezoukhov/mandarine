@@ -283,8 +283,8 @@ const s = StyleSheet.create({
     paddingHorizontal: space.xl, paddingTop: space.lg, paddingBottom: space.md,
   },
   backBtn:     { width: 60 },
-  backText:    { fontSize: FS.body, color: T.textMuted, letterSpacing: 0.5 },
-  headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600', letterSpacing: 0.5 },
+  backText:    { fontSize: FS.body, color: T.textMuted },
+  headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
 
   // Deck selector
   deckSelector: {

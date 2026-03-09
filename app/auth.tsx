@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
-import { T, FS, LH } from '@/theme/tokens';
+import { T, FS, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
@@ -260,8 +260,8 @@ const s = StyleSheet.create({
   scroll: { flexGrow: 1, paddingHorizontal: space.xxxl, paddingBottom: space.giant },
 
   logo:      { paddingTop: 72, marginBottom: space.giant },
-  logoHanzi: { fontSize: FS.score, color: T.textPrimary, letterSpacing: 2, marginBottom: space.xs },
-  logoLabel: { fontSize: FS.label, color: T.textMuted, letterSpacing: 6 },
+  logoHanzi: { fontSize: FS.score, color: T.textPrimary, letterSpacing: LS.tighter * FS.score, marginBottom: space.xs },
+  logoLabel: { fontSize: FS.label, color: T.textMuted },
 
   tabs: { marginBottom: 32 },
 
@@ -271,17 +271,17 @@ const s = StyleSheet.create({
   ctaTop: { marginTop: space.sm },
 
   forgotBtn:  { alignSelf: 'flex-end', marginTop: -6, marginBottom: space.sm },
-  forgotText: { fontSize: FS.label, color: T.textMuted, letterSpacing: 1 },
+  forgotText: { fontSize: FS.label, color: T.textMuted },
 
   divider:     { flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.xl },
   dividerLine: { flex: 1, height: 1, backgroundColor: T.border },
-  dividerText: { fontSize: FS.label, color: T.textMuted, letterSpacing: 2 },
+  dividerText: { fontSize: FS.label, color: T.textMuted },
 
   footer:     { marginTop: space.xxxl, textAlign: 'center', fontSize: FS.body, color: T.textMuted },
   footerLink: { color: T.textSecondary, textDecorationLine: 'underline' },
 
   backBtn:  { marginBottom: space.xxl },
-  backText: { color: T.textMuted, fontSize: FS.label, letterSpacing: 1 },
+  backText: { color: T.textMuted, fontSize: FS.label },
 
   successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
   successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(74,158,107,0.12)', borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)', alignItems: 'center', justifyContent: 'center' },

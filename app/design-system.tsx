@@ -2,7 +2,7 @@ import React, { useState, ReactNode } from 'react';
 import {
   ScrollView, View, Text, StyleSheet, TouchableOpacity,
 } from 'react-native';
-import { T, MONO, FS, LH } from '@/theme/tokens';
+import { T, MONO, FS, FSDisplay, FSBody, LH, LS } from '@/theme/tokens';
 import { space, radius } from '@/theme/spacing';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -19,12 +19,6 @@ import { BottomSheetModal } from '@/components/BottomSheetModal';
 // ── Nav anchors ───────────────────────────────────────────────────────────────
 const NAV_ITEMS = ['Colors', 'Typography', 'Spacing', 'Components'] as const;
 
-// ── Italic usage catalogue ────────────────────────────────────────────────────
-// Italic is reserved for foreign-language gloss and example sentences only.
-const ITALIC_USAGES = [
-  { token: 'FS.heading', px: FS.heading, sample: 'To study',      screen: 'session.tsx', usage: 'Flashcard word meaning — English translation of the hanzi' },
-  { token: 'FS.body',    px: FS.body,    sample: 'tā qù xuéxiào', screen: 'session.tsx', usage: 'Example sentence meaning — English gloss on flashcard back' },
-] as const;
 
 export default function DesignSystemScreen() {
   // TabSwitcher demo state
@@ -134,69 +128,80 @@ export default function DesignSystemScreen() {
           <View>
             <DocHeading>Typography</DocHeading>
             <DocSubheading>
-              Font sizes are exported as{' '}
-              <Text style={s.codeInline}>FS</Text> and line-heights as{' '}
-              <Text style={s.codeInline}>LH</Text> from{' '}
-              <Text style={s.codeInline}>theme/tokens.ts</Text>. Use the
-              monospace constant{' '}
+              Font sizes split into two named groups:{' '}
+              <Text style={s.codeInline}>FSDisplay</Text> and{' '}
+              <Text style={s.codeInline}>FSBody</Text>. The combined{' '}
+              <Text style={s.codeInline}>FS</Text> export keeps all existing
+              references working. Line-heights in{' '}
+              <Text style={s.codeInline}>LH</Text>; letter-spacing rules in{' '}
+              <Text style={s.codeInline}>LS</Text>. Use{' '}
               <Text style={s.codeInline}>MONO</Text> for pinyin, counters,
               and fixed-width numeric display.
             </DocSubheading>
 
-            {/* Scale specimens — largest to smallest */}
-            <Section label="SCALE — Perfect Fourth (×1.333) from 16px base">
+            {/* Display scale — large, heading hierarchy */}
+            <Section label="DISPLAY SCALE — LS.tighter · LS.tight">
               <TypeSpecimen
                 token="FS.hanzi"
-                px={FS.hanzi}
+                px={FSDisplay.hanzi}
                 sample="漢"
-                usage="Main flashcard character — outside prose scale"
+                usage={`Flashcard character — outside prose scale · LS.tighter: ${LS.tighter * FSDisplay.hanzi}px`}
                 color={T.textHanzi}
+                style={{ letterSpacing: LS.tighter * FSDisplay.hanzi }}
               />
               <TypeSpecimen
                 token="FS.seal"
-                px={FS.seal}
+                px={FSDisplay.seal}
                 sample="印"
-                usage="Session completion seal · LH.seal: 56px"
+                usage={`Session completion seal · LH.seal: ${LH.seal}px · LS.tighter: ${LS.tighter * FSDisplay.seal}px`}
                 color={T.accent}
+                style={{ letterSpacing: LS.tighter * FSDisplay.seal }}
               />
               <TypeSpecimen
                 token="FS.score"
-                px={FS.score}
+                px={FSDisplay.score}
                 sample="84"
-                usage="Session end score number · LH.score: 44px"
+                usage={`Large numeric display · LH.score: ${LH.score}px · LS.tighter: ${LS.tighter * FSDisplay.score}px`}
                 family={MONO}
+                style={{ letterSpacing: LS.tighter * FSDisplay.score }}
               />
               <TypeSpecimen
                 token="FS.title"
-                px={FS.title}
+                px={FSDisplay.title}
                 sample="Session complete"
-                usage="Screen titles, stat values, display text · LH.title: 36px"
+                usage={`Screen titles, stat values · LH.title: ${LH.title}px · LS.tight: ${LS.tight * FSDisplay.title}px`}
+                style={{ letterSpacing: LS.tight * FSDisplay.title }}
               />
               <TypeSpecimen
                 token="FS.heading"
-                px={FS.heading}
+                px={FSDisplay.heading}
                 sample="New Session"
-                usage="Sub-headings, card headings · LH.heading: 28px"
+                usage={`Sub-headings, card headings · LH.heading: ${LH.heading}px · LS.tight: ${LS.tight * FSDisplay.heading}px`}
+                style={{ letterSpacing: LS.tight * FSDisplay.heading }}
               />
+            </Section>
+
+            {/* Body scale — readable content, UI controls */}
+            <Section label="BODY SCALE — LS.normal (no tracking)">
               <TypeSpecimen
                 token="FS.ui"
-                px={FS.ui}
+                px={FSBody.ui}
                 sample="Profile"
-                usage="Inputs, buttons, nav controls — base size · LH.ui: 24px"
+                usage={`Inputs, buttons, nav controls — base size · LH.ui: ${LH.ui}px · LS.normal: 0`}
                 bold
               />
               <TypeSpecimen
                 token="FS.body"
-                px={FS.body}
+                px={FSBody.body}
                 sample="What would you like to do today?"
-                usage="Body text, subtitles, secondary copy · LH.body: 20px"
+                usage={`Body text, subtitles, secondary copy · LH.body: ${LH.body}px · LS.normal: 0`}
               />
               <TypeSpecimen
                 token="FS.label"
-                px={FS.label}
+                px={FSBody.label}
                 sample="DIFFICULTY"
-                usage="Section labels, hints, captions, badges · LH.label: 18px"
-                style={{ letterSpacing: 2.5, textTransform: 'uppercase' }}
+                usage={`Section labels, hints, captions, badges · LH.label: ${LH.label}px · LS.normal: 0`}
+                style={{ textTransform: 'uppercase' }}
               />
             </Section>
 
@@ -228,6 +233,30 @@ export default function DesignSystemScreen() {
               ))}
             </Section>
 
+            {/* Letter spacing */}
+            <Section label="LETTER SPACING — LS">
+              <Text style={s.lhNote}>
+                Unitless em multipliers applied as{' '}
+                <Text style={s.codeInline}>letterSpacing: LS.tight * FS.title</Text>.
+                Display sizes tighten progressively; body/UI text uses no tracking.
+                MONO phonetic text (pinyin, badges) is exempt — positive tracking aids readability.
+              </Text>
+              {(
+                [
+                  { token: 'LS.tighter', em: LS.tighter,  example: `${LS.tighter * FSDisplay.score}px @ FS.score (${FSDisplay.score}px)`,  appliesTo: 'score · seal · hanzi' },
+                  { token: 'LS.tight',   em: LS.tight,    example: `${LS.tight   * FSDisplay.title}px @ FS.title (${FSDisplay.title}px)`,   appliesTo: 'title · heading' },
+                  { token: 'LS.normal',  em: LS.normal,   example: '0px',                                                                   appliesTo: 'ui · body · label (all body text)' },
+                  { token: 'LS.loose',   em: LS.loose,    example: `+${LS.loose  * FSBody.label}px @ FS.label (${FSBody.label}px)`,         appliesTo: 'available — not currently applied' },
+                ] as const
+              ).map(({ token, em, example, appliesTo }) => (
+                <View key={token} style={s.lhRow}>
+                  <Text style={s.lhToken}>{token}</Text>
+                  <Text style={s.lhValue}>{em > 0 ? `+${em}` : em}em</Text>
+                  <Text style={s.lhFormula}>{example} · {appliesTo}</Text>
+                </View>
+              ))}
+            </Section>
+
             {/* Monospace callout */}
             <Section label="MONOSPACE — MONO">
               <View style={s.monoRow}>
@@ -244,31 +273,14 @@ export default function DesignSystemScreen() {
 
             {/* Italic usage */}
             <Section label="ITALIC USAGE">
-              <Text style={s.italicRule}>
-                Italic is reserved for{' '}
-                <Text style={s.italicRuleEm}>foreign-language gloss</Text> (word meaning translation)
-                and{' '}
-                <Text style={s.italicRuleEm}>example sentence meaning</Text> in flashcard view only —
-                never to headings, buttons, hints, or metadata.
-              </Text>
-              {ITALIC_USAGES.map(u => (
-                <View key={u.token + u.screen} style={s.italicRow}>
-                  <Text
-                    style={[s.italicSample, { fontSize: Math.min(u.px, 22) }]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
-                    {u.sample}
-                  </Text>
-                  <View style={s.italicMeta}>
-                    <View style={s.italicMetaTop}>
-                      <Text style={s.italicToken}>{u.token}</Text>
-                      <Text style={s.italicScreen}>{u.screen}</Text>
-                    </View>
-                    <Text style={s.italicUsage}>{u.usage}</Text>
-                  </View>
-                </View>
-              ))}
+              <View style={s.noItalicNote}>
+                <Text style={s.noItalicText}>
+                  Italic is not used in this design system. Emphasis is expressed
+                  through <Text style={s.codeInline}>color</Text>,{' '}
+                  <Text style={s.codeInline}>fontWeight</Text>, and{' '}
+                  <Text style={s.codeInline}>FS</Text> size hierarchy only.
+                </Text>
+              </View>
             </Section>
           </View>
         )}
@@ -953,36 +965,19 @@ const s = StyleSheet.create({
   footer: { marginTop: space.huge, alignItems: 'center' },
   footerText: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO, letterSpacing: 1 },
 
-  // Italic section
-  italicRule: {
+  // No-italic callout
+  noItalicNote: {
+    backgroundColor: T.surface,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 12,
+    padding: space.lg,
+  },
+  noItalicText: {
     fontSize: FS.body,
     color: T.textSecondary,
-    lineHeight: 21,
-    marginBottom: space.lg,
+    lineHeight: LH.body,
   },
-  italicRuleEm: {
-    fontStyle: 'italic',
-    color: T.textPrimary,
-  },
-  italicRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    paddingVertical: space.md,
-    gap: space.lg,
-    minHeight: 52,
-  },
-  italicSample: {
-    width: 160,
-    fontStyle: 'italic',
-    color: T.textPrimary,
-  },
-  italicMeta: { flex: 1, gap: 2 },
-  italicMetaTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  italicToken:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO },
-  italicScreen: { fontSize: FS.label, color: T.textMuted,   fontFamily: MONO },
-  italicUsage:  { fontSize: FS.label, color: T.textSecondary },
 });
 
 // doc-level typography styles

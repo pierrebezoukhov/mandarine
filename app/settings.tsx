@@ -142,7 +142,6 @@ const s = StyleSheet.create({
   fieldLabel: {
     fontSize: FS.label,
     color: T.textMuted,
-    letterSpacing: 2.5,
     textTransform: 'uppercase',
     marginBottom: space.sm,
   },

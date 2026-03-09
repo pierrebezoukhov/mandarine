@@ -39,17 +39,39 @@ export const MONO: string =
   Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'monospace';
 
 // ── Font-size scale ───────────────────────────────────────────────────────────
-// Perfect Fourth modular scale (ratio 1.333) anchored at base 16 px.
-// 8 semantic steps + hanzi (outside prose scale).
-export const FS = {
-  label:   12,  // section labels, hints, captions, badges
-  body:    14,  // body text, subtitles, secondary copy
-  ui:      16,  // inputs, buttons, nav controls — base size
-  heading: 21,  // sub-headings, card headings
-  title:   28,  // screen titles, stat values, display text
-  score:   37,  // large numeric / decorative display
+// Display / Title scale — large, prominent, heading hierarchy.
+export const FSDisplay = {
+  hanzi:   96,  // flashcard character — outside prose scale
   seal:    50,  // session completion seal
-  hanzi:   96,  // flashcard Chinese character (outside prose scale)
+  score:   37,  // large numeric display
+  title:   28,  // screen titles
+  heading: 21,  // sub-headings, card headings
+} as const;
+
+// Body / Content scale — readable content, UI controls.
+export const FSBody = {
+  ui:    16,  // inputs, buttons, nav controls — base size
+  body:  14,  // body text, subtitles, secondary copy
+  label: 12,  // section labels, captions, badges
+} as const;
+
+// Combined — all existing FS.* references continue to work unchanged.
+export const FS = { ...FSDisplay, ...FSBody } as const;
+
+// ── Letter-spacing scale ──────────────────────────────────────────────────────
+// Unitless em multipliers. Usage: letterSpacing: LS.tight * FS.title
+//
+//   FS.score, FS.seal, FS.hanzi  → LS.tighter  (large display, dense tracking)
+//   FS.heading, FS.title         → LS.tight     (heading hierarchy)
+//   FS.ui, FS.body, FS.label     → LS.normal    (no tracking — default)
+//
+// EXCEPTIONS: MONO phonetic / badge text keeps its positive tracking
+// (pinyin, hskBadge, posTag, exPinyin) since it aids phonetic readability.
+export const LS = {
+  tighter: -0.05,   // score / seal / hanzi  — large display
+  tight:   -0.025,  // title / heading        — heading hierarchy
+  normal:   0,      // body / UI text         — default
+  loose:    0.025,  // available; not currently applied
 } as const;
 
 // ── Line-height scale ─────────────────────────────────────────────────────────

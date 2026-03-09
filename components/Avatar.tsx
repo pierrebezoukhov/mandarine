@@ -62,8 +62,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   initials: {
-    color:       T.textSecondary,
-    fontWeight:  '500',
-    letterSpacing: 1,
+    color:      T.textSecondary,
+    fontWeight: '500',
   },
 });

@@ -56,7 +56,6 @@ const s = StyleSheet.create({
   label: {
     fontSize: FS.label,
     color: T.textMuted,
-    letterSpacing: 2,
     marginBottom: 6,
     textTransform: 'uppercase',
   },
@@ -79,7 +78,6 @@ const s = StyleSheet.create({
   errorText: {
     fontSize: FS.label,
     color: T.error,
-    letterSpacing: 0.5,
     marginTop: 4,
   },
 });

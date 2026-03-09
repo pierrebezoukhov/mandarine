@@ -6,7 +6,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO, FS, LH } from '@/theme/tokens';
+import { T, MONO, FS, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
@@ -386,6 +386,7 @@ const s = StyleSheet.create({
 
   hanziChar: {
     fontSize: FS.hanzi, color: T.textHanzi, lineHeight: 110,
+    letterSpacing: LS.tighter * FS.hanzi,
     textShadowColor: 'rgba(240,235,224,0.06)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 40,
   },
 
@@ -401,12 +402,12 @@ const s = StyleSheet.create({
 
   exMeaning: {
     fontSize: FS.body, color: '#8C8070', textAlign: 'center',
-    lineHeight: 22, fontStyle: 'italic', marginTop: 10,
+    lineHeight: 22, marginTop: 10,
   },
 
   meaningBlock: { marginTop: 22, alignItems: 'center', gap: 6 },
   posTag:       { fontFamily: MONO, fontSize: FS.label, fontWeight: '500', color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
-  meaningText:  { fontSize: FS.heading, color: T.textPrimary, textAlign: 'center', lineHeight: LH.heading, fontStyle: 'italic' },
+  meaningText:  { fontSize: FS.heading, color: T.textPrimary, textAlign: 'center', lineHeight: LH.heading, letterSpacing: LS.tight * FS.heading },
 
   tapHint: {
     position: 'absolute', bottom: 72,
@@ -441,12 +442,12 @@ const sc = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
   seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: space.xxxl },
-  title:     { fontSize: FS.title, color: T.textPrimary, marginBottom: space.sm, textAlign: 'center' },
+  title:     { fontSize: FS.title, color: T.textPrimary, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tight * FS.title },
   sub:       { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
 
   stats:     { flexDirection: 'row', alignItems: 'center', gap: space.xxl, marginBottom: 32 },
   stat:      { alignItems: 'center' },
-  statVal:   { fontSize: FS.score, lineHeight: LH.score, marginBottom: 6 },
+  statVal:   { fontSize: FS.score, lineHeight: LH.score, marginBottom: 6, letterSpacing: LS.tighter * FS.score },
   statLabel: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
   statSep:   { color: T.textMuted, fontSize: FS.heading },
 

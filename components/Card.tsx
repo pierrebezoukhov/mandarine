@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, FS, LH } from '@/theme/tokens';
+import { T, FS, LH, LS } from '@/theme/tokens';
 
 type CardVariant = 'primary' | 'secondary';
 
@@ -89,7 +89,7 @@ const s = StyleSheet.create({
     backgroundColor: T.surface2,
     borderColor: T.border,
   },
-  iconText:     { fontSize: FS.heading, color: T.accent },
+  iconText:     { fontSize: FS.heading, color: T.accent, letterSpacing: LS.tight * FS.heading },
   iconTextMuted:{ color: T.textMuted },
 
   body:     { flex: 1 },

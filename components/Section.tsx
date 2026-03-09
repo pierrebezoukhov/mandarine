@@ -22,7 +22,6 @@ const s = StyleSheet.create({
   label: {
     fontSize: FS.label,
     color: T.textMuted,
-    letterSpacing: 2.5,
     marginBottom: 10,
     textTransform: 'uppercase',
   },

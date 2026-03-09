@@ -254,7 +254,7 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: space.xl, paddingBottom: space.giant },
 
   avatarWrap: { alignItems: 'center', paddingVertical: space.xxxl },
-  avatarHint: { marginTop: space.sm, fontSize: FS.label, color: T.textMuted, letterSpacing: 0.5 },
+  avatarHint: { marginTop: space.sm, fontSize: FS.label, color: T.textMuted },
 
   grid:    { flexDirection: 'row', gap: 10 },
   gridGap: { marginTop: 10 },
