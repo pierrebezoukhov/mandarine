@@ -2,7 +2,7 @@ import React, { useState, ReactNode } from 'react';
 import {
   ScrollView, View, Text, StyleSheet, TouchableOpacity,
 } from 'react-native';
-import { T, MONO, FS, FSDisplay, FSBody, LH, LS } from '@/theme/tokens';
+import { T, MONO, FS, FSDisplay, FSBody, LH, LS, FW } from '@/theme/tokens';
 import { space, radius } from '@/theme/spacing';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -17,7 +17,7 @@ import { Avatar } from '@/components/Avatar';
 import { BottomSheetModal } from '@/components/BottomSheetModal';
 
 // ── Nav anchors ───────────────────────────────────────────────────────────────
-const NAV_ITEMS = ['Colors', 'Typography', 'Spacing', 'Components'] as const;
+const NAV_ITEMS = ['Colors', 'Typography', 'Rules', 'Spacing', 'Components'] as const;
 
 
 export default function DesignSystemScreen() {
@@ -281,6 +281,173 @@ export default function DesignSystemScreen() {
                   <Text style={s.codeInline}>FS</Text> size hierarchy only.
                 </Text>
               </View>
+            </Section>
+          </View>
+        )}
+
+        {/* ════════════════════════════════════════════════════════════════
+            RULES
+        ════════════════════════════════════════════════════════════════ */}
+        {activeNav === 'Rules' && (
+          <View>
+            <DocHeading>Type Rules</DocHeading>
+            <DocSubheading>
+              How{' '}<Text style={s.codeInline}>FS</Text>,{' '}
+              <Text style={s.codeInline}>FW</Text>,{' '}
+              color, and{' '}
+              <Text style={s.codeInline}>LS</Text>{' '}
+              combine to build hierarchy.{' '}
+              Size signals priority · weight signals interactivity · color signals role.
+            </DocSubheading>
+
+            {/* ── Font weight ───────────────────────────────────────── */}
+            <Section label="FONT WEIGHT — FW">
+              <Text style={s.lhNote}>
+                Three values only.{' '}
+                <Text style={s.codeInline}>FW.regular</Text> is the system default
+                — it is never written explicitly in stylesheets. Only{' '}
+                <Text style={s.codeInline}>FW.medium</Text> and{' '}
+                <Text style={s.codeInline}>FW.semibold</Text> appear in code.
+              </Text>
+              <WeightRow
+                token="FW.semibold"
+                value="'600'"
+                sample="Session complete"
+                rule="Screen headings · component names · nav bar labels"
+                where="profile title, session-setup headerTitle, BottomSheetModal title, cs.name"
+              />
+              <WeightRow
+                token="FW.medium"
+                value="'500'"
+                sample="Start Session"
+                rule="Interactive controls · list / card primary labels"
+                where="Button, Chip, TabSwitcher, SegmentedControl, Card.title, deckName"
+              />
+              <WeightRow
+                token="FW.regular"
+                value="'400' — default"
+                sample="Continue where you left off"
+                rule="Prose · subtitles · captions · metadata — omit fontWeight in style"
+                where="greetSub, descriptions, Section.label, tapHint, all body copy"
+              />
+            </Section>
+
+            {/* ── Text color hierarchy ──────────────────────────────── */}
+            <Section label="TEXT COLOR HIERARCHY">
+              <Text style={s.lhNote}>
+                Color tracks role, not size. The same{' '}
+                <Text style={s.codeInline}>FS.label</Text> caption can be{' '}
+                <Text style={s.codeInline}>T.textMuted</Text> (hint) or{' '}
+                <Text style={s.codeInline}>T.textPrimary</Text> (MONO badge token) —
+                choose based on how much attention the text should draw.
+              </Text>
+              <ColorRoleRow
+                token="T.textPrimary"
+                hex="#F0EBE0"
+                rule="Active labels, headings, primary content — maximum contrast"
+                where="all heading text, active tab/chip labels, input values"
+              />
+              <ColorRoleRow
+                token="T.textSecondary"
+                hex="#A09880"
+                rule="Supporting text — present but not competing for focus"
+                where="body copy, subtitles, back buttons, descriptions"
+              />
+              <ColorRoleRow
+                token="T.textMuted"
+                hex="#5C5646"
+                rule="Passive / background text — deliberately recedes"
+                where="hints, placeholders, section labels, captions, disabled states"
+              />
+            </Section>
+
+            {/* ── Role guide ────────────────────────────────────────── */}
+            <Section label="ROLE GUIDE — full token combination per text role">
+              <Text style={s.lhNote}>
+                Every text element in the app maps to one of these roles.
+                LS applies only to display-scale tokens; body scale always uses{' '}
+                <Text style={s.codeInline}>LS.normal</Text>.
+              </Text>
+              {([
+                {
+                  role: 'Page heading',
+                  sample: 'Session complete',
+                  size: FS.title,   fw: FW.semibold,  color: T.textPrimary,
+                  fsKey: 'FS.title',   fwKey: 'FW.semibold', colorKey: 'textPrimary',
+                  lsKey: 'LS.tight',
+                  where: 'sc.title · greetTitle',
+                },
+                {
+                  role: 'Sub-heading',
+                  sample: 'New Session',
+                  size: FS.heading, fw: FW.semibold,  color: T.textPrimary,
+                  fsKey: 'FS.heading', fwKey: 'FW.semibold', colorKey: 'textPrimary',
+                  lsKey: 'LS.tight',
+                  where: 'cs.name · headerTitle',
+                },
+                {
+                  role: 'Header bar label',
+                  sample: 'New Session',
+                  size: FS.ui,      fw: FW.semibold,  color: T.textPrimary,
+                  fsKey: 'FS.ui',      fwKey: 'FW.semibold', colorKey: 'textPrimary',
+                  lsKey: '—',
+                  where: 'session-setup headerTitle · BottomSheetModal title · settings title',
+                },
+                {
+                  role: 'Body text',
+                  sample: 'Continue where you left off',
+                  size: FS.body,    fw: undefined,    color: T.textSecondary,
+                  fsKey: 'FS.body',    fwKey: '—',           colorKey: 'textSecondary',
+                  lsKey: '—',
+                  where: 'greetSub · Card.subtitle · descriptions',
+                },
+                {
+                  role: 'Interactive label',
+                  sample: 'Start Session',
+                  size: FS.ui,      fw: FW.medium,    color: T.textPrimary,
+                  fsKey: 'FS.ui',      fwKey: 'FW.medium',   colorKey: 'textPrimary',
+                  lsKey: '—',
+                  where: 'Button · Card.title · deckName · rowName',
+                },
+                {
+                  role: 'Toggle / tab label',
+                  sample: 'New',
+                  size: FS.body,    fw: FW.medium,    color: T.textSecondary,
+                  fsKey: 'FS.body',    fwKey: 'FW.medium',   colorKey: 'textSecondary',
+                  lsKey: '—',
+                  where: 'Chip · TabSwitcher · SegmentedControl (inactive state)',
+                },
+                {
+                  role: 'Section label',
+                  sample: 'DECK',
+                  size: FS.label,   fw: undefined,    color: T.textMuted,
+                  fsKey: 'FS.label',   fwKey: '—',           colorKey: 'textMuted',
+                  lsKey: '— uppercase',
+                  where: 'Section component · cs.tableHeading · demoLabel',
+                },
+                {
+                  role: 'Caption / hint',
+                  sample: 'tap · pinyin  ··  double tap',
+                  size: FS.label,   fw: undefined,    color: T.textMuted,
+                  fsKey: 'FS.label',   fwKey: '—',           colorKey: 'textMuted',
+                  lsKey: 'MONO',
+                  where: 'tapHint · avatarHint · session metadata',
+                },
+              ] as const).map(({ role, sample, size, fw, color, fsKey, fwKey, colorKey, lsKey, where }) => (
+                <RoleRow
+                  key={role}
+                  role={role}
+                  sample={sample}
+                  size={size}
+                  fw={fw}
+                  color={color}
+                  fsKey={fsKey}
+                  fwKey={fwKey}
+                  colorKey={colorKey}
+                  lsKey={lsKey}
+                  where={where}
+                />
+              ))}
             </Section>
           </View>
         )}
@@ -774,6 +941,80 @@ function ComponentSection({
   );
 }
 
+// ── Rules tab components ──────────────────────────────────────────────────────
+
+function WeightRow({ token, value, sample, rule, where }: {
+  token: string; value: string; sample: string; rule: string; where: string;
+}) {
+  const fw = value.startsWith("'600'") ? FW.semibold : value.startsWith("'500'") ? FW.medium : undefined;
+  return (
+    <View style={rules.weightRow}>
+      <View style={rules.weightSample}>
+        <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: fw }} numberOfLines={1} adjustsFontSizeToFit>
+          {sample}
+        </Text>
+      </View>
+      <View style={rules.weightMeta}>
+        <View style={rules.tokenRow}>
+          <Text style={rules.tokenBadge}>{token}</Text>
+          <Text style={rules.valueBadge}>{value}</Text>
+        </View>
+        <Text style={rules.ruleText}>{rule}</Text>
+        <Text style={rules.whereText}>{where}</Text>
+      </View>
+    </View>
+  );
+}
+
+function ColorRoleRow({ token, hex, rule, where }: {
+  token: string; hex: string; rule: string; where: string;
+}) {
+  const color = (T as Record<string, string>)[token.replace('T.', '')];
+  return (
+    <View style={rules.weightRow}>
+      <View style={rules.colorSample}>
+        <Text style={{ fontSize: FS.body, color, fontWeight: FW.medium }} numberOfLines={2}>
+          The quick{'\n'}brown fox
+        </Text>
+      </View>
+      <View style={rules.weightMeta}>
+        <View style={rules.tokenRow}>
+          <Text style={rules.tokenBadge}>{token}</Text>
+          <Text style={rules.valueBadge}>{hex}</Text>
+        </View>
+        <Text style={rules.ruleText}>{rule}</Text>
+        <Text style={rules.whereText}>{where}</Text>
+      </View>
+    </View>
+  );
+}
+
+function RoleRow({ role, sample, size, fw, color, fsKey, fwKey, colorKey, lsKey, where }: {
+  role: string; sample: string; size: number;
+  fw: typeof FW.semibold | typeof FW.medium | undefined;
+  color: string; fsKey: string; fwKey: string; colorKey: string; lsKey: string; where: string;
+}) {
+  return (
+    <View style={rules.roleRow}>
+      <View style={rules.roleSample}>
+        <Text style={{ fontSize: Math.min(size, FS.heading), color, fontWeight: fw }} numberOfLines={2} adjustsFontSizeToFit>
+          {sample}
+        </Text>
+      </View>
+      <View style={rules.weightMeta}>
+        <Text style={rules.roleName}>{role}</Text>
+        <View style={rules.tokenRow}>
+          <Text style={rules.tokenBadge}>{fsKey}</Text>
+          <Text style={rules.tokenBadge}>{fwKey}</Text>
+          <Text style={[rules.tokenBadge, { color: T.textSecondary, backgroundColor: 'transparent' }]}>{colorKey}</Text>
+          {lsKey !== '—' && <Text style={rules.tokenBadge}>{lsKey}</Text>}
+        </View>
+        <Text style={rules.whereText}>{where}</Text>
+      </View>
+    </View>
+  );
+}
+
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
@@ -1095,4 +1336,62 @@ const cs = StyleSheet.create({
   },
   usedScreen:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO, width: 130 },
   usedContext: { flex: 1, fontSize: FS.label, color: T.textSecondary },
+});
+
+// rules-tab styles
+const rules = StyleSheet.create({
+  weightRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+    paddingVertical: space.md,
+    gap: space.lg,
+    minHeight: 64,
+  },
+  weightSample: {
+    width: 140,
+    justifyContent: 'center',
+  },
+  colorSample: {
+    width: 140,
+    justifyContent: 'center',
+  },
+  weightMeta: { flex: 1, gap: 4 },
+
+  tokenRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  tokenBadge: {
+    fontFamily: MONO,
+    fontSize: FS.label,
+    color: T.accent,
+    backgroundColor: T.accentDim,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  valueBadge: {
+    fontFamily: MONO,
+    fontSize: FS.label,
+    color: T.textMuted,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  ruleText: { fontSize: FS.body, color: T.textSecondary, lineHeight: LH.body },
+  whereText: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
+
+  roleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+    paddingVertical: space.md,
+    gap: space.lg,
+    minHeight: 64,
+  },
+  roleSample: {
+    width: 140,
+    justifyContent: 'center',
+  },
+  roleName: { fontSize: FS.body, color: T.textPrimary, fontWeight: FW.medium, marginBottom: 2 },
 });

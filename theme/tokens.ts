@@ -74,6 +74,21 @@ export const LS = {
   loose:    0.025,  // available; not currently applied
 } as const;
 
+// ── Font-weight scale ─────────────────────────────────────────────────────────
+// Three values only. FW.regular is the system default and rarely written
+// explicitly in code — only FW.medium and FW.semibold appear in stylesheets.
+//
+//   FW.semibold → screen headings, component names, nav bar labels
+//   FW.medium   → interactive controls (Button, Chip, Tab), list primary labels
+//   FW.regular  → prose, subtitles, captions, metadata (default; omit from style)
+//
+// Rule of thumb: size signals priority · weight signals interactivity · color signals role.
+export const FW = {
+  regular:  '400' as const,  // default prose — omit in styles, rely on system default
+  medium:   '500' as const,  // interactive / list primary
+  semibold: '600' as const,  // headings / titles / prominent labels
+} as const;
+
 // ── Line-height scale ─────────────────────────────────────────────────────────
 // All values on 4 px grid. Ratio tapers as size grows — loose for small text,
 // tight for large display — rather than a flat multiplier across all sizes.
