@@ -53,13 +53,22 @@ export const FS = {
 } as const;
 
 // ── Line-height scale ─────────────────────────────────────────────────────────
-// body / ui sizes → 1.5× font-size; heading+ sizes → 1.3× font-size.
+// All values on 4 px grid. Ratio tapers as size grows — loose for small text,
+// tight for large display — rather than a flat multiplier across all sizes.
+//
+//   label   12 / 18  → 1.50  (small labels need generous leading)
+//   body    14 / 20  → 1.43  (readable prose, just under 1.5)
+//   ui      16 / 24  → 1.50  (inputs / buttons, matches label rhythm)
+//   heading 21 / 28  → 1.33  (sub-headings start to tighten)
+//   title   28 / 36  → 1.29  (screen titles, tighter still)
+//   score   37 / 44  → 1.19  (large numerics, minimal leading needed)
+//   seal    50 / 56  → 1.12  (display-size text, nearly cap-height only)
 export const LH = {
-  label:   18,  // 12 × 1.5
-  body:    21,  // 14 × 1.5
-  ui:      24,  // 16 × 1.5
-  heading: 27,  // 21 × 1.3
-  title:   36,  // 28 × 1.3
-  score:   48,  // 37 × 1.3
-  seal:    65,  // 50 × 1.3
+  label:   18,
+  body:    20,
+  ui:      24,
+  heading: 28,
+  title:   36,
+  score:   44,
+  seal:    56,
 } as const;

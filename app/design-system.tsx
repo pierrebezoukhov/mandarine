@@ -156,14 +156,14 @@ export default function DesignSystemScreen() {
                 token="FS.seal"
                 px={FS.seal}
                 sample="印"
-                usage="Session completion seal · LH.seal: 65px"
+                usage="Session completion seal · LH.seal: 56px"
                 color={T.accent}
               />
               <TypeSpecimen
                 token="FS.score"
                 px={FS.score}
                 sample="84"
-                usage="Session end score number · LH.score: 48px"
+                usage="Session end score number · LH.score: 44px"
                 family={MONO}
               />
               <TypeSpecimen
@@ -176,7 +176,7 @@ export default function DesignSystemScreen() {
                 token="FS.heading"
                 px={FS.heading}
                 sample="New Session"
-                usage="Sub-headings, card headings · LH.heading: 27px"
+                usage="Sub-headings, card headings · LH.heading: 28px"
               />
               <TypeSpecimen
                 token="FS.ui"
@@ -189,7 +189,7 @@ export default function DesignSystemScreen() {
                 token="FS.body"
                 px={FS.body}
                 sample="What would you like to do today?"
-                usage="Body text, subtitles, secondary copy · LH.body: 21px"
+                usage="Body text, subtitles, secondary copy · LH.body: 20px"
               />
               <TypeSpecimen
                 token="FS.label"
@@ -206,19 +206,18 @@ export default function DesignSystemScreen() {
                 Companion constants exported as{' '}
                 <Text style={s.codeInline}>LH</Text> from{' '}
                 <Text style={s.codeInline}>theme/tokens.ts</Text>.
-                Body-scale sizes use{' '}
-                <Text style={s.codeInline}>×1.5</Text>; heading-scale use{' '}
-                <Text style={s.codeInline}>×1.3</Text>.
+                Ratio tapers as size grows — all values on a 4 px grid.
+                Small text (~1.5) → body/UI (~1.4–1.5) → headings/display (1.33→1.12).
               </Text>
               {(
                 [
-                  { name: 'label',   fs: FS.label,   lh: LH.label,   mult: '×1.5' },
-                  { name: 'body',    fs: FS.body,    lh: LH.body,    mult: '×1.5' },
-                  { name: 'ui',      fs: FS.ui,      lh: LH.ui,      mult: '×1.5' },
-                  { name: 'heading', fs: FS.heading, lh: LH.heading, mult: '×1.3' },
-                  { name: 'title',   fs: FS.title,   lh: LH.title,   mult: '×1.3' },
-                  { name: 'score',   fs: FS.score,   lh: LH.score,   mult: '×1.3' },
-                  { name: 'seal',    fs: FS.seal,    lh: LH.seal,    mult: '×1.3' },
+                  { name: 'label',   fs: FS.label,   lh: LH.label,   mult: '×1.50' },
+                  { name: 'body',    fs: FS.body,    lh: LH.body,    mult: '×1.43' },
+                  { name: 'ui',      fs: FS.ui,      lh: LH.ui,      mult: '×1.50' },
+                  { name: 'heading', fs: FS.heading, lh: LH.heading, mult: '×1.33' },
+                  { name: 'title',   fs: FS.title,   lh: LH.title,   mult: '×1.29' },
+                  { name: 'score',   fs: FS.score,   lh: LH.score,   mult: '×1.19' },
+                  { name: 'seal',    fs: FS.seal,    lh: LH.seal,    mult: '×1.12' },
                 ] as const
               ).map(({ name, fs, lh, mult }) => (
                 <View key={name} style={s.lhRow}>
