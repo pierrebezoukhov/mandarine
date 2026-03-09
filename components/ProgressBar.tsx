@@ -48,7 +48,7 @@ const s = StyleSheet.create({
   },
   counter: {
     fontFamily: MONO,
-    fontSize: FS.caption,
+    fontSize: FS.label,
     color: T.textMuted,
   },
   counterTotal: {

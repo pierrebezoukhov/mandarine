@@ -6,7 +6,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO, FS } from '@/theme/tokens';
+import { T, MONO, FS, LH } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import type { SessionConfig } from './session-setup';
@@ -354,18 +355,18 @@ const s = StyleSheet.create({
   centered:{ alignItems: 'center', justifyContent: 'center' },
 
   topbar: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8,
+    flexDirection: 'row', alignItems: 'center', gap: space.md,
+    paddingHorizontal: space.xl, paddingTop: space.md, paddingBottom: space.sm,
   },
-  iconBtn:         { padding: 8, borderRadius: 8 },
+  iconBtn:         { padding: space.sm, borderRadius: 8 },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: FS.sub, color: T.textMuted },
+  iconBtnText:     { fontSize: FS.heading, color: T.textMuted },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 12, paddingBottom: 10,
+    gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: FS.note, fontWeight: '500' },
+  scoreItem:   { fontFamily: MONO, fontSize: FS.body, fontWeight: '500' },
   scoreForgot: { color: T.error },
   scoreGot:    { color: T.success },
   scoreSep:    { color: T.textMuted, fontSize: FS.ui },
@@ -389,14 +390,14 @@ const s = StyleSheet.create({
   },
 
   pinyinText: {
-    fontFamily: MONO, fontSize: FS.sub, letterSpacing: 3,
+    fontFamily: MONO, fontSize: FS.heading, letterSpacing: 3,
     color: T.accent, opacity: 0.85, marginTop: 18,
   },
 
   exampleBlock: { marginTop: 22, width: '100%', alignItems: 'center' },
   exDivider:    { width: 24, height: 1, backgroundColor: T.border, marginBottom: 14 },
   exHanzi:      { fontSize: FS.heading, color: '#C8BFA8', textAlign: 'center', lineHeight: 44 },
-  exPinyin:     { fontFamily: MONO, fontSize: FS.caption, color: '#7A7060', textAlign: 'center', letterSpacing: 1 },
+  exPinyin:     { fontFamily: MONO, fontSize: FS.label, color: '#7A7060', textAlign: 'center', letterSpacing: 1 },
 
   exMeaning: {
     fontSize: FS.body, color: '#8C8070', textAlign: 'center',
@@ -405,7 +406,7 @@ const s = StyleSheet.create({
 
   meaningBlock: { marginTop: 22, alignItems: 'center', gap: 6 },
   posTag:       { fontFamily: MONO, fontSize: FS.label, fontWeight: '500', color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
-  meaningText:  { fontSize: FS.heading, color: T.textPrimary, textAlign: 'center', lineHeight: 32, fontStyle: 'italic' },
+  meaningText:  { fontSize: FS.heading, color: T.textPrimary, textAlign: 'center', lineHeight: LH.heading, fontStyle: 'italic' },
 
   tapHint: {
     position: 'absolute', bottom: 72,
@@ -439,21 +440,21 @@ const sc = StyleSheet.create({
     flex: 1, backgroundColor: T.bg,
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
-  seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: 28 },
-  title:     { fontSize: FS.stat, color: T.textPrimary, fontStyle: 'italic', marginBottom: 8, textAlign: 'center' },
-  sub:       { fontFamily: MONO, fontSize: FS.caption, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
+  seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: space.xxxl },
+  title:     { fontSize: FS.title, color: T.textPrimary, marginBottom: space.sm, textAlign: 'center' },
+  sub:       { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
 
-  stats:     { flexDirection: 'row', alignItems: 'center', gap: 24, marginBottom: 32 },
+  stats:     { flexDirection: 'row', alignItems: 'center', gap: space.xxl, marginBottom: 32 },
   stat:      { alignItems: 'center' },
-  statVal:   { fontSize: FS.score, lineHeight: 44, marginBottom: 6 },
+  statVal:   { fontSize: FS.score, lineHeight: LH.score, marginBottom: 6 },
   statLabel: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
   statSep:   { color: T.textMuted, fontSize: FS.heading },
 
   pctBadge: {
     borderWidth: 1, borderColor: T.border, borderRadius: 100,
-    paddingHorizontal: 20, paddingVertical: 8, marginBottom: 48,
+    paddingHorizontal: space.xl, paddingVertical: space.sm, marginBottom: space.giant,
   },
-  pctText: { fontFamily: MONO, fontSize: FS.note, color: T.textMuted, letterSpacing: 1 },
+  pctText: { fontFamily: MONO, fontSize: FS.body, color: T.textMuted, letterSpacing: 1 },
 
   actions: { width: '100%', maxWidth: 280, gap: 10 },
 });

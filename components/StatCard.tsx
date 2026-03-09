@@ -32,7 +32,7 @@ const s = StyleSheet.create({
   },
   value: {
     fontFamily:  MONO,
-    fontSize:    FS.stat,
+    fontSize:    FS.title,
     color:       T.textPrimary,
     marginBottom: 4,
   },

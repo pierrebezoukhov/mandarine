@@ -39,24 +39,27 @@ export const MONO: string =
   Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'monospace';
 
 // ── Font-size scale ───────────────────────────────────────────────────────────
-// Single source of truth for font sizes. Use FS.x everywhere instead of
-// raw numeric literals in StyleSheet.
+// Perfect Fourth modular scale (ratio 1.333) anchored at base 16 px.
+// 8 semantic steps + hanzi (outside prose scale).
 export const FS = {
-  micro:   9,   // logo tagline, tiny badges
-  label:   10,  // section labels, stat labels
-  hint:    11,  // inline hints, chip sublabels, avatar hint
-  caption: 12,  // metadata, session info rows
-  note:    13,  // secondary scores, auth footer
-  body:    14,  // standard body text, email, subtitles
-  input:   15,  // text inputs, buttons
-  ui:      16,  // screen headers, nav controls
-  sub:     18,  // sub-headings, score items
-  heading: 22,  // card icons, auth logo small
-  title:   26,  // auth headings
-  logo:    32,  // auth logo large hanzi
-  stat:    28,  // stat card values
-  display: 30,  // home greeting
-  score:   40,  // session end score number
-  seal:    48,  // session completion seal
-  hanzi:   96,  // main flashcard character
+  label:   12,  // section labels, hints, captions, badges
+  body:    14,  // body text, subtitles, secondary copy
+  ui:      16,  // inputs, buttons, nav controls — base size
+  heading: 21,  // sub-headings, card headings
+  title:   28,  // screen titles, stat values, display text
+  score:   37,  // large numeric / decorative display
+  seal:    50,  // session completion seal
+  hanzi:   96,  // flashcard Chinese character (outside prose scale)
+} as const;
+
+// ── Line-height scale ─────────────────────────────────────────────────────────
+// body / ui sizes → 1.5× font-size; heading+ sizes → 1.3× font-size.
+export const LH = {
+  label:   18,  // 12 × 1.5
+  body:    21,  // 14 × 1.5
+  ui:      24,  // 16 × 1.5
+  heading: 27,  // 21 × 1.3
+  title:   36,  // 28 × 1.3
+  score:   48,  // 37 × 1.3
+  seal:    65,  // 50 × 1.3
 } as const;

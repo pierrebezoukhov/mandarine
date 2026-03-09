@@ -6,6 +6,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { T, FS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
 import { SegmentedControl } from '@/components/SegmentedControl';
@@ -128,23 +129,23 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: space.xl,
+    paddingTop: space.lg,
+    paddingBottom: space.sm,
   },
   backBtn:  { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
   backText: { fontSize: FS.body, color: T.textSecondary },
   title:    { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
 
-  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 48 },
+  scroll: { paddingHorizontal: space.xl, paddingTop: space.xl, paddingBottom: space.giant },
 
   fieldLabel: {
     fontSize: FS.label,
     color: T.textMuted,
     letterSpacing: 2.5,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: space.sm,
   },
 
-  email: { fontSize: FS.body, color: T.textMuted, fontStyle: 'italic' },
+  email: { fontSize: FS.body, color: T.textMuted },
 });

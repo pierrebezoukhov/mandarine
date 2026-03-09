@@ -2,7 +2,7 @@ import React, { useState, ReactNode } from 'react';
 import {
   ScrollView, View, Text, StyleSheet, TouchableOpacity,
 } from 'react-native';
-import { T, MONO, FS } from '@/theme/tokens';
+import { T, MONO, FS, LH } from '@/theme/tokens';
 import { space, radius } from '@/theme/spacing';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -20,15 +20,10 @@ import { BottomSheetModal } from '@/components/BottomSheetModal';
 const NAV_ITEMS = ['Colors', 'Typography', 'Spacing', 'Components'] as const;
 
 // ── Italic usage catalogue ────────────────────────────────────────────────────
+// Italic is reserved for foreign-language gloss and example sentences only.
 const ITALIC_USAGES = [
-  { token: 'FS.display', px: FS.display, sample: 'Hello, Pierre.', screen: 'home.tsx',          usage: 'Personalised greeting on the home screen' },
-  { token: 'FS.title',   px: FS.title,   sample: 'Welcome back',   screen: 'auth.tsx',           usage: 'Primary heading on login / signup forms' },
-  { token: 'FS.stat',    px: FS.stat,    sample: 'Session complete',screen: 'session.tsx',        usage: '"Session complete" congratulation title' },
-  { token: 'FS.heading', px: FS.heading, sample: 'To study',        screen: 'session.tsx',        usage: 'Flashcard word meaning (translation)' },
-  { token: 'FS.heading', px: FS.heading, sample: 'Email confirmed', screen: 'auth.tsx',           usage: 'Success confirmation heading' },
-  { token: 'FS.body',    px: FS.body,    sample: 'tā qù xuéxiào',   screen: 'session.tsx',        usage: 'Example sentence pinyin on flashcard back' },
-  { token: 'FS.body',    px: FS.body,    sample: 'user@email.com',  screen: 'settings.tsx',       usage: 'Read-only email in Personal Info section' },
-  { token: 'FS.hint',    px: FS.hint,    sample: 'No filter — all cards included', screen: 'session-setup.tsx', usage: 'Difficulty selection hint below chips' },
+  { token: 'FS.heading', px: FS.heading, sample: 'To study',      screen: 'session.tsx', usage: 'Flashcard word meaning — English translation of the hanzi' },
+  { token: 'FS.body',    px: FS.body,    sample: 'tā qù xuéxiào', screen: 'session.tsx', usage: 'Example sentence meaning — English gloss on flashcard back' },
 ] as const;
 
 export default function DesignSystemScreen() {
@@ -140,7 +135,8 @@ export default function DesignSystemScreen() {
             <DocHeading>Typography</DocHeading>
             <DocSubheading>
               Font sizes are exported as{' '}
-              <Text style={s.codeInline}>FS</Text> from{' '}
+              <Text style={s.codeInline}>FS</Text> and line-heights as{' '}
+              <Text style={s.codeInline}>LH</Text> from{' '}
               <Text style={s.codeInline}>theme/tokens.ts</Text>. Use the
               monospace constant{' '}
               <Text style={s.codeInline}>MONO</Text> for pinyin, counters,
@@ -148,121 +144,89 @@ export default function DesignSystemScreen() {
             </DocSubheading>
 
             {/* Scale specimens — largest to smallest */}
-            <Section label="SCALE">
+            <Section label="SCALE — Perfect Fourth (×1.333) from 16px base">
               <TypeSpecimen
                 token="FS.hanzi"
                 px={FS.hanzi}
                 sample="漢"
-                usage="Main flashcard character"
-                family={undefined}
+                usage="Main flashcard character — outside prose scale"
                 color={T.textHanzi}
               />
               <TypeSpecimen
                 token="FS.seal"
                 px={FS.seal}
                 sample="印"
-                usage="Session completion seal"
+                usage="Session completion seal · LH.seal: 65px"
                 color={T.accent}
               />
               <TypeSpecimen
                 token="FS.score"
                 px={FS.score}
                 sample="84"
-                usage="Session end score number"
+                usage="Session end score number · LH.score: 48px"
                 family={MONO}
-              />
-              <TypeSpecimen
-                token="FS.display"
-                px={FS.display}
-                sample="Hello, Pierre."
-                usage="Home screen greeting"
-                italic
-              />
-              <TypeSpecimen
-                token="FS.stat"
-                px={FS.stat}
-                sample="1 240"
-                usage="Stat card values"
-                family={MONO}
-              />
-              <TypeSpecimen
-                token="FS.logo"
-                px={FS.logo}
-                sample="漢字"
-                usage="Auth & home logo hanzi"
               />
               <TypeSpecimen
                 token="FS.title"
                 px={FS.title}
-                sample="Welcome back"
-                usage="Auth screen headings"
-                italic
+                sample="Session complete"
+                usage="Screen titles, stat values, display text · LH.title: 36px"
               />
               <TypeSpecimen
                 token="FS.heading"
                 px={FS.heading}
-                sample="Session complete"
-                usage="Form headings, flashcard meaning"
-              />
-              <TypeSpecimen
-                token="FS.sub"
-                px={FS.sub}
                 sample="New Session"
-                usage="Sub-headings, score items"
+                usage="Sub-headings, card headings · LH.heading: 27px"
               />
               <TypeSpecimen
                 token="FS.ui"
                 px={FS.ui}
                 sample="Profile"
-                usage="Screen headers, nav controls"
+                usage="Inputs, buttons, nav controls — base size · LH.ui: 24px"
                 bold
-              />
-              <TypeSpecimen
-                token="FS.input"
-                px={FS.input}
-                sample="Choose a deck…"
-                usage="Text inputs, buttons"
               />
               <TypeSpecimen
                 token="FS.body"
                 px={FS.body}
                 sample="What would you like to do today?"
-                usage="Standard body text, subtitles"
-              />
-              <TypeSpecimen
-                token="FS.note"
-                px={FS.note}
-                sample="← Back"
-                usage="Secondary scores, auth footer, back buttons"
-              />
-              <TypeSpecimen
-                token="FS.caption"
-                px={FS.caption}
-                sample="HSK 3 · 20 cards · 85% retention"
-                usage="Metadata, session info rows"
-                family={MONO}
-              />
-              <TypeSpecimen
-                token="FS.hint"
-                px={FS.hint}
-                sample="No filter — all cards included"
-                usage="Inline hints, chip sublabels"
-                italic
+                usage="Body text, subtitles, secondary copy · LH.body: 21px"
               />
               <TypeSpecimen
                 token="FS.label"
                 px={FS.label}
                 sample="DIFFICULTY"
-                usage="Section labels, stat labels"
+                usage="Section labels, hints, captions, badges · LH.label: 18px"
                 style={{ letterSpacing: 2.5, textTransform: 'uppercase' }}
               />
-              <TypeSpecimen
-                token="FS.micro"
-                px={FS.micro}
-                sample="HANZIFLASH"
-                usage="Logo tagline, tiny badges"
-                style={{ letterSpacing: 6, textTransform: 'uppercase' }}
-              />
+            </Section>
+
+            {/* Line heights */}
+            <Section label="LINE HEIGHTS — LH">
+              <Text style={s.lhNote}>
+                Companion constants exported as{' '}
+                <Text style={s.codeInline}>LH</Text> from{' '}
+                <Text style={s.codeInline}>theme/tokens.ts</Text>.
+                Body-scale sizes use{' '}
+                <Text style={s.codeInline}>×1.5</Text>; heading-scale use{' '}
+                <Text style={s.codeInline}>×1.3</Text>.
+              </Text>
+              {(
+                [
+                  { name: 'label',   fs: FS.label,   lh: LH.label,   mult: '×1.5' },
+                  { name: 'body',    fs: FS.body,    lh: LH.body,    mult: '×1.5' },
+                  { name: 'ui',      fs: FS.ui,      lh: LH.ui,      mult: '×1.5' },
+                  { name: 'heading', fs: FS.heading, lh: LH.heading, mult: '×1.3' },
+                  { name: 'title',   fs: FS.title,   lh: LH.title,   mult: '×1.3' },
+                  { name: 'score',   fs: FS.score,   lh: LH.score,   mult: '×1.3' },
+                  { name: 'seal',    fs: FS.seal,    lh: LH.seal,    mult: '×1.3' },
+                ] as const
+              ).map(({ name, fs, lh, mult }) => (
+                <View key={name} style={s.lhRow}>
+                  <Text style={s.lhToken}>LH.{name}</Text>
+                  <Text style={s.lhValue}>{lh}px</Text>
+                  <Text style={s.lhFormula}>FS.{name} {fs}px {mult}</Text>
+                </View>
+              ))}
             </Section>
 
             {/* Monospace callout */}
@@ -270,7 +234,7 @@ export default function DesignSystemScreen() {
               <View style={s.monoRow}>
                 <View style={s.monoDemo}>
                   <Text style={s.monoSample}>pīn yīn</Text>
-                  <Text style={s.monoCaption}>FS.sub · MONO · T.accent</Text>
+                  <Text style={s.monoCaption}>FS.heading · MONO · T.accent</Text>
                 </View>
                 <View style={s.monoDesc}>
                   <Text style={s.propName}>Used for</Text>
@@ -282,9 +246,11 @@ export default function DesignSystemScreen() {
             {/* Italic usage */}
             <Section label="ITALIC USAGE">
               <Text style={s.italicRule}>
-                Italic is applied to <Text style={s.italicRuleEm}>expressive headings</Text> and{' '}
-                <Text style={s.italicRuleEm}>soft/secondary text</Text> only — never to body copy,
-                buttons, or metadata.
+                Italic is reserved for{' '}
+                <Text style={s.italicRuleEm}>foreign-language gloss</Text> (word meaning translation)
+                and{' '}
+                <Text style={s.italicRuleEm}>example sentence meaning</Text> in flashcard view only —
+                never to headings, buttons, hints, or metadata.
               </Text>
               {ITALIC_USAGES.map(u => (
                 <View key={u.token + u.screen} style={s.italicRow}>
@@ -822,7 +788,7 @@ const s = StyleSheet.create({
     fontWeight: '600',
   },
   logoLabel: {
-    fontSize: FS.micro,
+    fontSize: FS.label,
     color: T.textMuted,
     letterSpacing: 4,
     textTransform: 'uppercase',
@@ -843,7 +809,7 @@ const s = StyleSheet.create({
     fontFamily: MONO,
   },
   headerDate: {
-    fontSize: FS.caption,
+    fontSize: FS.label,
     color: T.textMuted,
     fontFamily: MONO,
     letterSpacing: 0.5,
@@ -864,7 +830,7 @@ const s = StyleSheet.create({
   // Inline code
   codeInline: {
     fontFamily: MONO,
-    fontSize: FS.caption,
+    fontSize: FS.label,
     color: T.accent,
     backgroundColor: T.accentDim,
     paddingHorizontal: 4,
@@ -903,7 +869,7 @@ const s = StyleSheet.create({
   },
 
   // Token labels (shared)
-  tokenName:  { fontSize: FS.caption, color: T.textSecondary, fontFamily: MONO },
+  tokenName:  { fontSize: FS.label, color: T.textSecondary, fontFamily: MONO },
   tokenValue: { fontSize: FS.label,   color: T.textMuted },
 
   // Button demo
@@ -938,7 +904,7 @@ const s = StyleSheet.create({
   // Avatar row
   avatarRow:  { flexDirection: 'row', gap: space.xxl, alignItems: 'flex-start' },
   avatarItem: { alignItems: 'center', gap: space.sm },
-  avatarLabel:{ fontSize: FS.hint, color: T.textMuted, fontFamily: MONO },
+  avatarLabel:{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
 
   // Sheet content demo
   sheetContent: { paddingVertical: space.sm, gap: space.md },
@@ -956,18 +922,37 @@ const s = StyleSheet.create({
   },
   monoSample: {
     fontFamily: MONO,
-    fontSize: FS.sub,
+    fontSize: FS.heading,
     color: T.accent,
     letterSpacing: 3,
   },
-  monoCaption:{ fontSize: FS.hint, color: T.textMuted, fontFamily: MONO },
+  monoCaption:{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
   monoDesc:   { flex: 1.4 },
   propName:   { fontSize: FS.label, color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 },
   propValue:  { fontSize: FS.body, color: T.textSecondary, lineHeight: 20 },
 
+  // Line heights section
+  lhNote: {
+    fontSize: FS.body,
+    color: T.textSecondary,
+    lineHeight: LH.body,
+    marginBottom: space.lg,
+  },
+  lhRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: space.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+    gap: space.lg,
+  },
+  lhToken:   { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO, width: 80 },
+  lhValue:   { fontSize: FS.label, color: T.accent,      fontFamily: MONO, width: 44 },
+  lhFormula: { fontSize: FS.label, color: T.textMuted,   fontFamily: MONO },
+
   // Footer
   footer: { marginTop: space.huge, alignItems: 'center' },
-  footerText: { fontSize: FS.caption, color: T.textMuted, fontFamily: MONO, letterSpacing: 1 },
+  footerText: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO, letterSpacing: 1 },
 
   // Italic section
   italicRule: {
@@ -996,9 +981,9 @@ const s = StyleSheet.create({
   },
   italicMeta: { flex: 1, gap: 2 },
   italicMetaTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  italicToken:  { fontSize: FS.caption, color: T.textPrimary, fontFamily: MONO },
-  italicScreen: { fontSize: FS.hint,    color: T.textMuted,   fontFamily: MONO },
-  italicUsage:  { fontSize: FS.hint,    color: T.textSecondary },
+  italicToken:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO },
+  italicScreen: { fontSize: FS.label, color: T.textMuted,   fontFamily: MONO },
+  italicUsage:  { fontSize: FS.label, color: T.textSecondary },
 });
 
 // doc-level typography styles
@@ -1008,7 +993,6 @@ const ds = StyleSheet.create({
     color: T.textPrimary,
     fontWeight: '600',
     marginBottom: space.sm,
-    fontStyle: 'italic',
   },
   docSubheading: {
     fontSize: FS.body,
@@ -1046,8 +1030,8 @@ const ds = StyleSheet.create({
   },
   swatchMeta:  { flex: 1, gap: 2 },
   swatchToken: { fontSize: FS.body, color: T.textPrimary, fontFamily: MONO },
-  swatchHex:   { fontSize: FS.caption, color: T.textMuted, fontFamily: MONO },
-  swatchUsage: { fontSize: FS.hint, color: T.textSecondary, marginTop: 2 },
+  swatchHex:   { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
+  swatchUsage: { fontSize: FS.label, color: T.textSecondary, marginTop: 2 },
 
   // Type specimens
   specimen: {
@@ -1061,9 +1045,9 @@ const ds = StyleSheet.create({
   },
   specimenSample: { width: 160, overflow: 'hidden' },
   specimenMeta:   { flex: 1, gap: 2 },
-  specimenToken:  { fontSize: FS.caption, color: T.textPrimary, fontFamily: MONO },
-  specimenPx:     { fontSize: FS.label,   color: T.accent,      fontFamily: MONO },
-  specimenUsage:  { fontSize: FS.hint,    color: T.textMuted },
+  specimenToken:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO },
+  specimenPx:     { fontSize: FS.label, color: T.accent,      fontFamily: MONO },
+  specimenUsage:  { fontSize: FS.label, color: T.textMuted },
 });
 
 // component-section styles
@@ -1078,7 +1062,7 @@ const cs = StyleSheet.create({
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: space.sm },
   name:   { fontSize: FS.heading, color: T.textPrimary, fontWeight: '600' },
-  file:   { fontSize: FS.hint, color: T.textMuted, fontFamily: MONO },
+  file:   { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
   desc:   { fontSize: FS.body, color: T.textSecondary, lineHeight: 20, marginBottom: space.xxl },
 
   demo: {
@@ -1105,9 +1089,9 @@ const cs = StyleSheet.create({
   cellType:    { flex: 2 },
   cellDesc:    { flex: 2 },
   th:          { fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5, textTransform: 'uppercase' },
-  propName:    { fontSize: FS.caption, color: T.textPrimary, fontFamily: MONO },
-  propType:    { fontSize: FS.caption, color: T.accent, fontFamily: MONO },
-  propDesc:    { fontSize: FS.caption, color: T.textSecondary },
+  propName:    { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO },
+  propType:    { fontSize: FS.label, color: T.accent, fontFamily: MONO },
+  propDesc:    { fontSize: FS.label, color: T.textSecondary },
 
   usedRow: {
     flexDirection: 'row',
@@ -1115,6 +1099,6 @@ const cs = StyleSheet.create({
     paddingVertical: space.xs,
     alignItems: 'flex-start',
   },
-  usedScreen:  { fontSize: FS.caption, color: T.textPrimary, fontFamily: MONO, width: 130 },
-  usedContext: { flex: 1, fontSize: FS.caption, color: T.textSecondary },
+  usedScreen:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO, width: 130 },
+  usedContext: { flex: 1, fontSize: FS.label, color: T.textSecondary },
 });

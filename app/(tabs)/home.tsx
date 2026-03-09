@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { T, FS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
@@ -105,14 +106,14 @@ const s = StyleSheet.create({
 
   header: {
     flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'flex-start', paddingHorizontal: 28, paddingTop: 24, paddingBottom: 8,
+    alignItems: 'flex-start', paddingHorizontal: space.xxxl, paddingTop: space.xxl, paddingBottom: space.sm,
   },
   logoHanzi:   { fontSize: FS.heading, color: T.textPrimary, letterSpacing: 2 },
-  logoLabel:   { fontSize: FS.micro, color: T.textMuted, letterSpacing: 6, marginTop: 2 },
+  logoLabel:   { fontSize: FS.label, color: T.textMuted, letterSpacing: 6, marginTop: 2 },
 
-  greet:      { paddingHorizontal: 28, paddingTop: 48, paddingBottom: 40 },
-  greetTitle: { fontSize: FS.display, color: T.textPrimary, fontStyle: 'italic', marginBottom: 6 },
+  greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },
+  greetTitle: { fontSize: FS.title, color: T.textPrimary, marginBottom: 6 },
   greetSub:   { fontSize: FS.body, color: T.textMuted, letterSpacing: 0.5 },
 
-  actions: { paddingHorizontal: 20, gap: 12 },
+  actions: { paddingHorizontal: space.xl, gap: space.md },
 });

@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { T, FS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { Section } from '@/components/Section';
 import { Chip } from '@/components/Chip';
 import { SegmentedControl } from '@/components/SegmentedControl';
@@ -275,36 +276,36 @@ export default function SessionSetupScreen() {
 // ── Styles ────────────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
   root:   { flex: 1, backgroundColor: T.bg },
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32 },
+  scroll: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: 32 },
 
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12,
+    paddingHorizontal: space.xl, paddingTop: space.lg, paddingBottom: space.md,
   },
   backBtn:     { width: 60 },
-  backText:    { fontSize: FS.note, color: T.textMuted, letterSpacing: 0.5 },
+  backText:    { fontSize: FS.body, color: T.textMuted, letterSpacing: 0.5 },
   headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600', letterSpacing: 0.5 },
 
   // Deck selector
   deckSelector: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
-    borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14,
+    borderRadius: 14, paddingHorizontal: space.lg, paddingVertical: 14,
   },
   deckName:        { fontSize: FS.ui, color: T.textPrimary, fontWeight: '500' },
-  deckDesc:        { fontSize: FS.caption, color: T.textMuted, marginTop: 2 },
-  deckPlaceholder: { flex: 1, fontSize: FS.input, color: T.textMuted },
-  deckCaret:       { fontSize: FS.body, color: T.textMuted, marginLeft: 12 },
+  deckDesc:        { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
+  deckPlaceholder: { flex: 1, fontSize: FS.ui, color: T.textMuted },
+  deckCaret:       { fontSize: FS.body, color: T.textMuted, marginLeft: space.md },
 
   // Difficulty chips container
-  chips:    { gap: 8 },
-  diffHint: { fontSize: FS.hint, color: T.textMuted, marginTop: 8, fontStyle: 'italic' },
+  chips:    { gap: space.sm },
+  diffHint: { fontSize: FS.label, color: T.textMuted, marginTop: space.sm },
 
   // Footer
   footer: {
-    paddingHorizontal: 20,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 20,
-    paddingTop: 12,
+    paddingHorizontal: space.xl,
+    paddingBottom: Platform.OS === 'ios' ? space.xxl : space.xl,
+    paddingTop: space.md,
     borderTopWidth: 1,
     borderTopColor: T.border,
   },
@@ -312,9 +313,9 @@ const s = StyleSheet.create({
   // Deck picker search
   searchWrap: {
     backgroundColor: T.surface2, borderWidth: 1, borderColor: T.border,
-    borderRadius: 10, paddingHorizontal: 12, marginBottom: 8,
+    borderRadius: 10, paddingHorizontal: space.md, marginBottom: space.sm,
   },
-  searchInput: { color: T.textPrimary, fontSize: FS.input, paddingVertical: 10 },
+  searchInput: { color: T.textPrimary, fontSize: FS.ui, paddingVertical: 10 },
 
   // Deck list rows
   row: {
@@ -322,8 +323,8 @@ const s = StyleSheet.create({
     paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: T.border,
   },
   rowActive:     {},
-  rowName:       { fontSize: FS.input, color: T.textSecondary, fontWeight: '500' },
+  rowName:       { fontSize: FS.ui, color: T.textSecondary, fontWeight: '500' },
   rowNameActive: { color: T.textPrimary },
-  rowDesc:       { fontSize: FS.caption, color: T.textMuted, marginTop: 2 },
-  checkmark:     { fontSize: FS.ui, color: T.accent, marginLeft: 12 },
+  rowDesc:       { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
+  checkmark:     { fontSize: FS.ui, color: T.accent, marginLeft: space.md },
 });
