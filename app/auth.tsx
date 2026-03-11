@@ -59,7 +59,7 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
         <Text style={s.forgotText}>Forgot password?</Text>
       </TouchableOpacity>
 
-      <Button label="Sign in" onPress={submit} disabled={!email || !password} loading={loading} style={s.ctaTop} />
+      <Button label="Sign in" onPress={submit} disabled={!email || !password} loading={loading} shape="rounded" style={s.ctaTop} />
 
       <View style={s.divider}>
         <View style={s.dividerLine} />
@@ -119,7 +119,7 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
         placeholder="Min. 8 characters" secureTextEntry
         hasError={!!error && password.length < 8} errorText={error || undefined} />
 
-      <Button label="Create account" onPress={submit} disabled={!email || !password} loading={loading} style={s.ctaTop} />
+      <Button label="Create account" onPress={submit} disabled={!email || !password} loading={loading} shape="rounded" style={s.ctaTop} />
 
       <View style={s.divider}>
         <View style={s.dividerLine} />
@@ -179,7 +179,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
       <Field label="EMAIL" value={email} onChange={setEmail}
         placeholder="you@example.com" errorText={error || undefined} />
 
-      <Button label="Send reset link" onPress={submit} disabled={!email} loading={loading} style={s.ctaTop} />
+      <Button label="Send reset link" onPress={submit} disabled={!email} loading={loading} shape="rounded" style={s.ctaTop} />
     </>
   );
 }
