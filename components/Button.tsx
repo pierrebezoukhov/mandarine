@@ -88,7 +88,7 @@ const s = StyleSheet.create({
 
   // Labels
   label: {
-    fontSize: FS.input,
+    fontSize: FS.ui,
     fontWeight: '500',
   },
   labelPrimary:   { color: '#fff' },

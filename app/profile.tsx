@@ -6,6 +6,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { T, MONO, FS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { Avatar } from '@/components/Avatar';
 import { StatCard } from '@/components/StatCard';
 import { Section } from '@/components/Section';
@@ -138,16 +139,20 @@ export default function ProfileScreen() {
       >
         {/* Avatar */}
         <View style={s.avatarWrap}>
-          <Avatar
-            uri={avatarUri}
-            initials={initials}
-            size={96}
-            onPress={pickAvatar}
-          />
-          {uploading
-            ? <ActivityIndicator size="small" color={T.textMuted} style={s.avatarHint} />
-            : <Text style={s.avatarHint}>tap to change</Text>
-          }
+          <View style={s.avatarContainer}>
+            <Avatar
+              uri={avatarUri}
+              initials={initials}
+              size={96}
+              onPress={pickAvatar}
+            />
+            {uploading
+              ? <ActivityIndicator size="small" color={T.textMuted} style={s.editBadge} />
+              : <View style={s.editBadge} pointerEvents="none">
+                  <Text style={s.editIcon}>✎</Text>
+                </View>
+            }
+          </View>
         </View>
 
         {/* Global stats */}
@@ -241,19 +246,33 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: space.xl,
+    paddingTop: space.lg,
+    paddingBottom: space.sm,
   },
   headerBtn:   { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
   backText:    { fontSize: FS.body, color: T.textSecondary },
   title:       { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
-  settingsIcon: { fontSize: FS.sub, textAlign: 'right' },
+  settingsIcon: { fontSize: FS.heading, textAlign: 'right' },
 
-  scroll: { paddingHorizontal: 20, paddingBottom: 48 },
+  scroll: { paddingHorizontal: space.xl, paddingBottom: space.giant },
 
-  avatarWrap: { alignItems: 'center', paddingVertical: 28 },
-  avatarHint: { marginTop: 8, fontSize: FS.hint, color: T.textMuted, letterSpacing: 0.5 },
+  avatarWrap:      { alignItems: 'center', paddingVertical: space.xxxl },
+  avatarContainer: { position: 'relative' },
+  editBadge: {
+    position:        'absolute',
+    bottom:          0,
+    right:           0,
+    width:           26,
+    height:          26,
+    borderRadius:    13,
+    backgroundColor: T.surface2,
+    borderWidth:     1,
+    borderColor:     T.border,
+    alignItems:      'center',
+    justifyContent:  'center',
+  },
+  editIcon: { fontSize: 11, color: T.textSecondary, lineHeight: 14 },
 
   grid:    { flexDirection: 'row', gap: 10 },
   gridGap: { marginTop: 10 },
@@ -262,18 +281,18 @@ const s = StyleSheet.create({
   hskRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: space.md,
     marginBottom: 14,
   },
   hskLabel: {
-    fontSize: FS.caption,
+    fontSize: FS.label,
     color: T.textMuted,
     fontFamily: MONO,
     width: 44,
   },
 
-  sessionRow: { paddingVertical: 12 },
+  sessionRow: { paddingVertical: space.md },
   sessionDivider: { borderBottomWidth: 1, borderBottomColor: T.border },
-  sessionDeck: { fontSize: FS.body, color: T.textPrimary, marginBottom: 4 },
-  sessionMeta: { fontSize: FS.caption, color: T.textMuted, fontFamily: MONO },
+  sessionDeck: { fontSize: FS.body, color: T.textPrimary, marginBottom: space.xs },
+  sessionMeta: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
 });

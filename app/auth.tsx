@@ -5,7 +5,8 @@ import {
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
-import { T } from '@/theme/tokens';
+import { T, FS, LH, LS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
 import { TabSwitcher } from '@/components/TabSwitcher';
@@ -66,7 +67,7 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
         <View style={s.dividerLine} />
       </View>
 
-      <Button label="Continue with Google" onPress={google} variant="secondary" shape="rounded" />
+      <Button label="Continue with Google" onPress={google} variant="secondary" />
 
       <Text style={s.footer}>
         No account?{' '}
@@ -126,7 +127,7 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
         <View style={s.dividerLine} />
       </View>
 
-      <Button label="Continue with Google" onPress={google} variant="secondary" shape="rounded" />
+      <Button label="Continue with Google" onPress={google} variant="secondary" />
 
       <Text style={s.footer}>
         Already have an account?{' '}
@@ -156,7 +157,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   if (sent) return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: 22 }}>✓</Text>
+        <Text style={{ color: T.success, fontSize: FS.heading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Check your inbox</Text>
       <Text style={s.successSub}>
@@ -188,7 +189,7 @@ function ConfirmScreen({ email, onBack }: { email: string; onBack: () => void })
   return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: 22 }}>✓</Text>
+        <Text style={{ color: T.success, fontSize: FS.heading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Confirm your email</Text>
       <Text style={s.successSub}>
@@ -256,34 +257,34 @@ export default function AuthScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
   root:   { flex: 1, backgroundColor: T.bg },
-  scroll: { flexGrow: 1, paddingHorizontal: 28, paddingBottom: 48 },
+  scroll: { flexGrow: 1, paddingHorizontal: space.xxxl, paddingBottom: space.giant },
 
-  logo:      { paddingTop: 72, marginBottom: 48 },
-  logoHanzi: { fontSize: 32, color: T.textPrimary, letterSpacing: 2, marginBottom: 4 },
-  logoLabel: { fontSize: 11, color: T.textMuted, letterSpacing: 6 },
+  logo:      { paddingTop: 72, marginBottom: space.giant },
+  logoHanzi: { fontSize: FS.score, color: T.textPrimary, letterSpacing: LS.tighter * FS.score, marginBottom: space.xs },
+  logoLabel: { fontSize: FS.label, color: T.textMuted },
 
   tabs: { marginBottom: 32 },
 
-  heading: { fontSize: 26, color: T.textPrimary, marginBottom: 8, fontStyle: 'italic' },
-  sub:     { fontSize: 14, color: T.textMuted, marginBottom: 28, lineHeight: 21 },
+  heading: { fontSize: FS.title, color: T.textPrimary, marginBottom: space.xs },
+  sub:     { fontSize: FS.body, color: T.textMuted, marginBottom: space.xxxl, lineHeight: LH.body },
 
-  ctaTop: { marginTop: 8 },
+  ctaTop: { marginTop: space.sm },
 
-  forgotBtn:  { alignSelf: 'flex-end', marginTop: -6, marginBottom: 8 },
-  forgotText: { fontSize: 10, color: T.textMuted, letterSpacing: 1 },
+  forgotBtn:  { alignSelf: 'flex-end', marginTop: -6, marginBottom: space.sm },
+  forgotText: { fontSize: FS.label, color: T.textMuted },
 
-  divider:     { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 20 },
+  divider:     { flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.xl },
   dividerLine: { flex: 1, height: 1, backgroundColor: T.border },
-  dividerText: { fontSize: 10, color: T.textMuted, letterSpacing: 2 },
+  dividerText: { fontSize: FS.label, color: T.textMuted },
 
-  footer:     { marginTop: 28, textAlign: 'center', fontSize: 13, color: T.textMuted },
+  footer:     { marginTop: space.xxxl, textAlign: 'center', fontSize: FS.body, color: T.textMuted },
   footerLink: { color: T.textSecondary, textDecorationLine: 'underline' },
 
-  backBtn:  { marginBottom: 24 },
-  backText: { color: T.textMuted, fontSize: 11, letterSpacing: 1 },
+  backBtn:  { marginBottom: space.xxl },
+  backText: { color: T.textMuted, fontSize: FS.label },
 
-  successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 16 },
+  successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
   successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(74,158,107,0.12)', borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)', alignItems: 'center', justifyContent: 'center' },
-  successTitle: { fontSize: 22, color: T.textPrimary, fontStyle: 'italic' },
-  successSub:   { fontSize: 13, color: T.textMuted, textAlign: 'center', lineHeight: 21, maxWidth: 260 },
+  successTitle: { fontSize: FS.heading, color: T.textPrimary },
+  successSub:   { fontSize: FS.body, color: T.textMuted, textAlign: 'center', lineHeight: LH.body, maxWidth: 260 },
 });

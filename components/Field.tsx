@@ -56,7 +56,6 @@ const s = StyleSheet.create({
   label: {
     fontSize: FS.label,
     color: T.textMuted,
-    letterSpacing: 2,
     marginBottom: 6,
     textTransform: 'uppercase',
   },
@@ -67,7 +66,7 @@ const s = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     color: T.textPrimary,
-    fontSize: FS.input,
+    fontSize: FS.ui,
   },
   inputFocused: {
     borderColor: T.borderFocus,
@@ -77,9 +76,8 @@ const s = StyleSheet.create({
     borderColor: 'rgba(224,82,82,0.5)',
   },
   errorText: {
-    fontSize: FS.hint,
+    fontSize: FS.label,
     color: T.error,
-    letterSpacing: 0.5,
     marginTop: 4,
   },
 });

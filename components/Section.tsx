@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { ReactNode } from 'react';
-import { T, FS } from '@/theme/tokens';
+import { T, FS, LS } from '@/theme/tokens';
 
 interface SectionProps {
   label: string;
@@ -21,8 +21,8 @@ const s = StyleSheet.create({
   wrap:  { marginBottom: 28 },
   label: {
     fontSize: FS.label,
+    letterSpacing: LS.loose * FS.label,
     color: T.textMuted,
-    letterSpacing: 2.5,
     marginBottom: 10,
     textTransform: 'uppercase',
   },

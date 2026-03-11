@@ -49,5 +49,5 @@ const s = StyleSheet.create({
 
   label:       { fontSize: FS.body, color: T.textMuted, fontWeight: '500' },
   labelActive: { color: T.textPrimary },
-  sublabel:    { fontSize: FS.hint, color: T.textMuted, marginTop: 1 },
+  sublabel:    { fontSize: FS.label, color: T.textMuted, marginTop: 1 },
 });
