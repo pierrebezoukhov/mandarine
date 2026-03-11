@@ -49,9 +49,9 @@ const s = StyleSheet.create({
   counter: {
     fontFamily: MONO,
     fontSize: FS.label,
-    color: T.textMuted,
+    color: T.textPrimary,
   },
   counterTotal: {
-    opacity: 0.5,
+    color: T.textMuted,
   },
 });

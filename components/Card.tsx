@@ -89,7 +89,7 @@ const s = StyleSheet.create({
     backgroundColor: T.surface2,
     borderColor: T.border,
   },
-  iconText:     { fontSize: FS.heading, color: T.accent, letterSpacing: LS.tight * FS.heading },
+  iconText:     { fontSize: FS.heading, color: T.textPrimary, letterSpacing: LS.tight * FS.heading },
   iconTextMuted:{ color: T.textMuted },
 
   body:     { flex: 1 },
