@@ -265,7 +265,7 @@ const s = StyleSheet.create({
 
   tabs: { marginBottom: 32 },
 
-  heading: { fontSize: FS.title, color: T.textPrimary, marginBottom: space.sm },
+  heading: { fontSize: FS.title, color: T.textPrimary, marginBottom: space.xs },
   sub:     { fontSize: FS.body, color: T.textMuted, marginBottom: space.xxxl, lineHeight: LH.body },
 
   ctaTop: { marginTop: space.sm },
