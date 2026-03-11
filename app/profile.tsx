@@ -139,16 +139,20 @@ export default function ProfileScreen() {
       >
         {/* Avatar */}
         <View style={s.avatarWrap}>
-          <Avatar
-            uri={avatarUri}
-            initials={initials}
-            size={96}
-            onPress={pickAvatar}
-          />
-          {uploading
-            ? <ActivityIndicator size="small" color={T.textMuted} style={s.avatarHint} />
-            : <Text style={s.avatarHint}>tap to change</Text>
-          }
+          <View style={s.avatarContainer}>
+            <Avatar
+              uri={avatarUri}
+              initials={initials}
+              size={96}
+              onPress={pickAvatar}
+            />
+            {uploading
+              ? <ActivityIndicator size="small" color={T.textMuted} style={s.editBadge} />
+              : <View style={s.editBadge} pointerEvents="none">
+                  <Text style={s.editIcon}>✎</Text>
+                </View>
+            }
+          </View>
         </View>
 
         {/* Global stats */}
@@ -253,8 +257,22 @@ const s = StyleSheet.create({
 
   scroll: { paddingHorizontal: space.xl, paddingBottom: space.giant },
 
-  avatarWrap: { alignItems: 'center', paddingVertical: space.xxxl },
-  avatarHint: { marginTop: space.sm, fontSize: FS.label, color: T.textMuted },
+  avatarWrap:      { alignItems: 'center', paddingVertical: space.xxxl },
+  avatarContainer: { position: 'relative' },
+  editBadge: {
+    position:        'absolute',
+    bottom:          0,
+    right:           0,
+    width:           26,
+    height:          26,
+    borderRadius:    13,
+    backgroundColor: T.surface2,
+    borderWidth:     1,
+    borderColor:     T.border,
+    alignItems:      'center',
+    justifyContent:  'center',
+  },
+  editIcon: { fontSize: 11, color: T.textSecondary, lineHeight: 14 },
 
   grid:    { flexDirection: 'row', gap: 10 },
   gridGap: { marginTop: 10 },

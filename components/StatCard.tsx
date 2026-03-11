@@ -41,5 +41,6 @@ const s = StyleSheet.create({
     fontSize:      FS.label,
     color:         T.textMuted,
     textTransform: 'uppercase',
+    letterSpacing: LS.loose * FS.label,
   },
 });
