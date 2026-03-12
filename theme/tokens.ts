@@ -21,7 +21,7 @@ export const T = {
   // Text
   textPrimary:  '#F0EBE0',
   textSecondary:'#A09880',
-  textMuted:    '#5C5646',
+  textMuted:    '#928A78',
   textHanzi:    '#F5F0E8',
 
   // Accent (red)

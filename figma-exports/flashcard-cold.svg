@@ -1,0 +1,114 @@
+<svg width="375" height="812" viewBox="0 0 375 812"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ═══ Cold ═══ -->
+
+  <!-- Background -->
+  <rect width="375" height="812" fill="#0A0F16" rx="40"/>
+
+  <!-- ── Top bar ── -->
+  <g>
+    <!-- Close button -->
+    <text x="28" y="72" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="21"
+          fill="#6A7A8E" text-anchor="middle">✕</text>
+
+    <!-- Progress track -->
+    <rect x="56" y="66" width="210" height="4" rx="2"
+          fill="#161D28"/>
+    <!-- Progress fill -->
+    <rect x="56" y="66" width="84" height="4" rx="2"
+          fill="#4A7FBE" fill-opacity="0.7"/>
+
+    <!-- Progress counter -->
+    <text x="278" y="72" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="12">
+      <tspan fill="#E8EEF5">8</tspan>
+      <tspan fill="#6A7A8E"> / 20</tspan>
+    </text>
+
+    <!-- Back button -->
+    <text x="347" y="74" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="24"
+          fill="#6A7A8E" text-anchor="middle">‹</text>
+  </g>
+
+  <!-- ── Score strip ── -->
+  <g>
+    <text x="187.5" y="118" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="14"
+          text-anchor="middle" letter-spacing="0.5">
+      <tspan fill="#E05252">✕  2</tspan>
+      <tspan fill="#6A7A8E">   ·   </tspan>
+      <tspan fill="#4A9E6B">5  ✓</tspan>
+    </text>
+  </g>
+
+  <!-- ── HSK badge ── -->
+  <g>
+    <rect x="297" y="142" width="56" height="22" rx="11"
+          fill="none" stroke="#C8DCFF" stroke-opacity="0.08" stroke-width="1"/>
+    <text x="325" y="157" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="10"
+          fill="#6A7A8E" text-anchor="middle" letter-spacing="1.5">HSK 1</text>
+  </g>
+
+  <!-- ── Hanzi character ── -->
+  <text x="187.5" y="320" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="96"
+        fill="#EEF2F8" text-anchor="middle"
+        letter-spacing="-4.8">学</text>
+
+  <!-- ── Pinyin ── -->
+  <text x="187.5" y="368" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="21"
+        fill="#4A7FBE" fill-opacity="0.85" text-anchor="middle"
+        letter-spacing="3">xué</text>
+
+  <!-- ── Example divider ── -->
+  <line x1="175.5" y1="396" x2="199.5" y2="396"
+        stroke="#C8DCFF" stroke-opacity="0.08" stroke-width="1"/>
+
+  <!-- ── Example hanzi ── -->
+  <text x="187.5" y="420" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="21"
+        fill="#B8C4D0" text-anchor="middle">我在学中文</text>
+
+  <!-- ── Example pinyin ── -->
+  <text x="187.5" y="446" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="12"
+        fill="#6A7A8A" text-anchor="middle"
+        letter-spacing="1">wǒ zài xué zhōngwén</text>
+
+  <!-- ── Example meaning ── -->
+  <text x="187.5" y="474" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="14"
+        fill="#7A8A9A" text-anchor="middle">I'm studying Chinese</text>
+
+  <!-- ── Part of speech ── -->
+  <text x="187.5" y="508" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="12"
+        fill="#6A7A8E" text-anchor="middle"
+        letter-spacing="2" font-weight="500">VERB</text>
+
+  <!-- ── Meaning ── -->
+  <text x="187.5" y="534" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="21"
+        fill="#E8EEF5" text-anchor="middle"
+        letter-spacing="-0.525">to study; to learn</text>
+
+  <!-- ── Tap hint ── -->
+  <text x="187.5" y="680" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="12"
+        fill="#6A7A8E" fill-opacity="0.6" text-anchor="middle"
+        letter-spacing="1.5">fully revealed</text>
+
+  <!-- ── FAB: Forgot ── -->
+  <g>
+    <circle cx="70" cy="730" r="30"
+            fill="#E05252" fill-opacity="0.12" stroke="#E05252" stroke-opacity="0.25" stroke-width="1"/>
+    <text x="70" y="737" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="21"
+          fill="#E05252" text-anchor="middle">✕</text>
+  </g>
+
+  <!-- ── FAB: Got it ── -->
+  <g>
+    <circle cx="305" cy="730" r="30"
+            fill="#4A9E6B" fill-opacity="0.12" stroke="#4A9E6B" stroke-opacity="0.25" stroke-width="1"/>
+    <text x="305" y="737" font-family="-apple-system, 'Helvetica Neue', sans-serif" font-size="21"
+          fill="#4A9E6B" text-anchor="middle">✓</text>
+  </g>
+
+  <!-- ── Variation label (for reference in Figma) ── -->
+  <text x="187.5" y="792" font-family="'SF Mono', 'Menlo', 'Consolas', monospace" font-size="10"
+        fill="#6A7A8E" fill-opacity="0.4" text-anchor="middle"
+        letter-spacing="2">COLD</text>
+
+</svg>

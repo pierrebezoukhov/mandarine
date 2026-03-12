@@ -52,7 +52,7 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 |---|---|---|
 | `T.textPrimary` | `#F0EBE0` | Headings, active labels, card titles |
 | `T.textSecondary` | `#A09880` | Body text, secondary labels |
-| `T.textMuted` | `#5C5646` | Hints, placeholders, disabled states |
+| `T.textMuted` | `#928A78` | Section labels, placeholders, inactive states — passes WCAG AA (4.5:1) on all surfaces |
 | `T.textHanzi` | `#F5F0E8` | The large Hanzi character on flashcards |
 
 ### Accent
@@ -301,10 +301,10 @@ Action row with a Chinese-character icon, title, subtitle, and directional arrow
 
 #### Variants
 
-| Variant | Icon background | Border |
-|---|---|---|
-| `primary` | `T.accentDim` + `T.accentBorder` border | `T.accentBorder` |
-| `secondary` | `T.surface2` | `T.border` |
+| Variant | Icon background | Border | Icon text |
+|---|---|---|---|
+| `primary` | `T.accentDim` + `T.accentBorder` border | `T.accentBorder` | `T.textPrimary` |
+| `secondary` | `T.surface2` | `T.border` | `T.textMuted` |
 
 #### Usage
 
@@ -530,7 +530,9 @@ Thin fill track with a `{current} / {total}` counter to the right. Used in the s
 
 ```
 ──────────────────────────    3 / 20
-  fill (T.accent, 70% opacity)        MONO counter
+  fill (T.accent, 70% opacity)        MONO counter:
+                                        current → T.textPrimary
+                                        / total → T.textMuted
 ```
 
 #### Usage
@@ -547,7 +549,7 @@ import { ProgressBar } from '@/components/ProgressBar';
 
 **File:** `components/Section.tsx`
 
-Labelled section wrapper. Renders an uppercase spaced label above its children with a `28px` bottom margin.
+Labelled section wrapper. Renders an uppercase label (`FS.label`, `T.textMuted`, `LS.loose` letter-spacing) above its children with a `28px` bottom margin.
 
 #### Props
 

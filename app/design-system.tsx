@@ -104,7 +104,7 @@ export default function DesignSystemScreen() {
             <ColorGroup label="TEXT">
               <Swatch token="T.textPrimary"   hex="#F0EBE0" label="textPrimary"   usage="Headings, active labels, card titles" />
               <Swatch token="T.textSecondary" hex="#A09880" label="textSecondary" usage="Body text, secondary labels, back buttons" />
-              <Swatch token="T.textMuted"     hex="#5C5646" label="textMuted"     usage="Hints, placeholders, disabled states" />
+              <Swatch token="T.textMuted"     hex="#928A78" label="textMuted"     usage="Section labels, placeholders, inactive states" />
               <Swatch token="T.textHanzi"     hex="#F5F0E8" label="textHanzi"     usage="Large hanzi character on flashcards" />
             </ColorGroup>
 
@@ -355,9 +355,9 @@ export default function DesignSystemScreen() {
               />
               <ColorRoleRow
                 token="T.textMuted"
-                hex="#5C5646"
-                rule="Passive / background text — deliberately recedes"
-                where="hints, placeholders, section labels, captions, disabled states"
+                hex="#928A78"
+                rule="Passive / background text — recedes, WCAG AA compliant (4.5:1)"
+                where="section labels, placeholders, inactive states, captions"
               />
             </Section>
 
