@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/pierrebezoukhov/mandarine/compare/v1.1.0...v1.1.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* **a11y:** raise contrast ratios to pass WCAG AA across all components ([f32866f](https://github.com/pierrebezoukhov/mandarine/commit/f32866faf0e3c8ec0940e2f4cbf3b6c73df5f88a)), closes [#5C5646](https://github.com/pierrebezoukhov/mandarine/issues/5C5646) [#928A78](https://github.com/pierrebezoukhov/mandarine/issues/928A78)
+* update hardcoded textMuted hex in design-system screen ([8105b69](https://github.com/pierrebezoukhov/mandarine/commit/8105b697e784a02b266cb0ae99a3057c12435a0f)), closes [#928A78](https://github.com/pierrebezoukhov/mandarine/issues/928A78)
+
 # [1.1.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.0.0...v1.1.0) (2026-03-11)
 
 
