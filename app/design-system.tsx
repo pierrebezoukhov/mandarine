@@ -17,7 +17,7 @@ import { Avatar } from '@/components/Avatar';
 import { BottomSheetModal } from '@/components/BottomSheetModal';
 
 // ── Nav anchors ───────────────────────────────────────────────────────────────
-const NAV_ITEMS = ['Colors', 'Typography', 'Rules', 'Spacing', 'Components'] as const;
+const NAV_ITEMS = ['Colors', 'Typography', 'Rules', 'Spacing', 'Components', 'Examples'] as const;
 
 
 export default function DesignSystemScreen() {
@@ -1079,10 +1079,408 @@ export default function DesignSystemScreen() {
           </View>
         )}
 
+        {/* ════════════════════════════════════════════════════════════════
+            EXAMPLES — annotated screen mockups
+        ════════════════════════════════════════════════════════════════ */}
+        {activeNav === 'Examples' && (
+          <View>
+            <DocHeading>Screen Examples</DocHeading>
+            <DocSubheading>
+              Placeholder mockups of every screen, annotated with the exact
+              design system tokens and components used. The left side shows
+              the screen; the right side shows what's driving each element.
+            </DocSubheading>
+
+            {/* ── HOME ─────────────────────────────────────────────── */}
+            <ScreenExample title="Home" file="app/(tabs)/home.tsx">
+              {/* Phone frame content */}
+              <PhoneFrame>
+                {/* Header */}
+                <View style={ex.homeHeader}>
+                  <View>
+                    <Text style={{ fontSize: FS.subheading, color: T.textPrimary, letterSpacing: LS.tight * FS.subheading }}>漢字</Text>
+                    <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2 }}>HANZIFLASH</Text>
+                  </View>
+                  <Avatar initials="PB" size={28} />
+                </View>
+                {/* Greeting */}
+                <View style={ex.homeGreet}>
+                  <Text style={{ fontSize: FS.title, color: T.textPrimary, letterSpacing: LS.tight * FS.title, marginBottom: 4 }}>Hello, Pierre.</Text>
+                  <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
+                </View>
+                {/* Cards */}
+                <View style={ex.homeCards}>
+                  <Card icon="开" title="New session" subtitle="Start a fresh round of flashcards" variant="primary" onPress={() => {}} />
+                  <Card icon="续" title="Resume session" subtitle="No session in progress" variant="secondary" onPress={() => {}} disabled />
+                </View>
+              </PhoneFrame>
+              {/* Annotations */}
+              <AnnotationList items={[
+                { token: 'FS.subheading', value: '21px', note: 'Logo hanzi — display scale +1' },
+                { token: 'LS.tight', value: '−0.025em', note: 'Heading letter-spacing' },
+                { token: 'Avatar', value: '28px', note: 'Component — initials fallback' },
+                { token: 'FS.title', value: '42px', note: 'Greeting — display scale +3' },
+                { token: 'FS.body', value: '16px', note: 'Subtitle — body scale base' },
+                { token: 'Card', value: 'primary', note: 'Component — accent-tinted icon box' },
+                { token: 'Card', value: 'secondary', note: 'Component — disabled state, 45% opacity' },
+                { token: 'T.bg', value: '#131109', note: 'Screen background' },
+                { token: 'space.xl', value: '20px', note: 'Card row padding' },
+              ]} />
+            </ScreenExample>
+
+            {/* ── SESSION (FLASHCARD) ──────────────────────────────── */}
+            <ScreenExample title="Session — Flashcard" file="app/session.tsx">
+              <PhoneFrame>
+                {/* Top bar */}
+                <View style={ex.sessionTopbar}>
+                  <Text style={{ fontSize: FS.subheading, color: T.textMuted }}>✕</Text>
+                  <ProgressBar current={5} total={20} style={{ flex: 1 }} />
+                  <Text style={{ fontSize: FS.subheading, color: T.textMuted }}>‹</Text>
+                </View>
+                {/* Score strip */}
+                <View style={ex.sessionScoreStrip}>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: T.error }}>✕  2</Text>
+                  <Text style={{ color: T.textMuted, fontSize: FS.ui }}>·</Text>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: T.success }}>3  ✓</Text>
+                </View>
+                {/* Card area */}
+                <View style={ex.sessionCardArea}>
+                  <View style={ex.sessionHskBadge}>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>HSK 1</Text>
+                  </View>
+                  <Text style={{
+                    fontSize: FS.hanzi, lineHeight: LH.hanzi, color: T.textHanzi,
+                    letterSpacing: LS.tighter * FS.hanzi, textAlign: 'center',
+                  }}>学</Text>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: 3,
+                    color: T.accent, opacity: 0.85, marginTop: 14, textAlign: 'center',
+                  }}>xué</Text>
+                  <View style={{ width: 24, height: 1, backgroundColor: T.border, marginTop: 16, alignSelf: 'center' }} />
+                  <Text style={{
+                    fontSize: FS.subheading, lineHeight: LH.subheading,
+                    color: '#C8BFA8', textAlign: 'center', marginTop: 12,
+                  }}>我喜欢学习</Text>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.label, color: '#7A7060',
+                    textAlign: 'center', letterSpacing: 1, marginTop: 4,
+                  }}>wǒ xǐhuān xuéxí</Text>
+                </View>
+                {/* FABs */}
+                <View style={ex.sessionFabs}>
+                  <View style={[ex.fab, { backgroundColor: 'rgba(224,82,82,0.12)', borderColor: 'rgba(224,82,82,0.25)' }]}>
+                    <Text style={{ fontSize: FS.subheading, color: T.error }}>✕</Text>
+                  </View>
+                  <View style={[ex.fab, { backgroundColor: 'rgba(74,158,107,0.12)', borderColor: 'rgba(74,158,107,0.25)' }]}>
+                    <Text style={{ fontSize: FS.subheading, color: T.success }}>✓</Text>
+                  </View>
+                </View>
+              </PhoneFrame>
+              <AnnotationList items={[
+                { token: 'ProgressBar', value: 'component', note: 'Track + MONO counter' },
+                { token: 'FS.hanzi', value: '72px', note: 'Manual override — outside both scales' },
+                { token: 'LH.hanzi', value: '80px', note: 'Tight 1.11 — 8px air in bounding box' },
+                { token: 'T.textHanzi', value: '#F5F0E8', note: 'Dedicated character color' },
+                { token: 'FS.pinyin', value: '20px', note: 'Body scale +1 — MONO font' },
+                { token: 'T.accent', value: '#C0392B', note: 'Pinyin color — accent red' },
+                { token: 'FS.subheading', value: '21px', note: 'Example sentence hanzi' },
+                { token: 'LH.subheading', value: '28px', note: 'Tight — reads as sentence, not isolated glyphs' },
+                { token: 'FS.label', value: '13px', note: 'Example pinyin — body scale −1' },
+                { token: 'T.error', value: '#E05252', note: 'Forgot FAB — semantic color' },
+                { token: 'T.success', value: '#4A9E6B', note: 'Got it FAB — semantic color' },
+              ]} />
+            </ScreenExample>
+
+            {/* ── SESSION COMPLETE ─────────────────────────────────── */}
+            <ScreenExample title="Session — Complete" file="app/session.tsx">
+              <PhoneFrame>
+                <View style={ex.completeCentered}>
+                  <Text style={{ fontSize: FS.seal, color: T.accent, opacity: 0.3 }}>印</Text>
+                  <Text style={{
+                    fontSize: FS.title, color: T.textPrimary, textAlign: 'center',
+                    letterSpacing: LS.tight * FS.title, marginTop: space.xxl,
+                  }}>Session complete</Text>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.label, color: T.textMuted,
+                    letterSpacing: 1, marginTop: space.sm,
+                  }}>20 cards reviewed</Text>
+                  <View style={{ flexDirection: 'row', gap: space.xxl, marginTop: space.xxl, alignItems: 'center' }}>
+                    <View style={{ alignItems: 'center' }}>
+                      <Text style={{ fontSize: FS.score, lineHeight: LH.score, color: T.success, letterSpacing: LS.tighter * FS.score }}>14</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>GOT IT</Text>
+                    </View>
+                    <Text style={{ color: T.textMuted, fontSize: FS.subheading }}>·</Text>
+                    <View style={{ alignItems: 'center' }}>
+                      <Text style={{ fontSize: FS.score, lineHeight: LH.score, color: T.error, letterSpacing: LS.tighter * FS.score }}>6</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>FORGOT</Text>
+                    </View>
+                  </View>
+                  <View style={{
+                    borderWidth: 1, borderColor: T.border, borderRadius: 100,
+                    paddingHorizontal: space.xl, paddingVertical: space.sm, marginTop: space.xxl,
+                  }}>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.body, color: T.textMuted, letterSpacing: 1 }}>70% retention</Text>
+                  </View>
+                  <View style={{ width: '100%', gap: 10, marginTop: space.giant, paddingHorizontal: space.lg }}>
+                    <Button label="Study again" onPress={() => {}} />
+                    <Button label="Back to home" variant="secondary" onPress={() => {}} />
+                  </View>
+                </View>
+              </PhoneFrame>
+              <AnnotationList items={[
+                { token: 'FS.seal', value: '50px', note: 'Decorative — outside scales, 30% opacity' },
+                { token: 'FS.title', value: '42px', note: 'Display +3 — screen heading' },
+                { token: 'LS.tight', value: '−0.025em', note: 'Editorial heading tracking' },
+                { token: 'FS.score', value: '42px', note: 'Large numeric — tight LH.score 48px' },
+                { token: 'LS.tighter', value: '−0.05em', note: 'Dense tracking for large display' },
+                { token: 'Button', value: 'primary', note: 'Component — pill shape, accent fill' },
+                { token: 'Button', value: 'secondary', note: 'Component — outlined, surface fill' },
+              ]} />
+            </ScreenExample>
+
+            {/* ── SESSION SETUP ────────────────────────────────────── */}
+            <ScreenExample title="Session Setup" file="app/session-setup.tsx">
+              <PhoneFrame>
+                {/* Header */}
+                <View style={ex.setupHeader}>
+                  <Text style={{ fontSize: FS.body, color: T.textMuted }}>← Back</Text>
+                  <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>New Session</Text>
+                  <View style={{ width: 44 }} />
+                </View>
+                {/* Deck */}
+                <Section label="DECK">
+                  <View style={ex.deckSelector}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>HSK 1 — Basics</Text>
+                      <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2 }}>150 common characters</Text>
+                    </View>
+                    <Text style={{ fontSize: FS.body, color: T.textMuted }}>↓</Text>
+                  </View>
+                </Section>
+                {/* Cards per session */}
+                <Section label="CARDS PER SESSION">
+                  <SegmentedControl
+                    options={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '50', value: 50 }]}
+                    value={20}
+                    onChange={() => {}}
+                    allowCustom
+                  />
+                </Section>
+                {/* Difficulty */}
+                <Section label="DIFFICULTY">
+                  <View style={{ gap: space.sm }}>
+                    <Chip label="New" sublabel="Haven't seen yet" active={true} onPress={() => {}} />
+                    <Chip label="Review" sublabel="Due for review" active={false} onPress={() => {}} />
+                  </View>
+                </Section>
+              </PhoneFrame>
+              <AnnotationList items={[
+                { token: 'FW.semibold', value: '600', note: 'Header bar — structural landmark' },
+                { token: 'Section', value: 'component', note: 'Uppercase label + LS.loose tracking' },
+                { token: 'FS.label', value: '13px', note: 'Section labels — body scale −1' },
+                { token: 'FW.medium', value: '500', note: 'Deck name — interactive, tappable' },
+                { token: 'SegmentedControl', value: 'component', note: 'Preset segments + custom input' },
+                { token: 'Chip', value: 'component', note: 'Toggle rows — dot + label + sublabel' },
+                { token: 'T.accentDim', value: 'rgba(…,0.12)', note: 'Active chip fill' },
+                { token: 'T.accentBorder', value: 'rgba(…,0.28)', note: 'Active chip border' },
+                { token: 'radius.lg', value: '12px', note: 'Chip + deck selector corners' },
+              ]} />
+            </ScreenExample>
+
+            {/* ── AUTH ─────────────────────────────────────────────── */}
+            <ScreenExample title="Auth — Sign In" file="app/auth.tsx">
+              <PhoneFrame>
+                <View style={{ paddingHorizontal: space.xl }}>
+                  {/* Logo */}
+                  <View style={{ paddingTop: space.giant }}>
+                    <Text style={{ fontSize: FS.score, color: T.textPrimary, letterSpacing: LS.tighter * FS.score, marginBottom: space.xs }}>漢字</Text>
+                    <Text style={{ fontSize: FS.label, color: T.textMuted }}>HANZIFLASH</Text>
+                  </View>
+                  {/* Tabs */}
+                  <TabSwitcher
+                    tabs={[{ label: 'Sign in', value: 'login' }, { label: 'Create account', value: 'signup' }]}
+                    value="login"
+                    onChange={() => {}}
+                    style={{ marginVertical: space.xxl }}
+                  />
+                  {/* Form */}
+                  <Text style={{ fontSize: FS.title, color: T.textPrimary, marginBottom: space.xs }}>Welcome back</Text>
+                  <Text style={{ fontSize: FS.body, color: T.textMuted, lineHeight: LH.body, marginBottom: space.xxl }}>Sign in to continue your practice.</Text>
+                  <Field label="EMAIL" value="" onChange={() => {}} placeholder="you@example.com" />
+                  <Field label="PASSWORD" value="" onChange={() => {}} placeholder="••••••••" secureTextEntry />
+                  <Button label="Sign in" onPress={() => {}} disabled style={{ marginTop: space.sm }} />
+                  {/* Divider */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.xl }}>
+                    <View style={{ flex: 1, height: 1, backgroundColor: T.border }} />
+                    <Text style={{ fontSize: FS.label, color: T.textMuted }}>or</Text>
+                    <View style={{ flex: 1, height: 1, backgroundColor: T.border }} />
+                  </View>
+                  <Button label="Continue with Google" onPress={() => {}} variant="secondary" />
+                </View>
+              </PhoneFrame>
+              <AnnotationList items={[
+                { token: 'FS.score', value: '42px', note: 'Logo character — display scale' },
+                { token: 'TabSwitcher', value: 'component', note: 'Active underline indicator' },
+                { token: 'FS.title', value: '42px', note: 'Form heading — display +3' },
+                { token: 'LH.body', value: '24px', note: 'Subtitle — 1.50 ratio for prose' },
+                { token: 'Field', value: 'component', note: 'Label + input + focus/error states' },
+                { token: 'T.border', value: 'rgba(…,0.08)', note: 'Input border + divider line' },
+                { token: 'T.borderFocus', value: 'rgba(…,0.22)', note: 'Input focus ring' },
+                { token: 'Button', value: 'primary', note: 'CTA — disabled dims to 40%' },
+                { token: 'Button', value: 'secondary', note: 'OAuth — surface fill, outlined' },
+                { token: 'radius.pill', value: '100px', note: 'Button border-radius' },
+              ]} />
+            </ScreenExample>
+
+            {/* ── PROFILE ─────────────────────────────────────────── */}
+            <ScreenExample title="Profile" file="app/profile.tsx">
+              <PhoneFrame>
+                {/* Header */}
+                <View style={ex.setupHeader}>
+                  <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
+                  <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Profile</Text>
+                  <Text style={{ fontSize: FS.subheading, textAlign: 'right', width: 44 }}>⚙️</Text>
+                </View>
+                {/* Avatar */}
+                <View style={{ alignItems: 'center', paddingVertical: space.xxl }}>
+                  <Avatar initials="PB" size={72} />
+                </View>
+                {/* Stats */}
+                <Section label="GLOBAL PROGRESS">
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <StatCard label="Sessions" value={42} style={{ flex: 1 }} />
+                    <StatCard label="Cards seen" value={380} style={{ flex: 1 }} />
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                    <StatCard label="Guessed" value={280} style={{ flex: 1 }} />
+                    <StatCard label="Mastered" value={95} style={{ flex: 1 }} />
+                  </View>
+                </Section>
+                {/* HSK breakdown */}
+                <Section label="BY HSK LEVEL">
+                  <View style={{ gap: space.md }}>
+                    {[{ l: 1, c: 120, t: 150 }, { l: 2, c: 80, t: 150 }, { l: 3, c: 30, t: 300 }].map(({ l, c, t }) => (
+                      <View key={l} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                        <Text style={{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO, width: 40 }}>HSK {l}</Text>
+                        <ProgressBar current={c} total={t} style={{ flex: 1 }} />
+                      </View>
+                    ))}
+                  </View>
+                </Section>
+              </PhoneFrame>
+              <AnnotationList items={[
+                { token: 'FW.semibold', value: '600', note: 'Header title — structural weight' },
+                { token: 'Avatar', value: '72px', note: 'Component — initials fallback, tappable' },
+                { token: 'StatCard', value: 'component', note: 'MONO value + uppercase label' },
+                { token: 'FS.title', value: '42px', note: 'StatCard value font size' },
+                { token: 'LS.tight', value: '−0.025em', note: 'StatCard value tracking' },
+                { token: 'Section', value: 'component', note: 'Uppercase label wrapper' },
+                { token: 'ProgressBar', value: 'component', note: 'Fill opacity 70% + MONO counter' },
+                { token: 'T.surface', value: '#1e1b12', note: 'Card backgrounds' },
+                { token: 'radius.card', value: '16px', note: 'StatCard border-radius' },
+              ]} />
+            </ScreenExample>
+
+            {/* ── SETTINGS ────────────────────────────────────────── */}
+            <ScreenExample title="Settings" file="app/settings.tsx">
+              <PhoneFrame>
+                {/* Header */}
+                <View style={ex.setupHeader}>
+                  <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
+                  <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Settings</Text>
+                  <View style={{ width: 44 }} />
+                </View>
+                <View style={{ paddingHorizontal: space.sm }}>
+                  <Section label="PERSONAL INFO">
+                    <Field label="DISPLAY NAME" value="Pierre" onChange={() => {}} placeholder="Your first name" />
+                    <Text style={{ fontSize: FS.label, color: T.textMuted, textTransform: 'uppercase', marginBottom: space.sm }}>NATIVE LANGUAGE</Text>
+                    <SegmentedControl
+                      options={[{ label: 'Français', value: 'fr' }, { label: 'English', value: 'en' }, { label: '日本語', value: 'ja' }]}
+                      value="fr"
+                      onChange={() => {}}
+                      style={{ marginBottom: space.lg }}
+                    />
+                    <Text style={{ fontSize: FS.label, color: T.textMuted, textTransform: 'uppercase', marginBottom: space.sm }}>HSK GOAL</Text>
+                    <SegmentedControl
+                      options={[1, 2, 3, 4, 5, 6].map(n => ({ label: String(n), value: n }))}
+                      value={6}
+                      onChange={() => {}}
+                    />
+                  </Section>
+                  <Section label="ACCOUNT">
+                    <Text style={{ fontSize: FS.body, color: T.textMuted }}>pierre@example.com</Text>
+                  </Section>
+                  <Button label="Save" onPress={() => {}} style={{ marginBottom: 12 }} />
+                  <Button label="Sign out" variant="ghost" onPress={() => {}} />
+                </View>
+              </PhoneFrame>
+              <AnnotationList items={[
+                { token: 'Field', value: 'component', note: 'Uppercase label + bordered input' },
+                { token: 'FS.label', value: '13px', note: 'Form field labels — uppercase, spaced' },
+                { token: 'SegmentedControl', value: 'component', note: 'Preset option row, accent on active' },
+                { token: 'FS.body', value: '16px', note: 'Account email — base body size' },
+                { token: 'T.textMuted', value: '#928A78', note: 'Passive text — WCAG AA compliant' },
+                { token: 'Button', value: 'ghost', note: 'Text-only variant — no bg, no border' },
+                { token: 'space.xl', value: '20px', note: 'Section horizontal padding' },
+              ]} />
+            </ScreenExample>
+          </View>
+        )}
+
         <View style={s.footer}>
           <Text style={s.footerText}>Mandarine Design System · 2026</Text>
         </View>
       </ScrollView>
+    </View>
+  );
+}
+
+// ── Examples tab sub-components ───────────────────────────────────────────────
+
+function PhoneFrame({ children }: { children: ReactNode }) {
+  return (
+    <View style={ex.phone}>
+      <View style={ex.phoneNotch} />
+      <View style={ex.phoneContent}>{children}</View>
+      <View style={ex.phoneHomeBar} />
+    </View>
+  );
+}
+
+function ScreenExample({ title, file, children }: {
+  title: string; file: string; children: ReactNode;
+}) {
+  return (
+    <View style={ex.exampleWrap}>
+      <View style={ex.exampleHeader}>
+        <Text style={ex.exampleTitle}>{title}</Text>
+        <Text style={ex.exampleFile}>{file}</Text>
+      </View>
+      <View style={ex.exampleBody}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+function AnnotationList({ items }: {
+  items: { token: string; value: string; note: string }[];
+}) {
+  return (
+    <View style={ex.annotationList}>
+      <Text style={ex.annotationHeading}>TOKENS & COMPONENTS</Text>
+      {items.map((item, i) => (
+        <View key={i} style={ex.annotationRow}>
+          <View style={ex.annotationDot} />
+          <View style={ex.annotationMeta}>
+            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+              <Text style={ex.annotationToken}>{item.token}</Text>
+              <Text style={ex.annotationValue}>{item.value}</Text>
+            </View>
+            <Text style={ex.annotationNote}>{item.note}</Text>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
@@ -1715,4 +2113,220 @@ const rules = StyleSheet.create({
     justifyContent: 'center',
   },
   roleName: { fontSize: FS.body, color: T.textPrimary, fontWeight: FW.medium, marginBottom: 2 },
+});
+
+// examples-tab styles
+const ex = StyleSheet.create({
+  // Screen example wrapper
+  exampleWrap: {
+    marginBottom: space.huge,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: radius.card,
+    overflow: 'hidden',
+  },
+  exampleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: T.surface,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.md,
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+  },
+  exampleTitle: {
+    fontSize: FS.ui,
+    color: T.textPrimary,
+    fontWeight: FW.semibold,
+  },
+  exampleFile: {
+    fontSize: FS.label,
+    color: T.textMuted,
+    fontFamily: MONO,
+  },
+  exampleBody: {
+    flexDirection: 'row',
+  },
+
+  // Phone frame
+  phone: {
+    width: 260,
+    minHeight: 480,
+    backgroundColor: T.bg,
+    borderRightWidth: 1,
+    borderRightColor: T.border,
+    overflow: 'hidden',
+  },
+  phoneNotch: {
+    width: 80,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: T.surface2,
+    alignSelf: 'center',
+    marginTop: space.sm,
+    marginBottom: space.sm,
+  },
+  phoneContent: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  phoneHomeBar: {
+    width: 56,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: T.surface2,
+    alignSelf: 'center',
+    marginTop: space.sm,
+    marginBottom: space.sm,
+  },
+
+  // Annotation sidebar
+  annotationList: {
+    flex: 1,
+    backgroundColor: T.surface,
+    paddingHorizontal: space.md,
+    paddingVertical: space.md,
+  },
+  annotationHeading: {
+    fontSize: FS.label,
+    color: T.textMuted,
+    letterSpacing: 2,
+    marginBottom: space.md,
+    fontFamily: MONO,
+  },
+  annotationRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: space.sm,
+    marginBottom: space.md,
+  },
+  annotationDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: T.accent,
+    marginTop: 5,
+  },
+  annotationMeta: {
+    flex: 1,
+  },
+  annotationToken: {
+    fontSize: FS.label,
+    color: T.accent,
+    fontFamily: MONO,
+    backgroundColor: T.accentDim,
+    paddingHorizontal: 4,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  annotationValue: {
+    fontSize: FS.label,
+    color: T.textMuted,
+    fontFamily: MONO,
+  },
+  annotationNote: {
+    fontSize: FS.label,
+    color: T.textSecondary,
+    marginTop: 2,
+    lineHeight: LH.label,
+  },
+
+  // ── Screen-specific placeholder styles ──────────────────────────────────
+
+  // Home
+  homeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: space.lg,
+    paddingTop: space.md,
+  },
+  homeGreet: {
+    paddingHorizontal: space.lg,
+    paddingTop: space.xxl,
+    paddingBottom: space.xl,
+  },
+  homeCards: {
+    paddingHorizontal: space.md,
+    gap: space.md,
+  },
+
+  // Session
+  sessionTopbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    paddingHorizontal: space.lg,
+    paddingTop: space.sm,
+    paddingBottom: space.xs,
+  },
+  sessionScoreStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space.md,
+    paddingBottom: space.sm,
+  },
+  sessionCardArea: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: space.xl,
+    paddingBottom: 60,
+  },
+  sessionHskBadge: {
+    position: 'absolute',
+    top: 8,
+    right: space.lg,
+    borderWidth: 1,
+    borderColor: T.border,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 100,
+  },
+  sessionFabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.xxl,
+    paddingBottom: space.lg,
+  },
+  fab: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+
+  // Session complete
+  completeCentered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: space.lg,
+  },
+
+  // Setup / Profile / Settings header
+  setupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.lg,
+    paddingTop: space.md,
+    paddingBottom: space.sm,
+  },
+
+  // Deck selector
+  deckSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: T.surface,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 14,
+    paddingHorizontal: space.lg,
+    paddingVertical: 12,
+  },
 });
