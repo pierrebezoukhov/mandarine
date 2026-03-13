@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
-import { T, FS, LH, LS } from '@/theme/tokens';
+import { T, FS, FW, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
@@ -157,7 +157,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   if (sent) return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: FS.heading }}>✓</Text>
+        <Text style={{ color: T.success, fontSize: FS.subheading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Check your inbox</Text>
       <Text style={s.successSub}>
@@ -189,7 +189,7 @@ function ConfirmScreen({ email, onBack }: { email: string; onBack: () => void })
   return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: FS.heading }}>✓</Text>
+        <Text style={{ color: T.success, fontSize: FS.subheading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Confirm your email</Text>
       <Text style={s.successSub}>
@@ -285,6 +285,6 @@ const s = StyleSheet.create({
 
   successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
   successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(74,158,107,0.12)', borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)', alignItems: 'center', justifyContent: 'center' },
-  successTitle: { fontSize: FS.heading, color: T.textPrimary },
+  successTitle: { fontSize: FS.subheading, color: T.textPrimary },
   successSub:   { fontSize: FS.body, color: T.textMuted, textAlign: 'center', lineHeight: LH.body, maxWidth: 260 },
 });

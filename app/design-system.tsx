@@ -139,6 +139,21 @@ export default function DesignSystemScreen() {
               and fixed-width numeric display.
             </DocSubheading>
 
+            {/* Dual-scale reasoning */}
+            <View style={s.noItalicNote}>
+              <Text style={[s.lhNote, { marginBottom: space.sm }]}>
+                <Text style={{ color: T.textPrimary, fontWeight: FW.semibold }}>Dual-Scale Architecture</Text>
+                {'\n\n'}The system uses two separate mathematical scales: Body (Major Third 1.250) for
+                flashcard text roles, and Display (Perfect Fourth 1.333) for screen headings.
+                A single scale cannot serve both pedagogical and navigational hierarchies — the
+                flashcard needs fine gradations between pinyin, translation, and example sentence,
+                while screen headings need editorial weight to anchor navigation without competing
+                with the hero character. The character itself is a manual override outside both
+                scales: its size is dictated by the pedagogical requirement of being the unambiguous
+                primary stimulus, not by any mathematical ratio.
+              </Text>
+            </View>
+
             {/* Display scale — large, heading hierarchy */}
             <Section label="DISPLAY SCALE — LS.tighter · LS.tight">
               <TypeSpecimen
@@ -176,13 +191,42 @@ export default function DesignSystemScreen() {
                 token="FS.heading"
                 px={FSDisplay.heading}
                 sample="New Session"
-                usage={`Sub-headings, card headings · LH.heading: ${LH.heading}px · LS.tight: ${LS.tight * FSDisplay.heading}px`}
+                usage={`Deck names, H2 · LH.heading: ${LH.heading}px · LS.tight: ${LS.tight * FSDisplay.heading}px`}
                 style={{ letterSpacing: LS.tight * FSDisplay.heading }}
+              />
+              <TypeSpecimen
+                token="FS.subheading"
+                px={FSDisplay.subheading}
+                sample="Card Heading"
+                usage={`Sub-headings, card headings · LH.subheading: ${LH.subheading}px · LS.tight: ${LS.tight * FSDisplay.subheading}px`}
+                style={{ letterSpacing: LS.tight * FSDisplay.subheading }}
               />
             </Section>
 
+            {/* Body scale reasoning */}
+            <View style={[s.noItalicNote, { marginTop: space.lg }]}>
+              <Text style={[s.lhNote, { marginBottom: 0 }]}>
+                <Text style={{ color: T.textPrimary, fontWeight: FW.semibold }}>Why Major Third (1.250)?</Text>
+                {'\n\n'}Chinese characters read more dramatically than Latin text — what feels
+                "medium" in English feels large in Chinese because each glyph fills its full em
+                square. 1.250 was chosen because the bottom of the stack (13px) is the critical
+                constraint: Chinese characters with complex strokes become illegible below ~12px
+                on mobile screens. Lower ratios (1.125-1.2) flatten the hierarchy between pinyin
+                and translation, making it harder for learners to distinguish phonetic annotation
+                from meaning at a glance.
+              </Text>
+            </View>
+
             {/* Body scale — readable content, UI controls */}
             <Section label="BODY SCALE — LS.normal (no tracking)">
+              <TypeSpecimen
+                token="FS.pinyin"
+                px={FSBody.pinyin}
+                sample="zhōng guó"
+                usage={`Pinyin romanization · LH.pinyin: ${LH.pinyin}px · LS.normal: 0`}
+                family={MONO}
+                color={T.accent}
+              />
               <TypeSpecimen
                 token="FS.ui"
                 px={FSBody.ui}
@@ -212,17 +256,20 @@ export default function DesignSystemScreen() {
                 <Text style={s.codeInline}>LH</Text> from{' '}
                 <Text style={s.codeInline}>theme/tokens.ts</Text>.
                 Ratio tapers as size grows — all values on a 4 px grid.
-                Small text (~1.5) → body/UI (~1.4–1.5) → headings/display (1.33→1.12).
+                Small text (~1.54) → body/UI (~1.40–1.50) → headings/display (1.33→1.11).
               </Text>
               {(
                 [
-                  { name: 'label',   fs: FS.label,   lh: LH.label,   mult: '×1.50' },
-                  { name: 'body',    fs: FS.body,    lh: LH.body,    mult: '×1.43' },
-                  { name: 'ui',      fs: FS.ui,      lh: LH.ui,      mult: '×1.50' },
-                  { name: 'heading', fs: FS.heading, lh: LH.heading, mult: '×1.33' },
-                  { name: 'title',   fs: FS.title,   lh: LH.title,   mult: '×1.29' },
-                  { name: 'score',   fs: FS.score,   lh: LH.score,   mult: '×1.19' },
-                  { name: 'seal',    fs: FS.seal,    lh: LH.seal,    mult: '×1.12' },
+                  { name: 'label',      fs: FS.label,      lh: LH.label,      mult: '×1.54' },
+                  { name: 'body',       fs: FS.body,       lh: LH.body,       mult: '×1.50' },
+                  { name: 'ui',         fs: FS.ui,         lh: LH.ui,         mult: '×1.50' },
+                  { name: 'pinyin',     fs: FS.pinyin,     lh: LH.pinyin,     mult: '×1.40' },
+                  { name: 'subheading', fs: FS.subheading, lh: LH.subheading, mult: '×1.33' },
+                  { name: 'heading',    fs: FS.heading,    lh: LH.heading,    mult: '×1.25' },
+                  { name: 'title',      fs: FS.title,      lh: LH.title,      mult: '×1.14' },
+                  { name: 'score',      fs: FS.score,      lh: LH.score,      mult: '×1.14' },
+                  { name: 'seal',       fs: FS.seal,       lh: LH.seal,       mult: '×1.12' },
+                  { name: 'hanzi',      fs: FS.hanzi,      lh: LH.hanzi,      mult: '×1.11' },
                 ] as const
               ).map(({ name, fs, lh, mult }) => (
                 <View key={name} style={s.lhRow}>
@@ -244,7 +291,7 @@ export default function DesignSystemScreen() {
               {(
                 [
                   { token: 'LS.tighter', em: LS.tighter,  example: `${LS.tighter * FSDisplay.score}px @ FS.score (${FSDisplay.score}px)`,  appliesTo: 'score · seal · hanzi' },
-                  { token: 'LS.tight',   em: LS.tight,    example: `${LS.tight   * FSDisplay.title}px @ FS.title (${FSDisplay.title}px)`,   appliesTo: 'title · heading' },
+                  { token: 'LS.tight',   em: LS.tight,    example: `${LS.tight   * FSDisplay.title}px @ FS.title (${FSDisplay.title}px)`,   appliesTo: 'title · heading · subheading' },
                   { token: 'LS.normal',  em: LS.normal,   example: '0px',                                                                   appliesTo: 'ui · body · label (all body text)' },
                   { token: 'LS.loose',   em: LS.loose,    example: `+${LS.loose  * FSBody.label}px @ FS.label (${FSBody.label}px)`,         appliesTo: 'available — not currently applied' },
                 ] as const
@@ -262,7 +309,7 @@ export default function DesignSystemScreen() {
               <View style={s.monoRow}>
                 <View style={s.monoDemo}>
                   <Text style={s.monoSample}>pīn yīn</Text>
-                  <Text style={s.monoCaption}>FS.heading · MONO · T.accent</Text>
+                  <Text style={s.monoCaption}>FS.pinyin · MONO · T.accent</Text>
                 </View>
                 <View style={s.monoDesc}>
                   <Text style={s.propName}>Used for</Text>
@@ -378,12 +425,20 @@ export default function DesignSystemScreen() {
                   where: 'sc.title · greetTitle',
                 },
                 {
-                  role: 'Sub-heading',
-                  sample: 'New Session',
+                  role: 'Deck name / H2',
+                  sample: 'HSK Level 1',
                   size: FS.heading, fw: FW.semibold,  color: T.textPrimary,
                   fsKey: 'FS.heading', fwKey: 'FW.semibold', colorKey: 'textPrimary',
                   lsKey: 'LS.tight',
-                  where: 'cs.name · headerTitle',
+                  where: 'deck headings · section H2',
+                },
+                {
+                  role: 'Sub-heading',
+                  sample: 'New Session',
+                  size: FS.subheading, fw: FW.semibold,  color: T.textPrimary,
+                  fsKey: 'FS.subheading', fwKey: 'FW.semibold', colorKey: 'textPrimary',
+                  lsKey: 'LS.tight',
+                  where: 'cs.name · headerTitle · card headings',
                 },
                 {
                   role: 'Header bar label',
@@ -868,7 +923,7 @@ function TypeSpecimen({ token, px, sample, usage, family, color, italic, bold, s
               color:      color ?? T.textPrimary,
               fontFamily: family,
               fontStyle:  italic ? 'italic'  : 'normal',
-              fontWeight: bold   ? '600'     : 'normal',
+              fontWeight: bold   ? FW.semibold : 'normal',
             },
             style,
           ]}
@@ -1037,7 +1092,7 @@ const s = StyleSheet.create({
   logoHanzi: {
     fontSize: FS.heading,
     color: T.accent,
-    fontWeight: '600',
+    fontWeight: FW.semibold,
   },
   logoLabel: {
     fontSize: FS.label,
@@ -1072,7 +1127,7 @@ const s = StyleSheet.create({
   nav:          { flexDirection: 'row', paddingHorizontal: space.xl },
   navItem:      { paddingHorizontal: space.lg, paddingVertical: space.md, position: 'relative' },
   navItemActive: { borderBottomWidth: 2, borderBottomColor: T.accent },
-  navText:      { fontSize: FS.body, color: T.textMuted, fontWeight: '500' },
+  navText:      { fontSize: FS.body, color: T.textMuted, fontWeight: FW.medium },
   navTextActive:{ color: T.textPrimary },
 
   // Scroll body
@@ -1174,7 +1229,7 @@ const s = StyleSheet.create({
   },
   monoSample: {
     fontFamily: MONO,
-    fontSize: FS.heading,
+    fontSize: FS.pinyin,
     color: T.accent,
     letterSpacing: 3,
   },
@@ -1226,7 +1281,7 @@ const ds = StyleSheet.create({
   docHeading: {
     fontSize: FS.title,
     color: T.textPrimary,
-    fontWeight: '600',
+    fontWeight: FW.semibold,
     marginBottom: space.sm,
   },
   docSubheading: {
@@ -1296,7 +1351,7 @@ const cs = StyleSheet.create({
     marginBottom: space.xxl,
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: space.sm },
-  name:   { fontSize: FS.heading, color: T.textPrimary, fontWeight: '600' },
+  name:   { fontSize: FS.subheading, color: T.textPrimary, fontWeight: FW.semibold },
   file:   { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
   desc:   { fontSize: FS.body, color: T.textSecondary, lineHeight: 20, marginBottom: space.xxl },
 

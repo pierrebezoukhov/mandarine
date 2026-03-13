@@ -6,7 +6,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO, FS, LH, LS } from '@/theme/tokens';
+import { T, MONO, FS, FW, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
@@ -360,13 +360,13 @@ const s = StyleSheet.create({
   },
   iconBtn:         { padding: space.sm, borderRadius: 8 },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: FS.heading, color: T.textMuted },
+  iconBtnText:     { fontSize: FS.subheading, color: T.textMuted },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: FS.body, fontWeight: '500' },
+  scoreItem:   { fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium },
   scoreForgot: { color: T.error },
   scoreGot:    { color: T.success },
   scoreSep:    { color: T.textMuted, fontSize: FS.ui },
@@ -385,29 +385,29 @@ const s = StyleSheet.create({
   hskBadgeText: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
 
   hanziChar: {
-    fontSize: FS.hanzi, color: T.textHanzi, lineHeight: 110,
+    fontSize: FS.hanzi, color: T.textHanzi, lineHeight: LH.hanzi,
     letterSpacing: LS.tighter * FS.hanzi,
     textShadowColor: 'rgba(240,235,224,0.06)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 40,
   },
 
   pinyinText: {
-    fontFamily: MONO, fontSize: FS.heading, letterSpacing: 3,
+    fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: 3,
     color: T.accent, opacity: 0.85, marginTop: 18,
   },
 
   exampleBlock: { marginTop: 22, width: '100%', alignItems: 'center' },
   exDivider:    { width: 24, height: 1, backgroundColor: T.border, marginBottom: 14 },
-  exHanzi:      { fontSize: FS.heading, color: '#C8BFA8', textAlign: 'center', lineHeight: 44 },
+  exHanzi:      { fontSize: FS.subheading, color: '#C8BFA8', textAlign: 'center', lineHeight: LH.subheading },
   exPinyin:     { fontFamily: MONO, fontSize: FS.label, color: '#7A7060', textAlign: 'center', letterSpacing: 1 },
 
   exMeaning: {
     fontSize: FS.body, color: '#8C8070', textAlign: 'center',
-    lineHeight: 22, marginTop: 10,
+    lineHeight: LH.body, marginTop: 10,
   },
 
   meaningBlock: { marginTop: 22, alignItems: 'center', gap: 6 },
-  posTag:       { fontFamily: MONO, fontSize: FS.label, fontWeight: '500', color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
-  meaningText:  { fontSize: FS.heading, color: T.textPrimary, textAlign: 'center', lineHeight: LH.heading, letterSpacing: LS.tight * FS.heading },
+  posTag:       { fontFamily: MONO, fontSize: FS.label, fontWeight: FW.medium, color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
+  meaningText:  { fontSize: FS.subheading, color: T.textPrimary, textAlign: 'center', lineHeight: LH.subheading, letterSpacing: LS.tight * FS.subheading },
 
   tapHint: {
     position: 'absolute', bottom: 72,
@@ -432,7 +432,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(74,158,107,0.12)',
     borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)',
   },
-  fabIcon: { fontSize: FS.heading },
+  fabIcon: { fontSize: FS.subheading },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
@@ -449,7 +449,7 @@ const sc = StyleSheet.create({
   stat:      { alignItems: 'center' },
   statVal:   { fontSize: FS.score, lineHeight: LH.score, marginBottom: 6, letterSpacing: LS.tighter * FS.score },
   statLabel: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
-  statSep:   { color: T.textMuted, fontSize: FS.heading },
+  statSep:   { color: T.textMuted, fontSize: FS.subheading },
 
   pctBadge: {
     borderWidth: 1, borderColor: T.border, borderRadius: 100,

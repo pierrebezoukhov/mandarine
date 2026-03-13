@@ -75,7 +75,72 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 ## 2. Typography
 
 **File:** `theme/tokens.ts`
-**Import:** `import { MONO } from '@/theme/tokens'`
+
+### Dual-scale architecture
+
+The type system uses two independent mathematical scales plus one manual override:
+
+| Scale | Ratio | Name | Domain |
+|---|---|---|---|
+| Body / supporting | 1.250 | Major Third | Flashcard text roles, UI copy, captions |
+| Display / title | 1.333 | Perfect Fourth | Screen headings, deck names, navigation |
+
+**Why two scales?** A single scale cannot serve both the flashcard's pedagogical hierarchy (pinyin → translation → example sentence) and the app's navigational hierarchy (screen title → deck name → sub-heading) without one distorting the other.
+
+### Display scale (Perfect Fourth 1.333)
+
+| Token | Value | Role |
+|---|---|---|
+| `FSDisplay.hanzi` | 72px | Flashcard hero character (manual override — not derived from scale) |
+| `FSDisplay.seal` | 50px | Session completion seal |
+| `FSDisplay.score` | 42px | Large numeric display |
+| `FSDisplay.title` | 42px | Screen titles / H1 |
+| `FSDisplay.heading` | 32px | Deck names / H2 |
+| `FSDisplay.subheading` | 21px | Sub-headings, card headings |
+
+### Body scale (Major Third 1.250)
+
+| Token | Value | Role |
+|---|---|---|
+| `FSBody.pinyin` | 20px | Pinyin romanization |
+| `FSBody.ui` | 16px | Inputs, buttons, nav controls (base) |
+| `FSBody.body` | 16px | Body text, translations (base) |
+| `FSBody.label` | 13px | Example sentences, captions, section labels |
+
+### Why 1.250 for the body scale?
+
+Chinese characters read more dramatically than Latin text at equivalent sizes. 1.250 keeps enough contrast between pinyin (20px), translation (16px), and example sentence (13px) without dropping below the ~12px Chinese-character legibility floor on mobile.
+
+### Character sizing (72px)
+
+The hero character is a manual override — not derived from either scale. It is the product being learned, not a heading. 72px ensures it is the unambiguous primary stimulus. The gap between 72px and the next-largest element (title at 42px) creates a deliberate rupture that signals "this is the thing."
+
+### Line heights
+
+| Token | Font size | Line height | Ratio |
+|---|---|---|---|
+| `LH.label` | 13px | 20px | 1.54 |
+| `LH.body` / `LH.ui` | 16px | 24px | 1.50 |
+| `LH.pinyin` | 20px | 28px | 1.40 |
+| `LH.subheading` | 21px | 28px | 1.33 |
+| `LH.heading` | 32px | 40px | 1.25 |
+| `LH.title` / `LH.score` | 42px | 48px | 1.14 |
+| `LH.seal` | 50px | 56px | 1.12 |
+| `LH.hanzi` | 72px | 80px | 1.11 |
+
+### Font weights
+
+Three weights only. No bold (700) — it thickens Chinese character strokes, reducing legibility.
+
+| Token | Weight | Role |
+|---|---|---|
+| `FW.regular` | 400 | Prose, translations, pinyin, captions (default — omit from style) |
+| `FW.medium` | 500 | Interactive controls: buttons, chips, tabs, list labels |
+| `FW.semibold` | 600 | Screen headings, deck names, section titles |
+
+**Why no bold?** Size signals priority. Weight signals interactivity. Color signals role. Each weight encodes a semantic role. The hero character must be regular weight — learners should see strokes as they appear in normal reading.
+
+### Monospace
 
 | Constant | Value |
 |---|---|
@@ -549,7 +614,7 @@ import { ProgressBar } from '@/components/ProgressBar';
 
 **File:** `components/Section.tsx`
 
-Labelled section wrapper. Renders an uppercase label (`FS.label`, `T.textMuted`, `LS.loose` letter-spacing) above its children with a `28px` bottom margin.
+Labelled section wrapper. Renders an uppercase label (`FSBody.label`, `T.textMuted`, `LS.loose` letter-spacing) above its children with a `28px` bottom margin.
 
 #### Props
 
@@ -578,7 +643,7 @@ import { Section } from '@/components/Section';
 Always import tokens and components using the `@/` alias:
 
 ```ts
-import { T, MONO }           from '@/theme/tokens';
+import { T, MONO, FSDisplay, FSBody, LH, FW } from '@/theme/tokens';
 import { space, radius }     from '@/theme/spacing';
 import { Button }            from '@/components/Button';
 ```

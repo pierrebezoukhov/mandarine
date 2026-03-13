@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS, LS } from '@/theme/tokens';
+import { T, FS, FW, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
@@ -108,7 +108,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'flex-start', paddingHorizontal: space.xxxl, paddingTop: space.xxl, paddingBottom: space.sm,
   },
-  logoHanzi:   { fontSize: FS.heading, color: T.textPrimary, letterSpacing: LS.tight * FS.heading },
+  logoHanzi:   { fontSize: FS.subheading, color: T.textPrimary, letterSpacing: LS.tight * FS.subheading },
   logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
 
   greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },

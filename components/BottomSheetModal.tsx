@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import {
   Modal, View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { T, FS } from '@/theme/tokens';
+import { T, FS, FW } from '@/theme/tokens';
 
 interface BottomSheetModalProps {
   visible: boolean;
@@ -76,6 +76,6 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
   },
-  title: { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
-  done:  { fontSize: FS.body, color: T.accent, fontWeight: '500' },
+  title: { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
+  done:  { fontSize: FS.body, color: T.accent, fontWeight: FW.medium },
 });
