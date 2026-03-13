@@ -572,13 +572,203 @@ export default function DesignSystemScreen() {
 
             {/* ── Font weight ───────────────────────────────────────── */}
             <Section label="FONT WEIGHT — FW">
+              {/* ── Why only three weights ─────────────────────── */}
+              <Text style={s.lhSectionTitle}>Why three weights — and no bold?</Text>
               <Text style={s.lhNote}>
-                Three values only.{' '}
-                <Text style={s.codeInline}>FW.regular</Text> is the system default
-                — it is never written explicitly in stylesheets. Only{' '}
-                <Text style={s.codeInline}>FW.medium</Text> and{' '}
-                <Text style={s.codeInline}>FW.semibold</Text> appear in code.
+                Each weight encodes a{' '}
+                <Text style={{ color: T.textPrimary }}>semantic role</Text>, not a
+                level of emphasis. The three axes work together: size signals
+                priority, weight signals interactivity, color signals role. With
+                three clearly separated weights, peripheral vision can distinguish
+                "structural landmark" from "tappable control" from "readable
+                content" without consciously parsing it.
               </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>why not bold (700)?</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg }}>
+                  <Text style={s.lhNote}>
+                    Bold thickens Chinese character strokes, reducing white space
+                    between strokes — the very space that makes characters legible.
+                    At display sizes (32px+), bold Chinese text feels muddy.
+                    Semibold (600) adds heading emphasis without degrading stroke
+                    clarity. The hero character{' '}
+                    <Text style={{ color: T.textPrimary }}>must</Text> be regular
+                    weight — learners should see strokes as they appear in real-world
+                    text. Adding weight teaches a visual form that doesn't transfer.
+                  </Text>
+                  <View style={{ flexDirection: 'row', gap: space.xxl, marginTop: space.lg, justifyContent: 'center' }}>
+                    <View style={{ alignItems: 'center', gap: space.xs }}>
+                      <Text style={{ fontSize: 40, color: T.textHanzi }}>学</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.success }}>400 regular ✓</Text>
+                      <Text style={{ fontSize: FS.label, color: T.textMuted }}>Clear strokes</Text>
+                    </View>
+                    <View style={{ alignItems: 'center', gap: space.xs }}>
+                      <Text style={{ fontSize: 40, color: T.textHanzi, fontWeight: '700' }}>学</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.error }}>700 bold ✕</Text>
+                      <Text style={{ fontSize: FS.label, color: T.textMuted }}>Muddy strokes</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    Compare stroke clarity — bold fills the counter-spaces that make 学 legible
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── The three weights ──────────────────────────── */}
+              <Text style={s.lhSectionTitle}>FW.semibold — 600 — structural landmarks</Text>
+              <Text style={s.lhNote}>
+                Signals "this is a navigation waypoint." Semibold text answers the
+                question "where am I?" — screen titles, header bar labels, component
+                names in the design system. Combined with display-scale sizing, it
+                creates confident headings without the heaviness of bold.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>used in: profile, settings, session-setup headers · BottomSheetModal title</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.md }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
+                    <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>New Session</Text>
+                    <View style={{ width: 44 }} />
+                  </View>
+                  <View style={{ height: 1, backgroundColor: T.border }} />
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
+                    <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Profile</Text>
+                    <Text style={{ fontSize: FS.subheading }}>⚙️</Text>
+                  </View>
+                  <View style={{ height: 1, backgroundColor: T.border }} />
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Select Deck</Text>
+                    <Text style={{ fontSize: FS.body, color: T.accent, fontWeight: FW.medium }}>Done</Text>
+                  </View>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    Same FS.ui size (16px) as body text, but semibold weight makes it a landmark
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={s.lhSectionTitle}>FW.medium — 500 — interactive controls</Text>
+              <Text style={s.lhNote}>
+                Signals "this can be tapped." Medium weight is heavier than prose
+                (distinguishing it from passive text) but lighter than headings
+                (it's an affordance, not a landmark). The learner's finger knows
+                where to go before their eyes finish scanning.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>used in: Button, Chip, TabSwitcher, SegmentedControl, Card.title, deck name</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.md }}>
+                  <Button label="Start Session" onPress={() => {}} />
+                  <View style={{ flexDirection: 'row', gap: space.sm }}>
+                    <View style={{
+                      flex: 1, paddingVertical: 11, borderRadius: 10,
+                      backgroundColor: T.accentDim, borderWidth: 1, borderColor: T.accentBorder,
+                      alignItems: 'center',
+                    }}>
+                      <Text style={{ fontSize: FS.body, color: T.textPrimary, fontWeight: FW.medium }}>20</Text>
+                    </View>
+                    <View style={{
+                      flex: 1, paddingVertical: 11, borderRadius: 10,
+                      backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
+                      alignItems: 'center',
+                    }}>
+                      <Text style={{ fontSize: FS.body, color: T.textMuted, fontWeight: FW.medium }}>50</Text>
+                    </View>
+                  </View>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center', gap: space.md,
+                    backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
+                    borderRadius: 14, paddingHorizontal: space.lg, paddingVertical: 12,
+                  }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>HSK 1 — Basics</Text>
+                      <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2 }}>150 common characters</Text>
+                    </View>
+                    <Text style={{ fontSize: FS.body, color: T.textMuted }}>↓</Text>
+                  </View>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    Medium weight on all tappable labels — buttons, segments, deck selector
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={s.lhSectionTitle}>FW.regular — 400 — readable content</Text>
+              <Text style={s.lhNote}>
+                The default. Never written explicitly in stylesheets — omitting{' '}
+                <Text style={s.codeInline}>fontWeight</Text> produces regular.
+                Most text in a learning app is{' '}
+                <Text style={{ color: T.textPrimary }}>read</Text>, not acted
+                upon. Regular weight keeps reading text quiet so the hero character,
+                headings, and interactive controls can do their jobs.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>used in: subtitles, descriptions, captions, pinyin, example sentences, translations</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.sm }}>
+                  <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
+                  <Text style={{ fontSize: FS.label, color: T.textMuted, lineHeight: LH.label }}>Start a fresh round of flashcards{'\n'}with your selected deck and filters</Text>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.pinyin, color: T.accent, opacity: 0.85, letterSpacing: 3, marginTop: space.sm }}>zhōng guó rén</Text>
+                  <Text style={{ fontSize: FS.subheading, color: '#C8BFA8', marginTop: space.xs }}>我喜欢学习中文</Text>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.label, color: '#7A7060', letterSpacing: 1 }}>wǒ xǐhuān xuéxí zhōngwén</Text>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    No fontWeight in any of these styles — regular keeps content subordinate to controls and headings
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── Where weights collide ─────────────────────── */}
+              <Text style={s.lhSectionTitle}>Where weight resolves ambiguity</Text>
+              <Text style={s.lhNote}>
+                Weight matters most where sizes are close. Two text elements at
+                nearly the same size can have completely different roles if their
+                weights differ. Without weight as a second axis, these pairs
+                would be indistinguishable.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>same size, different weight → different role</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.lg }}>
+                  <View style={{ gap: space.xs }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                      <Text style={{ fontSize: FS.subheading, color: T.textPrimary, fontWeight: FW.semibold }}>Card Heading</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>21px · 600</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.pinyin, color: T.accent, opacity: 0.85, letterSpacing: 3 }}>zhōng guó</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>20px · 400</Text>
+                    </View>
+                    <Text style={s.lhNote}>
+                      Only 1px apart, but weight (600 vs 400) + tracking + font family make
+                      their roles unambiguous. The heading is a landmark; the pinyin is a
+                      pronunciation guide.
+                    </Text>
+                  </View>
+                  <View style={{ height: 1, backgroundColor: T.border }} />
+                  <View style={{ gap: space.xs }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>Start Session</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>16px · 500</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                      <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>16px · 400</Text>
+                    </View>
+                    <Text style={s.lhNote}>
+                      Identical font size, but medium weight signals "tap me" while regular
+                      signals "read me." Color reinforces: primary for interactive, muted for
+                      passive.
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* ── Original reference rows ───────────────────── */}
+              <Text style={s.lhSectionTitle}>Token reference</Text>
               <WeightRow
                 token="FW.semibold"
                 value="'600'"
