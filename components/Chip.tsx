@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 
 interface ChipProps {
   label: string;
@@ -47,7 +47,7 @@ const s = StyleSheet.create({
   dot:      { width: 8, height: 8, borderRadius: 4, backgroundColor: T.textMuted },
   dotActive:{ backgroundColor: T.accent },
 
-  label:       { fontSize: 14, color: T.textMuted, fontWeight: '500' },
+  label:       { fontSize: FS.body, color: T.textMuted, fontWeight: '500' },
   labelActive: { color: T.textPrimary },
-  sublabel:    { fontSize: 11, color: T.textMuted, marginTop: 1 },
+  sublabel:    { fontSize: FS.label, color: T.textMuted, marginTop: 1 },
 });

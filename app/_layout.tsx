@@ -9,7 +9,10 @@ function RouteGuard() {
   useEffect(() => {
     if (loading) return;
 
-    const inAuthGroup = segments[0] === 'auth';
+    const inAuthGroup    = segments[0] === 'auth';
+    const inDesignSystem = segments[0] === 'design-system';
+
+    if (inDesignSystem) return; // public — no auth required
 
     if (!session && !inAuthGroup) {
       router.replace('/auth');
@@ -29,7 +32,10 @@ export default function RootLayout() {
         <Stack.Screen name="auth" options={{ animation: 'fade' }} />
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
         <Stack.Screen name="session-setup" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="session" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="session"       options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="profile"       options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="settings"       options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="design-system" options={{ animation: 'fade' }} />
       </Stack>
     </AuthProvider>
   );

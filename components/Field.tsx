@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 
 interface FieldProps {
   label: string;
@@ -54,9 +54,8 @@ export function Field({
 const s = StyleSheet.create({
   wrap:  { marginBottom: 14 },
   label: {
-    fontSize: 10,
+    fontSize: FS.label,
     color: T.textMuted,
-    letterSpacing: 2,
     marginBottom: 6,
     textTransform: 'uppercase',
   },
@@ -67,7 +66,7 @@ const s = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     color: T.textPrimary,
-    fontSize: 15,
+    fontSize: FS.ui,
   },
   inputFocused: {
     borderColor: T.borderFocus,
@@ -77,9 +76,8 @@ const s = StyleSheet.create({
     borderColor: 'rgba(224,82,82,0.5)',
   },
   errorText: {
-    fontSize: 11,
+    fontSize: FS.label,
     color: T.error,
-    letterSpacing: 0.5,
     marginTop: 4,
   },
 });

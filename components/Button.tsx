@@ -2,7 +2,7 @@ import {
   TouchableOpacity, Text, ActivityIndicator, StyleSheet,
   ViewStyle, StyleProp,
 } from 'react-native';
-import { T } from '@/theme/tokens';
+import { T, FS } from '@/theme/tokens';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 type ButtonShape   = 'pill' | 'rounded';
@@ -88,7 +88,7 @@ const s = StyleSheet.create({
 
   // Labels
   label: {
-    fontSize: 15,
+    fontSize: FS.ui,
     fontWeight: '500',
   },
   labelPrimary:   { color: '#fff' },

@@ -14,7 +14,6 @@
 - [ ] Dictionary infotip for each character
 - [ ] Report a mistake
 
-
 ## 📖 Story
 - [ ] Add story reading experience
 - [ ] Story database
@@ -31,7 +30,6 @@
 - [ ] IAP (in-app purchases)
 - [ ] Analytics
 
-
 ## 🚀 GTM
 - [ ] SEO
 - [ ] CRM
@@ -40,7 +38,6 @@
 - [ ] App Store screenshots
 - [ ] Logo
 - [ ] Google Ads
-
 
 ## 👤 Profile
 - [ ] Progress tracking
