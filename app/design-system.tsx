@@ -1116,15 +1116,24 @@ export default function DesignSystemScreen() {
               </PhoneFrame>
               {/* Annotations */}
               <AnnotationList items={[
-                { token: 'FS.subheading', value: '21px', note: 'Logo hanzi — display scale +1' },
-                { token: 'LS.tight', value: '−0.025em', note: 'Heading letter-spacing' },
-                { token: 'Avatar', value: '28px', note: 'Component — initials fallback' },
-                { token: 'FS.title', value: '42px', note: 'Greeting — display scale +3' },
-                { token: 'FS.body', value: '16px', note: 'Subtitle — body scale base' },
-                { token: 'Card', value: 'primary', note: 'Component — accent-tinted icon box' },
-                { token: 'Card', value: 'secondary', note: 'Component — disabled state, 45% opacity' },
-                { token: 'T.bg', value: '#131109', note: 'Screen background' },
-                { token: 'space.xl', value: '20px', note: 'Card row padding' },
+                { category: 'role', token: 'Brand anchor', value: '—', note: 'Logo at top-left, always visible',
+                  why: 'Persistent brand identity that grounds the user — the hanzi characters signal "you are in a Chinese learning app" before reading any Latin text.' },
+                { category: 'role', token: 'Personal greeting', value: '—', note: 'First focal point after launch',
+                  why: 'Establishes personal connection before presenting actions. Name + question pattern invites the user to choose, not just consume.' },
+                { category: 'role', token: 'Primary action', value: '—', note: 'New session card, accent-tinted',
+                  why: 'Accent fill on the icon box draws the eye to the most common action. Hanzi icon reinforces that tapping starts a learning experience.' },
+                { category: 'token', token: 'FS.title', value: '42px', note: 'Greeting text — display scale +3',
+                  why: 'Needs to dominate the screen without competing with the smaller logo hanzi above. The 20px gap between 42px and 21px makes hierarchy unambiguous.' },
+                { category: 'token', token: 'FS.subheading', value: '21px', note: 'Logo hanzi — display scale +1',
+                  why: 'Small enough to be a brand mark, not a heading. Tight letter-spacing (LS.tight) makes the two characters feel like a logo, not text.' },
+                { category: 'token', token: 'FS.body', value: '16px', note: 'Subtitle — body scale base',
+                  why: 'Neutral size that recedes behind the greeting. Muted color (T.textMuted) ensures it\'s read second.' },
+                { category: 'token', token: 'T.bg', value: '#131109', note: 'Screen background',
+                  why: 'Near-black warm base prevents the amber text palette from feeling washed out. Dark theme is a deliberate choice for a study app — reduces eye strain in extended sessions.' },
+                { category: 'component', token: 'Avatar', value: '28px', note: 'Initials fallback, tappable',
+                  why: 'Small size signals "navigation shortcut", not "profile display". Initials fallback means the header works even before the user uploads a photo.' },
+                { category: 'component', token: 'Card', value: 'primary + secondary', note: 'Action rows with hanzi icons',
+                  why: 'Two variants create visual priority — primary (accent-tinted) for the main CTA, secondary (surface) for the conditional resume action. Disabled state at 45% opacity communicates "not available" without hiding the option.' },
               ]} />
             </ScreenExample>
 
@@ -1177,17 +1186,26 @@ export default function DesignSystemScreen() {
                 </View>
               </PhoneFrame>
               <AnnotationList items={[
-                { token: 'ProgressBar', value: 'component', note: 'Track + MONO counter' },
-                { token: 'FS.hanzi', value: '72px', note: 'Manual override — outside both scales' },
-                { token: 'LH.hanzi', value: '80px', note: 'Tight 1.11 — 8px air in bounding box' },
-                { token: 'T.textHanzi', value: '#F5F0E8', note: 'Dedicated character color' },
-                { token: 'FS.pinyin', value: '20px', note: 'Body scale +1 — MONO font' },
-                { token: 'T.accent', value: '#C0392B', note: 'Pinyin color — accent red' },
-                { token: 'FS.subheading', value: '21px', note: 'Example sentence hanzi' },
-                { token: 'LH.subheading', value: '28px', note: 'Tight — reads as sentence, not isolated glyphs' },
-                { token: 'FS.label', value: '13px', note: 'Example pinyin — body scale −1' },
-                { token: 'T.error', value: '#E05252', note: 'Forgot FAB — semantic color' },
-                { token: 'T.success', value: '#4A9E6B', note: 'Got it FAB — semantic color' },
+                { category: 'role', token: 'Hero stimulus', value: '—', note: 'The character is the product being learned',
+                  why: 'Sized at 72px to create a deliberate rupture in the type scale — the 30px gap from the next-largest element (42px title) signals "this is not a heading, this is the thing you\'re memorising."' },
+                { category: 'role', token: 'Progressive reveal', value: '5 taps', note: 'Character → pinyin → example → translation → meaning',
+                  why: 'Forces active recall. The learner must try to remember before seeing the answer. Each tap adds one layer of context, matching spaced-repetition pedagogy.' },
+                { category: 'role', token: 'Binary judgement', value: '✕ / ✓', note: 'Forgot and Got It floating actions',
+                  why: 'Two large FABs at thumb reach. Red/green semantic colors make the choice visceral — no reading required. Position at screen bottom matches mobile thumb zones.' },
+                { category: 'token', token: 'FS.hanzi', value: '72px', note: 'Manual override — outside both scales',
+                  why: 'A pedagogical decision, not aesthetic. The brain must instantly identify what is being learned. Derived scale sizes would tie character sizing to heading changes — but this should be stable.' },
+                { category: 'token', token: 'LH.hanzi', value: '80px', note: 'Ratio 1.11 — 8px air',
+                  why: 'Tight bounding box keeps pinyin close to the character it describes. Excess leading would waste vertical space on compact screens.' },
+                { category: 'token', token: 'T.textHanzi', value: '#F5F0E8', note: 'Dedicated character color',
+                  why: 'Slightly warmer and brighter than T.textPrimary — makes the hero character glow against the dark background while remaining distinct from heading text.' },
+                { category: 'token', token: 'FS.pinyin', value: '20px', note: 'Body scale +1 — MONO font',
+                  why: 'One step above base so it\'s visibly subordinate to the character but clearly larger than body text. MONO font + loose tracking aids syllable-by-syllable parsing.' },
+                { category: 'token', token: 'FS.subheading', value: '21px', note: 'Example sentence in Chinese',
+                  why: 'Same scale step as pinyin but in the display register (no MONO, tight tracking). Shows the character in context — a sentence, not an isolated glyph.' },
+                { category: 'token', token: 'T.error / T.success', value: '#E05252 / #4A9E6B', note: 'Semantic FAB colors',
+                  why: 'Red and green are universally understood as wrong/right. The dim fill (12% opacity) + border pattern matches the Chip active state for visual consistency.' },
+                { category: 'component', token: 'ProgressBar', value: 'component', note: 'Fill track + MONO counter',
+                  why: 'Thin and unobtrusive — positioned at the top so it\'s visible but doesn\'t compete with the flashcard. The MONO counter gives an exact position for learners who want precision.' },
               ]} />
             </ScreenExample>
 
@@ -1228,13 +1246,20 @@ export default function DesignSystemScreen() {
                 </View>
               </PhoneFrame>
               <AnnotationList items={[
-                { token: 'FS.seal', value: '50px', note: 'Decorative — outside scales, 30% opacity' },
-                { token: 'FS.title', value: '42px', note: 'Display +3 — screen heading' },
-                { token: 'LS.tight', value: '−0.025em', note: 'Editorial heading tracking' },
-                { token: 'FS.score', value: '42px', note: 'Large numeric — tight LH.score 48px' },
-                { token: 'LS.tighter', value: '−0.05em', note: 'Dense tracking for large display' },
-                { token: 'Button', value: 'primary', note: 'Component — pill shape, accent fill' },
-                { token: 'Button', value: 'secondary', note: 'Component — outlined, surface fill' },
+                { category: 'role', token: 'Reward moment', value: '—', note: 'Celebration after completing a session',
+                  why: 'The seal character "印" at 30% opacity creates a watermark-like presence — decorative, not informational. It rewards completion without being loud.' },
+                { category: 'role', token: 'Performance summary', value: '—', note: 'Got/forgot split + retention percentage',
+                  why: 'Learners need immediate feedback to calibrate their confidence. The binary got/forgot split is more actionable than a single percentage — it shows where to focus.' },
+                { category: 'role', token: 'Next action', value: '—', note: 'Study again vs. go home',
+                  why: 'Primary button encourages continued practice (the habit loop). Secondary button offers an exit without guilt. No tertiary options — decision fatigue after a study session is real.' },
+                { category: 'token', token: 'FS.seal', value: '50px', note: 'Decorative — outside both scales',
+                  why: 'Deliberately between the character size (72px) and title size (42px). It\'s not content — it\'s atmosphere. The 30% opacity keeps it from competing with the actual results.' },
+                { category: 'token', token: 'FS.score', value: '42px', note: 'Large numerics in MONO font',
+                  why: 'Same size as FS.title for visual parity, but MONO font and tighter tracking (LS.tighter −0.05em) distinguish numbers from headings. The tight 48px line height makes them feel punchy.' },
+                { category: 'token', token: 'LS.tighter', value: '−0.05em', note: 'Dense tracking for display numerics',
+                  why: 'Large MONO digits at default tracking look loose and unintentional. Negative tracking pulls them into a cohesive number, not a sequence of isolated characters.' },
+                { category: 'component', token: 'Button', value: 'primary + secondary', note: 'Stacked action pair',
+                  why: 'Primary pill shape with accent fill draws the eye to "Study again" — the desired behavior. Secondary outlined button is visible but recessive, matching the app\'s "continue or exit" pattern.' },
               ]} />
             </ScreenExample>
 
@@ -1275,15 +1300,24 @@ export default function DesignSystemScreen() {
                 </Section>
               </PhoneFrame>
               <AnnotationList items={[
-                { token: 'FW.semibold', value: '600', note: 'Header bar — structural landmark' },
-                { token: 'Section', value: 'component', note: 'Uppercase label + LS.loose tracking' },
-                { token: 'FS.label', value: '13px', note: 'Section labels — body scale −1' },
-                { token: 'FW.medium', value: '500', note: 'Deck name — interactive, tappable' },
-                { token: 'SegmentedControl', value: 'component', note: 'Preset segments + custom input' },
-                { token: 'Chip', value: 'component', note: 'Toggle rows — dot + label + sublabel' },
-                { token: 'T.accentDim', value: 'rgba(…,0.12)', note: 'Active chip fill' },
-                { token: 'T.accentBorder', value: 'rgba(…,0.28)', note: 'Active chip border' },
-                { token: 'radius.lg', value: '12px', note: 'Chip + deck selector corners' },
+                { category: 'role', token: 'Configuration flow', value: '—', note: 'Three decisions: deck, count, difficulty',
+                  why: 'Structured top-to-bottom to match decision order. The learner picks what to study, how much, and at what level — each in its own Section with a clear label.' },
+                { category: 'role', token: 'Constrained choice', value: '—', note: 'Presets with optional custom override',
+                  why: 'Presets (10/20/50) cover 90% of use cases and reduce decision fatigue. The custom input is hidden behind an extra tap — available but not distracting.' },
+                { category: 'role', token: 'Filter toggles', value: '—', note: 'Multi-select difficulty chips',
+                  why: 'Chips are multi-select (not radio buttons) because learners often want mixed difficulty. The dot indicator + sublabel pattern explains each option without a tooltip.' },
+                { category: 'token', token: 'FW.semibold', value: '600', note: 'Header bar title',
+                  why: 'Signals "structural landmark" — tells the user where they are in the nav hierarchy. Same weight pattern as profile and settings headers for consistency.' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Deck name in selector row',
+                  why: 'Medium weight signals "this is tappable" — distinguishing it from regular body text. The learner knows they can change the deck before consciously reading the affordance.' },
+                { category: 'token', token: 'T.accentDim + T.accentBorder', value: '0.12 / 0.28', note: 'Active state accent pattern',
+                  why: 'Translucent accent fill + slightly stronger accent border creates a consistent "selected" treatment used across Chip, SegmentedControl, and Card primary. The opacity values (12%/28%) are low enough to keep the dark theme from feeling heavy.' },
+                { category: 'component', token: 'Section', value: 'component', note: 'Uppercase label + 28px bottom margin',
+                  why: 'Provides consistent visual grouping across setup, profile, and settings screens. Uppercase + loose tracking makes labels scannable without being loud.' },
+                { category: 'component', token: 'SegmentedControl', value: 'component', note: 'Preset row + custom input',
+                  why: 'Single-select between presets with an optional custom numeric input. Chosen over a slider because discrete counts (10/20/50) are more meaningful than a continuous range for flashcard sessions.' },
+                { category: 'component', token: 'Chip', value: 'component', note: 'Toggle row with dot + sublabel',
+                  why: 'Multi-select filter pattern. The dot indicator is more subtle than a checkbox — it fits the minimal aesthetic while still providing clear state feedback through color change.' },
               ]} />
             </ScreenExample>
 
@@ -1319,16 +1353,24 @@ export default function DesignSystemScreen() {
                 </View>
               </PhoneFrame>
               <AnnotationList items={[
-                { token: 'FS.score', value: '42px', note: 'Logo character — display scale' },
-                { token: 'TabSwitcher', value: 'component', note: 'Active underline indicator' },
-                { token: 'FS.title', value: '42px', note: 'Form heading — display +3' },
-                { token: 'LH.body', value: '24px', note: 'Subtitle — 1.50 ratio for prose' },
-                { token: 'Field', value: 'component', note: 'Label + input + focus/error states' },
-                { token: 'T.border', value: 'rgba(…,0.08)', note: 'Input border + divider line' },
-                { token: 'T.borderFocus', value: 'rgba(…,0.22)', note: 'Input focus ring' },
-                { token: 'Button', value: 'primary', note: 'CTA — disabled dims to 40%' },
-                { token: 'Button', value: 'secondary', note: 'OAuth — surface fill, outlined' },
-                { token: 'radius.pill', value: '100px', note: 'Button border-radius' },
+                { category: 'role', token: 'Brand entry point', value: '—', note: 'Large logo character at top',
+                  why: 'First screen new users see. The oversized hanzi immediately communicates "this is a Chinese learning app" before any Latin text is read — works even for non-Chinese-speakers.' },
+                { category: 'role', token: 'Mode switcher', value: '—', note: 'Sign in / Create account tabs',
+                  why: 'Tabs rather than separate screens because the forms are nearly identical. Switching is instant — no navigation, no lost state. The underline indicator shows current mode at a glance.' },
+                { category: 'role', token: 'Error recovery', value: '—', note: 'Inline field errors + forgot password',
+                  why: 'Errors appear directly below the offending field, not as a toast or alert. This keeps context — the user sees what\'s wrong and where to fix it simultaneously.' },
+                { category: 'token', token: 'FS.title', value: '42px', note: 'Form heading — "Welcome back"',
+                  why: 'Matches the home screen greeting size for familiarity. Users who sign out and back in see the same typographic weight — the app feels continuous, not restarted.' },
+                { category: 'token', token: 'LH.body', value: '24px', note: 'Subtitle prose — 1.50 ratio',
+                  why: 'The subtitle ("Sign in to continue your practice") may wrap to two lines on narrow phones. 1.50 ratio ensures comfortable reading without the subtitle feeling like a separate paragraph.' },
+                { category: 'token', token: 'T.border / T.borderFocus', value: '0.08 / 0.22', note: 'Input border states',
+                  why: 'Default border at 8% is barely visible — the input exists but doesn\'t demand attention. Focus ring at 22% brightens enough to confirm "you\'re typing here" without being harsh on the dark background.' },
+                { category: 'component', token: 'TabSwitcher', value: 'component', note: 'Underline indicator tabs',
+                  why: 'Minimal tab pattern — no background fills, just an underline. FW.medium weight on labels signals interactivity while the underline provides state feedback.' },
+                { category: 'component', token: 'Field', value: 'component', note: 'Labelled input with error states',
+                  why: 'Uppercase label above the input (not a floating label) because Chinese text entry may need more visual room. Three border states (default, focus, error) provide clear feedback without icons.' },
+                { category: 'component', token: 'Button', value: 'primary + secondary', note: 'Email CTA + OAuth option',
+                  why: 'Primary for the email flow (most users). Secondary for Google OAuth — present but visually subordinate. The "or" divider makes the hierarchy explicit.' },
               ]} />
             </ScreenExample>
 
@@ -1369,15 +1411,24 @@ export default function DesignSystemScreen() {
                 </Section>
               </PhoneFrame>
               <AnnotationList items={[
-                { token: 'FW.semibold', value: '600', note: 'Header title — structural weight' },
-                { token: 'Avatar', value: '72px', note: 'Component — initials fallback, tappable' },
-                { token: 'StatCard', value: 'component', note: 'MONO value + uppercase label' },
-                { token: 'FS.title', value: '42px', note: 'StatCard value font size' },
-                { token: 'LS.tight', value: '−0.025em', note: 'StatCard value tracking' },
-                { token: 'Section', value: 'component', note: 'Uppercase label wrapper' },
-                { token: 'ProgressBar', value: 'component', note: 'Fill opacity 70% + MONO counter' },
-                { token: 'T.surface', value: '#1e1b12', note: 'Card backgrounds' },
-                { token: 'radius.card', value: '16px', note: 'StatCard border-radius' },
+                { category: 'role', token: 'Identity anchor', value: '—', note: 'Large avatar at screen centre',
+                  why: 'The profile screen is the only place the user sees themselves. The 72px avatar dominates the top half, making the screen feel personal before any data appears below.' },
+                { category: 'role', token: 'Progress dashboard', value: '—', note: 'Stats grid + HSK breakdown',
+                  why: 'Two complementary views: aggregate numbers (how much) and per-level bars (where). The grid-then-breakdown layout lets the user scan totals first, then drill into specifics.' },
+                { category: 'role', token: 'Motivation signal', value: '—', note: 'Recent sessions list',
+                  why: 'Showing recent sessions with dates and scores creates a visible streak. Learners see their own consistency — or gaps — which is a stronger motivator than abstract numbers.' },
+                { category: 'token', token: 'FW.semibold', value: '600', note: 'Header title — "Profile"',
+                  why: 'Same weight as session-setup and settings headers. Consistent header treatment across all non-tab screens lets the user trust the navigation pattern without relearning.' },
+                { category: 'token', token: 'FS.title', value: '42px', note: 'StatCard value in MONO',
+                  why: 'Large MONO numerics make stats feel like a scoreboard. The tight tracking (LS.tight) keeps multi-digit numbers compact and cohesive.' },
+                { category: 'token', token: 'T.surface', value: '#1e1b12', note: 'StatCard and row backgrounds',
+                  why: 'One step up from T.bg — creates card elevation on the dark background without shadows. The subtle lift separates data groups from the screen canvas.' },
+                { category: 'component', token: 'Avatar', value: '72px', note: 'Tappable with edit badge',
+                  why: 'Larger than the home screen (28px) because this is the identity context. The edit badge overlay signals tappability without adding a separate "change photo" button.' },
+                { category: 'component', token: 'StatCard', value: 'component', note: '2-column grid with flex: 1',
+                  why: 'Equal-width cards prevent any metric from feeling more important than another. The MONO font for values and uppercase labels for descriptions create a consistent data-display pattern.' },
+                { category: 'component', token: 'ProgressBar', value: 'component', note: 'HSK level breakdown rows',
+                  why: 'Reused from the session screen but in a different context — here it shows mastery per level rather than session progress. The MONO counter (got/seen) gives precision alongside the visual bar.' },
               ]} />
             </ScreenExample>
 
@@ -1415,13 +1466,22 @@ export default function DesignSystemScreen() {
                 </View>
               </PhoneFrame>
               <AnnotationList items={[
-                { token: 'Field', value: 'component', note: 'Uppercase label + bordered input' },
-                { token: 'FS.label', value: '13px', note: 'Form field labels — uppercase, spaced' },
-                { token: 'SegmentedControl', value: 'component', note: 'Preset option row, accent on active' },
-                { token: 'FS.body', value: '16px', note: 'Account email — base body size' },
-                { token: 'T.textMuted', value: '#928A78', note: 'Passive text — WCAG AA compliant' },
-                { token: 'Button', value: 'ghost', note: 'Text-only variant — no bg, no border' },
-                { token: 'space.xl', value: '20px', note: 'Section horizontal padding' },
+                { category: 'role', token: 'Preference form', value: '—', note: 'Name, language, HSK goal',
+                  why: 'Three settings that directly affect the learning experience. Grouped under "Personal Info" because they describe who the learner is, not how the app behaves.' },
+                { category: 'role', token: 'Destructive action', value: '—', note: 'Sign out at the bottom, ghost style',
+                  why: 'Ghost variant (no background, no border) makes sign-out visually recessive — present but not inviting. Positioning below Save ensures the learner sees the constructive action first.' },
+                { category: 'token', token: 'FS.label', value: '13px', note: 'Form labels — uppercase, spaced',
+                  why: 'Body scale −1 at uppercase with loose tracking matches the Section component pattern. Small labels above controls create a form rhythm that\'s consistent with session-setup.' },
+                { category: 'token', token: 'T.textMuted', value: '#928A78', note: 'Account email + passive text',
+                  why: 'Passes WCAG AA (4.5:1 contrast on T.bg). The email is displayed but not editable — muted color signals "this is information, not an input" without needing a disabled state.' },
+                { category: 'token', token: 'space.xl', value: '20px', note: 'Horizontal padding throughout',
+                  why: 'Consistent with session-setup and profile screens. The 20px inset keeps content away from screen edges on all device widths while maximizing form field width.' },
+                { category: 'component', token: 'Field', value: 'component', note: 'Display name text input',
+                  why: 'Same component as the auth screen — reuse means the learner recognises the input pattern (uppercase label, bordered box, focus ring) without relearning.' },
+                { category: 'component', token: 'SegmentedControl', value: 'component', note: 'Language + HSK selectors',
+                  why: 'Presets are ideal for small, known option sets (3 languages, 6 HSK levels). No custom input needed here — unlike card count, these are fixed enumerations.' },
+                { category: 'component', token: 'Button', value: 'primary + ghost', note: 'Save and sign out',
+                  why: 'Save uses the primary accent fill — it\'s the intended action. Sign out uses ghost (text only) — available but deliberately de-emphasised to prevent accidental logouts.' },
               ]} />
             </ScreenExample>
           </View>
@@ -1463,22 +1523,43 @@ function ScreenExample({ title, file, children }: {
   );
 }
 
-function AnnotationList({ items }: {
-  items: { token: string; value: string; note: string }[];
-}) {
+type AnnotationCategory = 'token' | 'role' | 'component';
+
+interface AnnotationItem {
+  category: AnnotationCategory;
+  token: string;
+  value: string;
+  note: string;
+  why: string;
+}
+
+const ANNOTATION_GROUPS: { key: AnnotationCategory; label: string; dotColor: string }[] = [
+  { key: 'role',      label: 'SEMANTIC ROLES',  dotColor: T.success },
+  { key: 'token',     label: 'TOKENS',          dotColor: T.accent },
+  { key: 'component', label: 'COMPONENTS',      dotColor: T.textSecondary },
+];
+
+function AnnotationList({ items }: { items: AnnotationItem[] }) {
   return (
     <View style={ex.annotationList}>
-      <Text style={ex.annotationHeading}>TOKENS & COMPONENTS</Text>
-      {items.map((item, i) => (
-        <View key={i} style={ex.annotationRow}>
-          <View style={ex.annotationDot} />
-          <View style={ex.annotationMeta}>
-            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-              <Text style={ex.annotationToken}>{item.token}</Text>
-              <Text style={ex.annotationValue}>{item.value}</Text>
+      {ANNOTATION_GROUPS
+        .filter(g => items.some(i => i.category === g.key))
+        .map((group, gi) => (
+        <View key={group.key} style={gi > 0 ? ex.annotationSectionGap : undefined}>
+          <Text style={ex.annotationHeading}>{group.label}</Text>
+          {items.filter(i => i.category === group.key).map((item, i) => (
+            <View key={i} style={ex.annotationRow}>
+              <View style={[ex.annotationDot, { backgroundColor: group.dotColor }]} />
+              <View style={ex.annotationMeta}>
+                <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+                  <Text style={ex.annotationToken}>{item.token}</Text>
+                  <Text style={ex.annotationValue}>{item.value}</Text>
+                </View>
+                <Text style={ex.annotationNote}>{item.note}</Text>
+                {item.why ? <Text style={ex.annotationWhy}>{item.why}</Text> : null}
+              </View>
             </View>
-            <Text style={ex.annotationNote}>{item.note}</Text>
-          </View>
+          ))}
         </View>
       ))}
     </View>
@@ -2230,6 +2311,16 @@ const ex = StyleSheet.create({
     color: T.textSecondary,
     marginTop: 2,
     lineHeight: LH.label,
+  },
+  annotationWhy: {
+    fontSize: FS.label,
+    color: T.textMuted,
+    marginTop: 3,
+    lineHeight: LH.label,
+    fontStyle: 'italic',
+  },
+  annotationSectionGap: {
+    marginTop: space.lg,
   },
 
   // ── Screen-specific placeholder styles ──────────────────────────────────
