@@ -249,15 +249,20 @@ export default function DesignSystemScreen() {
               />
             </Section>
 
-            {/* Line heights */}
+            {/* Line heights — reasoning + visuals */}
             <Section label="LINE HEIGHTS — LH">
               <Text style={s.lhNote}>
-                Companion constants exported as{' '}
-                <Text style={s.codeInline}>LH</Text> from{' '}
-                <Text style={s.codeInline}>theme/tokens.ts</Text>.
-                Ratio tapers as size grows — all values on a 4 px grid.
-                Small text (~1.54) → body/UI (~1.40–1.50) → headings/display (1.33→1.11).
+                Line height isn't a flat multiplier — it{' '}
+                <Text style={{ color: T.textPrimary }}>tapers</Text> as font
+                size grows. Small text gets generous leading (multi-line blocks
+                where the eye must track back). Large text gets tight leading
+                (single lines read in one pass). All values snap to a{' '}
+                <Text style={s.codeInline}>4px grid</Text> so baselines stay in
+                rhythm when different sizes stack vertically.
               </Text>
+
+              {/* ── Token table ──────────────────────────────────── */}
+              <Text style={s.lhSectionTitle}>Token reference</Text>
               {(
                 [
                   { name: 'label',      fs: FS.label,      lh: LH.label,      mult: '×1.54' },
@@ -278,6 +283,224 @@ export default function DesignSystemScreen() {
                   <Text style={s.lhFormula}>FS.{name} {fs}px {mult}</Text>
                 </View>
               ))}
+
+              {/* ── LH.hanzi — hero character ────────────────────── */}
+              <Text style={s.lhSectionTitle}>LH.hanzi — 80px (ratio 1.11)</Text>
+              <Text style={s.lhNote}>
+                The hero character sits in a tight bounding box with just 8px of air.
+                Excess leading would push pinyin and supporting text further down,
+                wasting vertical space on compact screens. The character should feel
+                like it's floating in the card centre, not inside a text container.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>session.tsx — flashcard hero</Text>
+                <View style={s.lhDemoCentered}>
+                  <Text style={{
+                    fontSize: FS.hanzi, lineHeight: LH.hanzi,
+                    color: T.textHanzi, letterSpacing: LS.tighter * FS.hanzi,
+                    textAlign: 'center',
+                  }}>学</Text>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: 3,
+                    color: T.accent, opacity: 0.85, marginTop: 18, textAlign: 'center',
+                  }}>xué</Text>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    72px character in 80px line box — 8px air keeps pinyin close
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── LH.score — session complete ──────────────────── */}
+              <Text style={s.lhSectionTitle}>LH.score — 48px (ratio 1.14)</Text>
+              <Text style={s.lhNote}>
+                Large score numerics on the session completion screen. Single-line text
+                that should feel punchy and immediate. The tight 1.14 ratio keeps numbers
+                dense — they're not prose, they're results.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>session.tsx — completion scores</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: space.xxl, paddingVertical: space.lg }}>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{
+                      fontSize: FS.score, lineHeight: LH.score, fontFamily: MONO,
+                      color: T.success, letterSpacing: LS.tighter * FS.score,
+                    }}>12</Text>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>GOT IT</Text>
+                  </View>
+                  <Text style={{ color: T.textMuted, fontSize: FS.subheading }}>·</Text>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{
+                      fontSize: FS.score, lineHeight: LH.score, fontFamily: MONO,
+                      color: T.error, letterSpacing: LS.tighter * FS.score,
+                    }}>8</Text>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>FORGOT</Text>
+                  </View>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    42px numerics in 48px line box — tight, confident, no excess air
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── LH.subheading — flashcard meaning ────────────── */}
+              <Text style={s.lhSectionTitle}>LH.subheading — 28px (ratio 1.33)</Text>
+              <Text style={s.lhNote}>
+                Used for the flashcard's revealed meaning and example sentence in
+                Chinese. These are short phrases, not paragraphs — tight leading keeps
+                the characters connected as a sentence rather than isolated glyphs.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>session.tsx — meaning + example</Text>
+                <View style={s.lhDemoCentered}>
+                  <Text style={{
+                    fontSize: FS.subheading, lineHeight: LH.subheading,
+                    color: T.textPrimary, textAlign: 'center',
+                    letterSpacing: LS.tight * FS.subheading,
+                  }}>to study, to learn</Text>
+                  <View style={{ width: 24, height: 1, backgroundColor: T.border, marginVertical: space.md, alignSelf: 'center' }} />
+                  <Text style={{
+                    fontSize: FS.subheading, lineHeight: LH.subheading,
+                    color: '#C8BFA8', textAlign: 'center',
+                  }}>我喜欢学习中文</Text>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.label,
+                    color: '#7A7060', textAlign: 'center', letterSpacing: 1, marginTop: 4,
+                  }}>wǒ xǐhuān xuéxí zhōngwén</Text>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    21px text in 28px line box — characters read as a connected sentence
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── LH.body — auth + prose ────────────────────────── */}
+              <Text style={s.lhSectionTitle}>LH.body — 24px (ratio 1.50)</Text>
+              <Text style={s.lhNote}>
+                Standard comfortable reading. Body and UI share the same 16px/24px
+                cadence, creating vertical rhythm — a body paragraph above a caption
+                keeps baselines on a predictable 4px grid. This is where most
+                multi-line text lives: auth subtitles, descriptions, success messages.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>auth.tsx — login subtitle</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg }}>
+                  <Text style={{
+                    fontSize: FS.title, color: T.textPrimary,
+                    letterSpacing: LS.tight * FS.title, marginBottom: space.xs,
+                  }}>Welcome back</Text>
+                  <Text style={{
+                    fontSize: FS.body, lineHeight: LH.body,
+                    color: T.textMuted,
+                  }}>Sign in to continue your practice.{'\n'}Your progress syncs across devices.</Text>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    16px text in 24px line box — 8px of air between lines for comfortable reading
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── LH.label — captions + small text ─────────────── */}
+              <Text style={s.lhSectionTitle}>LH.label — 20px (ratio 1.54)</Text>
+              <Text style={s.lhNote}>
+                The most generous ratio. Captions and example sentences are the densest
+                text in the app — often multi-line Chinese with complex stroke characters.
+                At 13px, characters like 龍 or 鬱 are near the legibility floor. The 1.54
+                ratio adds 7px of air between lines, preventing strokes from adjacent lines
+                from visually bleeding into each other.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>Card.tsx — subtitle · session.tsx — tap hints</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.lg }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                    <View style={{
+                      width: 36, height: 36, borderRadius: 8,
+                      backgroundColor: T.accentDim, borderWidth: 1, borderColor: T.accentBorder,
+                      alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Text style={{ fontSize: FS.ui, color: T.textPrimary }}>开</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>New session</Text>
+                      <Text style={{
+                        fontSize: FS.label, lineHeight: LH.label,
+                        color: T.textMuted,
+                      }}>Start a fresh round of flashcards{'\n'}with your selected deck and filters</Text>
+                    </View>
+                  </View>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{
+                      fontFamily: MONO, fontSize: FS.label, lineHeight: LH.label,
+                      color: T.textMuted, opacity: 0.6, letterSpacing: 1.5, textAlign: 'center',
+                    }}>tap · pinyin  ··  double tap · reveal all</Text>
+                  </View>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    13px text in 20px line box — generous air prevents dense Chinese strokes from bleeding
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── LH.pinyin — phonetic annotations ─────────────── */}
+              <Text style={s.lhSectionTitle}>LH.pinyin — 28px (ratio 1.40)</Text>
+              <Text style={s.lhNote}>
+                Tighter than body text because pinyin is typically a single line of
+                romanized syllables, not a paragraph. But if it wraps (long compounds),
+                28px leading prevents tone diacritics (ā, é, ǐ, ù) from colliding
+                with descenders on the line above.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>session.tsx — pinyin annotation</Text>
+                <View style={s.lhDemoCentered}>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.pinyin, lineHeight: LH.pinyin,
+                    color: T.accent, opacity: 0.85, letterSpacing: 3, textAlign: 'center',
+                  }}>zhōng guó rén</Text>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    20px text in 28px line box — air for tone marks without paragraph-level looseness
+                  </Text>
+                </View>
+              </View>
+
+              {/* ── 4px grid explanation ──────────────────────────── */}
+              <Text style={s.lhSectionTitle}>Why a 4px grid?</Text>
+              <Text style={s.lhNote}>
+                Every line height is a multiple of 4: 20, 24, 28, 40, 48, 56, 80.
+                When different text sizes stack vertically — which happens constantly
+                on the flashcard and profile screens — their baselines fall on a
+                predictable rhythm. Without the grid, fractional pixel positions cause
+                sub-pixel rendering artefacts and a subtle "something feels off" in
+                the layout.
+              </Text>
+              <View style={s.lhDemoCard}>
+                <Text style={s.lhDemoLabel}>vertical rhythm — stacked text roles</Text>
+                <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: 0 }}>
+                  <Text style={{
+                    fontSize: FS.subheading, lineHeight: LH.subheading,
+                    color: T.textPrimary, fontWeight: FW.semibold,
+                  }}>HSK 1 — Basic Characters</Text>
+                  <Text style={{
+                    fontSize: FS.body, lineHeight: LH.body,
+                    color: T.textSecondary,
+                  }}>150 cards across 6 categories</Text>
+                  <Text style={{
+                    fontSize: FS.label, lineHeight: LH.label,
+                    color: T.textMuted,
+                  }}>Last studied 2 days ago · 71% retention</Text>
+                </View>
+                <View style={s.lhDemoAnnotation}>
+                  <Text style={s.lhDemoAnnotationText}>
+                    28px → 24px → 20px — all multiples of 4, baselines stay in rhythm
+                  </Text>
+                </View>
+              </View>
             </Section>
 
             {/* Letter spacing */}
@@ -1236,7 +1459,7 @@ const s = StyleSheet.create({
   monoCaption:{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
   monoDesc:   { flex: 1.4 },
   propName:   { fontSize: FS.label, color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 },
-  propValue:  { fontSize: FS.body, color: T.textSecondary, lineHeight: 20 },
+  propValue:  { fontSize: FS.body, color: T.textSecondary, lineHeight: LH.body },
 
   // Line heights section
   lhNote: {
@@ -1256,6 +1479,49 @@ const s = StyleSheet.create({
   lhToken:   { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO, width: 80 },
   lhValue:   { fontSize: FS.label, color: T.accent,      fontFamily: MONO, width: 44 },
   lhFormula: { fontSize: FS.label, color: T.textMuted,   fontFamily: MONO },
+  lhSectionTitle: {
+    fontSize: FS.body,
+    color: T.textPrimary,
+    fontWeight: FW.semibold,
+    marginTop: space.xxl,
+    marginBottom: space.sm,
+  },
+  lhDemoCard: {
+    backgroundColor: T.surface,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: radius.card,
+    overflow: 'hidden',
+    marginTop: space.sm,
+    marginBottom: space.sm,
+  },
+  lhDemoLabel: {
+    fontSize: FS.label,
+    color: T.textMuted,
+    fontFamily: MONO,
+    letterSpacing: 1,
+    paddingHorizontal: space.lg,
+    paddingTop: space.md,
+    paddingBottom: space.xs,
+  },
+  lhDemoCentered: {
+    alignItems: 'center',
+    paddingVertical: space.xl,
+    paddingHorizontal: space.lg,
+  },
+  lhDemoAnnotation: {
+    backgroundColor: T.surface2,
+    borderTopWidth: 1,
+    borderTopColor: T.border,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.sm,
+  },
+  lhDemoAnnotationText: {
+    fontSize: FS.label,
+    color: T.accent,
+    fontFamily: MONO,
+    letterSpacing: 0.5,
+  },
 
   // Footer
   footer: { marginTop: space.huge, alignItems: 'center' },
