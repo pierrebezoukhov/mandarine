@@ -112,7 +112,7 @@ const s = StyleSheet.create({
   logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
 
   greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },
-  greetTitle: { fontSize: FS.title, color: T.textPrimary, marginBottom: 6, letterSpacing: LS.tight * FS.title },
+  greetTitle: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: 6, letterSpacing: LS.tight * FS.title },
   greetSub:   { fontSize: FS.body, color: T.textMuted },
 
   actions: { paddingHorizontal: space.xl, gap: space.md },

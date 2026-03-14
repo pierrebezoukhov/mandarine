@@ -1295,7 +1295,7 @@ export default function DesignSystemScreen() {
                 </View>
                 {/* Greeting */}
                 <View style={ex.homeGreet}>
-                  <Text style={{ fontSize: FS.title, color: T.textPrimary, letterSpacing: LS.tight * FS.title, marginBottom: 4 }}>Hello, Pierre.</Text>
+                  <Text style={{ fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, letterSpacing: LS.tight * FS.title, marginBottom: 4 }}>Hello, Pierre.</Text>
                   <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
                 </View>
                 {/* Cards */}
@@ -1314,10 +1314,14 @@ export default function DesignSystemScreen() {
                   why: 'Accent fill on the icon box draws the eye to the most common action. Hanzi icon reinforces that tapping starts a learning experience.' },
                 { category: 'token', token: 'FS.title', value: '42px', note: 'Greeting text — display scale +3',
                   why: 'Needs to dominate the screen without competing with the smaller logo hanzi above. The 20px gap between 42px and 21px makes hierarchy unambiguous.' },
+                { category: 'token', token: 'FW.semibold', value: '600', note: 'Greeting weight — structural landmark',
+                  why: 'The greeting is the screen\'s primary heading — semibold signals "this is where you are." Without it, the 42px text at regular weight would feel like a large subtitle rather than a confident anchor.' },
+                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Logo hanzi + subtitle — passive text',
+                  why: 'The logo hanzi is a brand mark, not a heading — regular weight keeps it quiet. The subtitle is read after the greeting, so it stays regular to avoid competing. Weight is omitted from the stylesheet; the system default handles it.' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Card titles — "New session", "Resume session"',
+                  why: 'Card titles are tappable labels. Medium weight distinguishes them from the regular-weight subtitle below each card, signalling interactivity without the authority of semibold.' },
                 { category: 'token', token: 'FS.subheading', value: '21px', note: 'Logo hanzi — display scale +1',
                   why: 'Small enough to be a brand mark, not a heading. Tight letter-spacing (LS.tight) makes the two characters feel like a logo, not text.' },
-                { category: 'token', token: 'FS.body', value: '16px', note: 'Subtitle — body scale base',
-                  why: 'Neutral size that recedes behind the greeting. Muted color (T.textMuted) ensures it\'s read second.' },
                 { category: 'token', token: 'T.bg', value: '#131109', note: 'Screen background',
                   why: 'Near-black warm base prevents the amber text palette from feeling washed out. Dark theme is a deliberate choice for a study app — reduces eye strain in extended sessions.' },
                 { category: 'component', token: 'Avatar', value: '28px', note: 'Initials fallback, tappable',
@@ -1392,6 +1396,10 @@ export default function DesignSystemScreen() {
                   why: 'One step above base so it\'s visibly subordinate to the character but clearly larger than body text. MONO font + loose tracking aids syllable-by-syllable parsing.' },
                 { category: 'token', token: 'FS.subheading', value: '21px', note: 'Example sentence in Chinese',
                   why: 'Same scale step as pinyin but in the display register (no MONO, tight tracking). Shows the character in context — a sentence, not an isolated glyph.' },
+                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'All flashcard text — hero character, pinyin, examples, meaning',
+                  why: 'Every text element on the flashcard is content to be read or memorised, not a control to be tapped. Regular weight keeps strokes clean on the hero character and avoids competing with the FAB icons. The hero character must be regular — bold would teach stroke forms that don\'t match real-world text.' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Score strip counters + part-of-speech tag',
+                  why: 'The score strip (✕ 2 · 3 ✓) uses medium weight because these are live counters the learner tracks during the session — they\'re closer to interactive state than passive prose. The part-of-speech tag (noun, verb) also uses medium as a categorical badge.' },
                 { category: 'token', token: 'T.error / T.success', value: '#E05252 / #4A9E6B', note: 'Semantic FAB colors',
                   why: 'Red and green are universally understood as wrong/right. The dim fill (12% opacity) + border pattern matches the Chip active state for visual consistency.' },
                 { category: 'component', token: 'ProgressBar', value: 'component', note: 'Fill track + MONO counter',
@@ -1405,7 +1413,7 @@ export default function DesignSystemScreen() {
                 <View style={ex.completeCentered}>
                   <Text style={{ fontSize: FS.seal, color: T.accent, opacity: 0.3 }}>印</Text>
                   <Text style={{
-                    fontSize: FS.title, color: T.textPrimary, textAlign: 'center',
+                    fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, textAlign: 'center',
                     letterSpacing: LS.tight * FS.title, marginTop: space.xxl,
                   }}>Session complete</Text>
                   <Text style={{
@@ -1444,6 +1452,12 @@ export default function DesignSystemScreen() {
                   why: 'Primary button encourages continued practice (the habit loop). Secondary button offers an exit without guilt. No tertiary options — decision fatigue after a study session is real.' },
                 { category: 'token', token: 'FS.seal', value: '50px', note: 'Decorative — outside both scales',
                   why: 'Deliberately between the character size (72px) and title size (42px). It\'s not content — it\'s atmosphere. The 30% opacity keeps it from competing with the actual results.' },
+                { category: 'token', token: 'FW.semibold', value: '600', note: '"Session complete" heading',
+                  why: 'Screen-level heading gets semibold to match home and auth headings. Without it, the 42px title at regular weight would blur with the nearby MONO score numerics — semibold establishes it as the structural anchor of the completion screen.' },
+                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Seal, score numerics, retention badge, subtitle',
+                  why: 'All data display elements stay regular. Score numerics (14, 6) are differentiated from the heading by MONO font + tighter tracking, not by weight. The seal is decorative. The "20 cards reviewed" subtitle and "70% retention" badge are informational — regular weight keeps them subordinate.' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Button labels — "Study again", "Back to home"',
+                  why: 'Buttons are the only interactive elements on this screen. Medium weight signals tappability against the surrounding regular-weight data display.' },
                 { category: 'token', token: 'FS.score', value: '42px', note: 'Large numerics in MONO font',
                   why: 'Same size as FS.title for visual parity, but MONO font and tighter tracking (LS.tighter −0.05em) distinguish numbers from headings. The tight 48px line height makes them feel punchy.' },
                 { category: 'token', token: 'LS.tighter', value: '−0.05em', note: 'Dense tracking for display numerics',
@@ -1528,7 +1542,7 @@ export default function DesignSystemScreen() {
                     style={{ marginVertical: space.xxl }}
                   />
                   {/* Form */}
-                  <Text style={{ fontSize: FS.title, color: T.textPrimary, marginBottom: space.xs }}>Welcome back</Text>
+                  <Text style={{ fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs }}>Welcome back</Text>
                   <Text style={{ fontSize: FS.body, color: T.textMuted, lineHeight: LH.body, marginBottom: space.xxl }}>Sign in to continue your practice.</Text>
                   <Field label="EMAIL" value="" onChange={() => {}} placeholder="you@example.com" />
                   <Field label="PASSWORD" value="" onChange={() => {}} placeholder="••••••••" secureTextEntry />
@@ -1551,6 +1565,12 @@ export default function DesignSystemScreen() {
                   why: 'Errors appear directly below the offending field, not as a toast or alert. This keeps context — the user sees what\'s wrong and where to fix it simultaneously.' },
                 { category: 'token', token: 'FS.title', value: '42px', note: 'Form heading — "Welcome back"',
                   why: 'Matches the home screen greeting size for familiarity. Users who sign out and back in see the same typographic weight — the app feels continuous, not restarted.' },
+                { category: 'token', token: 'FW.semibold', value: '600', note: '"Welcome back" / "Start learning" heading',
+                  why: 'Screen-level heading gets semibold — same pattern as the home greeting. Signals structural landmark so the user instantly knows which form they\'re looking at (sign in vs. create vs. forgot).' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Tab labels + button labels + "Done" / "Forgot?"',
+                  why: 'Every tappable text element on the auth screen uses medium weight. TabSwitcher labels ("Sign in", "Create account"), Button labels, and the "Forgot password?" link all share this weight to create a consistent "tappable" signal.' },
+                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Subtitle, field labels, placeholders, "or" divider, footer',
+                  why: 'Everything that isn\'t a heading or a control stays regular. Field labels are uppercase but regular weight — the uppercase treatment provides enough emphasis without adding visual weight that would compete with the form heading.' },
                 { category: 'token', token: 'LH.body', value: '24px', note: 'Subtitle prose — 1.50 ratio',
                   why: 'The subtitle ("Sign in to continue your practice") may wrap to two lines on narrow phones. 1.50 ratio ensures comfortable reading without the subtitle feeling like a separate paragraph.' },
                 { category: 'token', token: 'T.border / T.borderFocus', value: '0.08 / 0.22', note: 'Input border states',
@@ -1609,6 +1629,10 @@ export default function DesignSystemScreen() {
                   why: 'Showing recent sessions with dates and scores creates a visible streak. Learners see their own consistency — or gaps — which is a stronger motivator than abstract numbers.' },
                 { category: 'token', token: 'FW.semibold', value: '600', note: 'Header title — "Profile"',
                   why: 'Same weight as session-setup and settings headers. Consistent header treatment across all non-tab screens lets the user trust the navigation pattern without relearning.' },
+                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Back button, stat values, HSK labels, session rows',
+                  why: 'All data display on the profile screen is regular weight. StatCard values use MONO font — the monospace letterform provides enough visual distinctiveness without needing medium or semibold. Session deck names and meta text are informational, not interactive.' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Avatar initials',
+                  why: 'The Avatar component uses medium weight for its initials fallback text — a subtle signal that the avatar is tappable (to change the photo), consistent with the medium-weight-means-interactive rule.' },
                 { category: 'token', token: 'FS.title', value: '42px', note: 'StatCard value in MONO',
                   why: 'Large MONO numerics make stats feel like a scoreboard. The tight tracking (LS.tight) keeps multi-digit numbers compact and cohesive.' },
                 { category: 'token', token: 'T.surface', value: '#1e1b12', note: 'StatCard and row backgrounds',
@@ -1660,6 +1684,12 @@ export default function DesignSystemScreen() {
                   why: 'Three settings that directly affect the learning experience. Grouped under "Personal Info" because they describe who the learner is, not how the app behaves.' },
                 { category: 'role', token: 'Destructive action', value: '—', note: 'Sign out at the bottom, ghost style',
                   why: 'Ghost variant (no background, no border) makes sign-out visually recessive — present but not inviting. Positioning below Save ensures the learner sees the constructive action first.' },
+                { category: 'token', token: 'FW.semibold', value: '600', note: '"Settings" header title',
+                  why: 'Consistent header pattern across all non-tab screens (profile, session-setup, settings). The user recognises the same structural weight at the top of every detail screen.' },
+                { category: 'token', token: 'FW.medium', value: '500', note: 'Segment labels + button labels',
+                  why: 'SegmentedControl labels ("Français", "English", HSK numbers) and Button labels use medium to signal tappability. The active segment is distinguished by accent color, not weight — weight stays consistent across active and inactive states.' },
+                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Field labels, input text, email, back button',
+                  why: 'Form labels are uppercase regular — the uppercase is enough emphasis. Input text (the display name value) is regular because it\'s editable content, not a control label. The email address is passive display text.' },
                 { category: 'token', token: 'FS.label', value: '13px', note: 'Form labels — uppercase, spaced',
                   why: 'Body scale −1 at uppercase with loose tracking matches the Section component pattern. Small labels above controls create a form rhythm that\'s consistent with session-setup.' },
                 { category: 'token', token: 'T.textMuted', value: '#928A78', note: 'Account email + passive text',

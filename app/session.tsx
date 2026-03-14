@@ -442,7 +442,7 @@ const sc = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
   seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: space.xxxl },
-  title:     { fontSize: FS.title, color: T.textPrimary, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tight * FS.title },
+  title:     { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tight * FS.title },
   sub:       { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
 
   stats:     { flexDirection: 'row', alignItems: 'center', gap: space.xxl, marginBottom: 32 },
