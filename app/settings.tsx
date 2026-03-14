@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS } from '@/theme/tokens';
+import { T, FS, FW } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
@@ -135,7 +135,7 @@ const s = StyleSheet.create({
   },
   backBtn:  { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
   backText: { fontSize: FS.body, color: T.textSecondary },
-  title:    { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
+  title:    { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
 
   scroll: { paddingHorizontal: space.xl, paddingTop: space.xl, paddingBottom: space.giant },
 

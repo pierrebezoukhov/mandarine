@@ -39,34 +39,56 @@ export const MONO: string =
   Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'monospace';
 
 // ── Font-size scale ───────────────────────────────────────────────────────────
-// Display / Title scale — large, prominent, heading hierarchy.
+//
+// Two independent mathematical scales + one manual override:
+//
+//   DISPLAY — Perfect Fourth (1.333) from 16px base
+//     Used for screen headings, deck names, navigation context.
+//     Provides editorial weight without competing with the flashcard hero character.
+//
+//   BODY — Major Third (1.250) from 16px base
+//     Used for flashcard text roles (pinyin, translation, example sentence).
+//     1.250 keeps enough contrast between 4 learning levels without dropping
+//     below the 12px Chinese-character legibility floor on mobile.
+//
+//   CHARACTER — Manual override, NOT derived from either scale
+//     The Chinese character is the product being learned, not a heading.
+//     64–72px ensures it is the unambiguous primary stimulus.
+
+// Display / Title scale — Perfect Fourth (1.333), heading hierarchy.
 export const FSDisplay = {
-  hanzi:   96,  // flashcard character — outside prose scale
-  seal:    50,  // session completion seal
-  score:   37,  // large numeric display
-  title:   28,  // screen titles
-  heading: 21,  // sub-headings, card headings
+  hanzi:      72,  // flashcard hero character — manual override, outside scales
+  seal:       50,  // session completion seal — decorative, outside scales
+  score:      42,  // large numeric display — same as title for visual parity
+  title:      42,  // screen titles / H1 — 16 × 1.333³
+  heading:    32,  // deck names, H2  — 16 × 1.333²
+  subheading: 21,  // sub-headings, card headings — 16 × 1.333¹
 } as const;
 
-// Body / Content scale — readable content, UI controls.
+// Body / Content scale — Major Third (1.250), readable content + UI controls.
 export const FSBody = {
-  ui:    16,  // inputs, buttons, nav controls — base size
-  body:  14,  // body text, subtitles, secondary copy
-  label: 12,  // section labels, captions, badges
+  pinyin: 20,  // pinyin romanization — 16 × 1.250¹
+  ui:     16,  // inputs, buttons, nav controls — base size
+  body:   16,  // body text, translations — base size
+  label:  13,  // example sentences, captions, section labels — 16 ÷ 1.250
 } as const;
 
 // Combined — all existing FS.* references continue to work unchanged.
+// NOTE: FSDisplay.score was removed — use FSDisplay.title for large numerics.
 export const FS = { ...FSDisplay, ...FSBody } as const;
 
 // ── Letter-spacing scale ──────────────────────────────────────────────────────
 // Unitless em multipliers. Usage: letterSpacing: LS.tight * FS.title
 //
-//   FS.score, FS.seal, FS.hanzi  → LS.tighter  (large display, dense tracking)
-//   FS.heading, FS.title         → LS.tight     (heading hierarchy)
-//   FS.ui, FS.body, FS.label     → LS.normal    (no tracking — default)
+//   FS.score, FS.seal, FS.hanzi       → LS.tighter  (large display, dense tracking)
+//   FS.heading, FS.title, FS.subheading → LS.tight   (heading hierarchy)
+//   FS.ui, FS.body, FS.label          → LS.normal    (no tracking — default)
 //
 // EXCEPTIONS: MONO phonetic / badge text keeps its positive tracking
 // (pinyin, hskBadge, posTag, exPinyin) since it aids phonetic readability.
+// Positive tracking on pinyin is a pedagogical choice: learners parse
+// syllable-by-syllable ("zhōng" + "guó"), and air between syllables
+// aligns with that parsing behaviour.
 export const LS = {
   tighter: -0.05,   // score / seal / hanzi  — large display
   tight:   -0.025,  // title / heading        — heading hierarchy
@@ -75,12 +97,17 @@ export const LS = {
 } as const;
 
 // ── Font-weight scale ─────────────────────────────────────────────────────────
-// Three values only. FW.regular is the system default and rarely written
-// explicitly in code — only FW.medium and FW.semibold appear in stylesheets.
+// Three values only — no bold (700). Bold thickens Chinese character strokes,
+// reducing white space between strokes and degrading legibility at display sizes.
+// Semibold (600) adds heading emphasis without muddy stroke rendering.
 //
 //   FW.semibold → screen headings, component names, nav bar labels
 //   FW.medium   → interactive controls (Button, Chip, Tab), list primary labels
-//   FW.regular  → prose, subtitles, captions, metadata (default; omit from style)
+//   FW.regular  → prose, subtitles, captions, pinyin, hero character (default; omit)
+//
+// The hero character MUST be regular weight — learners should see strokes as
+// they appear in normal reading. Adding weight teaches a visual form that
+// doesn't transfer to real-world text.
 //
 // Rule of thumb: size signals priority · weight signals interactivity · color signals role.
 export const FW = {
@@ -90,22 +117,28 @@ export const FW = {
 } as const;
 
 // ── Line-height scale ─────────────────────────────────────────────────────────
-// All values on 4 px grid. Ratio tapers as size grows — loose for small text,
-// tight for large display — rather than a flat multiplier across all sizes.
+// All values on 4 px grid. Ratio tapers as size grows — generous for small
+// text (multi-line readability), tight for large display (single lines).
+// Chinese characters fill the full em square, so these ratios are calibrated
+// for CJK-primary text. Latin-only lines will feel slightly airy — acceptable.
 //
-//   label   12 / 18  → 1.50  (small labels need generous leading)
-//   body    14 / 20  → 1.43  (readable prose, just under 1.5)
-//   ui      16 / 24  → 1.50  (inputs / buttons, matches label rhythm)
-//   heading 21 / 28  → 1.33  (sub-headings start to tighten)
-//   title   28 / 36  → 1.29  (screen titles, tighter still)
-//   score   37 / 44  → 1.19  (large numerics, minimal leading needed)
-//   seal    50 / 56  → 1.12  (display-size text, nearly cap-height only)
+//   label        13 / 20  → 1.54  (small text, multi-line examples)
+//   body / ui    16 / 24  → 1.50  (prose, inputs, buttons)
+//   pinyin       20 / 28  → 1.40  (phonetic annotations)
+//   subheading   21 / 28  → 1.33  (sub-headings start to tighten)
+//   heading      32 / 40  → 1.25  (deck names, H2)
+//   title/score  42 / 48  → 1.14  (screen titles, large numerics)
+//   seal         50 / 56  → 1.12  (display-size decorative)
+//   hanzi        72 / 80  → 1.11  (hero character, nearly cap-height)
 export const LH = {
-  label:   18,
-  body:    20,
-  ui:      24,
-  heading: 28,
-  title:   36,
-  score:   44,
-  seal:    56,
+  label:      20,
+  body:       24,
+  ui:         24,
+  pinyin:     28,
+  subheading: 28,
+  heading:    40,
+  title:      48,
+  score:      48,
+  seal:       56,
+  hanzi:      80,
 } as const;

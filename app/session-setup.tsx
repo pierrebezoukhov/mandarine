@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS } from '@/theme/tokens';
+import { T, FS, FW } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Section } from '@/components/Section';
 import { Chip } from '@/components/Chip';
@@ -284,7 +284,7 @@ const s = StyleSheet.create({
   },
   backBtn:     { width: 60 },
   backText:    { fontSize: FS.body, color: T.textMuted },
-  headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: '600' },
+  headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
 
   // Deck selector
   deckSelector: {
@@ -292,7 +292,7 @@ const s = StyleSheet.create({
     backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
     borderRadius: 14, paddingHorizontal: space.lg, paddingVertical: 14,
   },
-  deckName:        { fontSize: FS.ui, color: T.textPrimary, fontWeight: '500' },
+  deckName:        { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium },
   deckDesc:        { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
   deckPlaceholder: { flex: 1, fontSize: FS.ui, color: T.textMuted },
   deckCaret:       { fontSize: FS.body, color: T.textMuted, marginLeft: space.md },
@@ -323,7 +323,7 @@ const s = StyleSheet.create({
     paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: T.border,
   },
   rowActive:     {},
-  rowName:       { fontSize: FS.ui, color: T.textSecondary, fontWeight: '500' },
+  rowName:       { fontSize: FS.ui, color: T.textSecondary, fontWeight: FW.medium },
   rowNameActive: { color: T.textPrimary },
   rowDesc:       { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
   checkmark:     { fontSize: FS.ui, color: T.accent, marginLeft: space.md },

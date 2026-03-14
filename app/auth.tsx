@@ -5,11 +5,11 @@ import {
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
-import { T, FS, LH, LS } from '@/theme/tokens';
+import { T, FS, FW, LH } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
-import { TabSwitcher } from '@/components/TabSwitcher';
+
 
 // ─── Login form ──────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () => void }) {
@@ -157,7 +157,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   if (sent) return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: FS.heading }}>✓</Text>
+        <Text style={{ color: T.success, fontSize: FS.subheading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Check your inbox</Text>
       <Text style={s.successSub}>
@@ -189,7 +189,7 @@ function ConfirmScreen({ email, onBack }: { email: string; onBack: () => void })
   return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: FS.heading }}>✓</Text>
+        <Text style={{ color: T.success, fontSize: FS.subheading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Confirm your email</Text>
       <Text style={s.successSub}>
@@ -214,7 +214,6 @@ export default function AuthScreen() {
     setScreen('confirm');
   };
 
-  const showTabs = screen === 'login' || screen === 'signup';
 
   return (
     <KeyboardAvoidingView
@@ -229,21 +228,9 @@ export default function AuthScreen() {
         {/* Logo */}
         <View style={s.logo}>
           <Text style={s.logoHanzi}>漢字</Text>
-          <Text style={s.logoLabel}>HANZIFLASH</Text>
+          <Text style={s.logoLabel}>MANDARINE</Text>
         </View>
 
-        {/* Tab switcher — hidden on forgot / confirm */}
-        {showTabs && (
-          <TabSwitcher
-            tabs={[
-              { label: 'Sign in',        value: 'login'  },
-              { label: 'Create account', value: 'signup' },
-            ]}
-            value={screen}
-            onChange={v => setScreen(v as Screen)}
-            style={s.tabs}
-          />
-        )}
 
         {screen === 'login'   && <LoginForm   onSwitch={() => setScreen('signup')} onForgot={() => setScreen('forgot')} />}
         {screen === 'signup'  && <SignupForm   onSwitch={() => setScreen('login')}  onSuccess={handleSignupSuccess} />}
@@ -260,12 +247,10 @@ const s = StyleSheet.create({
   scroll: { flexGrow: 1, paddingHorizontal: space.xxxl, paddingBottom: space.giant },
 
   logo:      { paddingTop: 72, marginBottom: space.giant },
-  logoHanzi: { fontSize: FS.score, color: T.textPrimary, letterSpacing: LS.tighter * FS.score, marginBottom: space.xs },
-  logoLabel: { fontSize: FS.label, color: T.textMuted },
+  logoHanzi: { fontSize: FS.score, color: T.accent, fontWeight: FW.semibold, marginBottom: space.xs },
+  logoLabel: { fontSize: FS.label, color: T.textMuted, letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 },
 
-  tabs: { marginBottom: 32 },
-
-  heading: { fontSize: FS.title, color: T.textPrimary, marginBottom: space.xs },
+  heading: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs },
   sub:     { fontSize: FS.body, color: T.textMuted, marginBottom: space.xxxl, lineHeight: LH.body },
 
   ctaTop: { marginTop: space.sm },
@@ -285,6 +270,6 @@ const s = StyleSheet.create({
 
   successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
   successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(74,158,107,0.12)', borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)', alignItems: 'center', justifyContent: 'center' },
-  successTitle: { fontSize: FS.heading, color: T.textPrimary },
+  successTitle: { fontSize: FS.subheading, color: T.textPrimary },
   successSub:   { fontSize: FS.body, color: T.textMuted, textAlign: 'center', lineHeight: LH.body, maxWidth: 260 },
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS, LS } from '@/theme/tokens';
+import { T, FS, FW, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
@@ -61,7 +61,7 @@ export default function HomeScreen() {
       <View style={s.header}>
         <View>
           <Text style={s.logoHanzi}>漢字</Text>
-          <Text style={s.logoLabel}>HANZIFLASH</Text>
+          <Text style={s.logoLabel}>MANDARINE</Text>
         </View>
         <Avatar
           initials={(
@@ -108,11 +108,11 @@ const s = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'flex-start', paddingHorizontal: space.xxxl, paddingTop: space.xxl, paddingBottom: space.sm,
   },
-  logoHanzi:   { fontSize: FS.heading, color: T.textPrimary, letterSpacing: LS.tight * FS.heading },
-  logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
+  logoHanzi:   { fontSize: FS.subheading, color: T.accent, fontWeight: FW.semibold },
+  logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' },
 
   greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },
-  greetTitle: { fontSize: FS.title, color: T.textPrimary, marginBottom: 6, letterSpacing: LS.tight * FS.title },
+  greetTitle: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: 6, letterSpacing: LS.tight * FS.title },
   greetSub:   { fontSize: FS.body, color: T.textMuted },
 
   actions: { paddingHorizontal: space.xl, gap: space.md },
