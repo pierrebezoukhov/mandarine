@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.2.0...v1.3.0) (2026-03-14)
+
+
+### Features
+
+* add responsive layout with max-width containment for desktop ([1e397e6](https://github.com/pierrebezoukhov/mandarine/commit/1e397e62ed29bf1acae0c456bcc749d0fae88562))
+
 # [1.2.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.1.1...v1.2.0) (2026-03-14)
 
 
