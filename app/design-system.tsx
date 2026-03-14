@@ -1320,6 +1320,8 @@ export default function DesignSystemScreen() {
                   why: 'The logo hanzi is a brand mark, not a heading — regular weight keeps it quiet. The subtitle is read after the greeting, so it stays regular to avoid competing. Weight is omitted from the stylesheet; the system default handles it.' },
                 { category: 'token', token: 'FW.medium', value: '500', note: 'Card titles — "New session", "Resume session"',
                   why: 'Card titles are tappable labels. Medium weight distinguishes them from the regular-weight subtitle below each card, signalling interactivity without the authority of semibold.' },
+                { category: 'token', token: 'FS.label', value: '13px', note: 'Card subtitles — "Start a fresh round…", "No session in progress"',
+                  why: 'Body scale −1 keeps subtitles clearly subordinate to the 16px card title. At regular weight and T.textMuted color, they provide context without competing for attention. The 20px line height (LH.label, ratio 1.54) gives generous air in case the subtitle wraps to two lines — important because these descriptions help the user decide which card to tap.' },
                 { category: 'token', token: 'FS.subheading', value: '21px', note: 'Logo hanzi — display scale +1',
                   why: 'Small enough to be a brand mark, not a heading. Tight letter-spacing (LS.tight) makes the two characters feel like a logo, not text.' },
                 { category: 'token', token: 'T.bg', value: '#131109', note: 'Screen background',
