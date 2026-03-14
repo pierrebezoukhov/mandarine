@@ -1288,8 +1288,8 @@ export default function DesignSystemScreen() {
                 {/* Header */}
                 <View style={ex.homeHeader}>
                   <View>
-                    <Text style={{ fontSize: FS.subheading, color: T.textPrimary, letterSpacing: LS.tight * FS.subheading }}>漢字</Text>
-                    <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2 }}>HANZIFLASH</Text>
+                    <Text style={{ fontSize: FS.subheading, color: T.accent, fontWeight: FW.semibold }}>漢字</Text>
+                    <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' }}>MANDARINE</Text>
                   </View>
                   <Avatar initials="PB" size={28} />
                 </View>
@@ -1533,16 +1533,9 @@ export default function DesignSystemScreen() {
                 <View style={{ paddingHorizontal: space.xl }}>
                   {/* Logo */}
                   <View style={{ paddingTop: space.giant }}>
-                    <Text style={{ fontSize: FS.score, color: T.textPrimary, letterSpacing: LS.tighter * FS.score, marginBottom: space.xs }}>漢字</Text>
-                    <Text style={{ fontSize: FS.label, color: T.textMuted }}>HANZIFLASH</Text>
+                    <Text style={{ fontSize: FS.score, color: T.accent, fontWeight: FW.semibold, marginBottom: space.xs }}>漢字</Text>
+                    <Text style={{ fontSize: FS.label, color: T.textMuted, letterSpacing: 4, textTransform: 'uppercase' }}>MANDARINE</Text>
                   </View>
-                  {/* Tabs */}
-                  <TabSwitcher
-                    tabs={[{ label: 'Sign in', value: 'login' }, { label: 'Create account', value: 'signup' }]}
-                    value="login"
-                    onChange={() => {}}
-                    style={{ marginVertical: space.xxl }}
-                  />
                   {/* Form */}
                   <Text style={{ fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs }}>Welcome back</Text>
                   <Text style={{ fontSize: FS.body, color: T.textMuted, lineHeight: LH.body, marginBottom: space.xxl }}>Sign in to continue your practice.</Text>

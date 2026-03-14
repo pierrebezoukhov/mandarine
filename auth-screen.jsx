@@ -55,8 +55,8 @@ const CSS = `
   animation: fadeUp 0.5s 0.1s both;
 }
 .auth-logo-hanzi {
-  font-family: var(--font-hanzi); font-size: 32px; font-weight: 500;
-  color: var(--text-primary); letter-spacing: 0.04em; display: block;
+  font-family: var(--font-hanzi); font-size: 32px; font-weight: 600;
+  color: var(--accent); letter-spacing: 0.04em; display: block;
   margin-bottom: 4px;
 }
 .auth-logo-label {
@@ -399,7 +399,7 @@ export default function AuthScreen() {
 
       <div className="auth-logo">
         <span className="auth-logo-hanzi">漢字</span>
-        <span className="auth-logo-label">HANZIFLASH</span>
+        <span className="auth-logo-label">MANDARINE</span>
       </div>
 
       {screen !== "forgot" && screen !== "done" && (
