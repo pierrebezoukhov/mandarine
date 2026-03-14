@@ -5,11 +5,11 @@ import {
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
-import { T, FS, FW, LH, LS } from '@/theme/tokens';
+import { T, FS, FW, LH } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
-import { TabSwitcher } from '@/components/TabSwitcher';
+
 
 // ─── Login form ──────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () => void }) {
@@ -214,7 +214,6 @@ export default function AuthScreen() {
     setScreen('confirm');
   };
 
-  const showTabs = screen === 'login' || screen === 'signup';
 
   return (
     <KeyboardAvoidingView
@@ -229,21 +228,9 @@ export default function AuthScreen() {
         {/* Logo */}
         <View style={s.logo}>
           <Text style={s.logoHanzi}>漢字</Text>
-          <Text style={s.logoLabel}>HANZIFLASH</Text>
+          <Text style={s.logoLabel}>MANDARINE</Text>
         </View>
 
-        {/* Tab switcher — hidden on forgot / confirm */}
-        {showTabs && (
-          <TabSwitcher
-            tabs={[
-              { label: 'Sign in',        value: 'login'  },
-              { label: 'Create account', value: 'signup' },
-            ]}
-            value={screen}
-            onChange={v => setScreen(v as Screen)}
-            style={s.tabs}
-          />
-        )}
 
         {screen === 'login'   && <LoginForm   onSwitch={() => setScreen('signup')} onForgot={() => setScreen('forgot')} />}
         {screen === 'signup'  && <SignupForm   onSwitch={() => setScreen('login')}  onSuccess={handleSignupSuccess} />}
@@ -260,10 +247,8 @@ const s = StyleSheet.create({
   scroll: { flexGrow: 1, paddingHorizontal: space.xxxl, paddingBottom: space.giant },
 
   logo:      { paddingTop: 72, marginBottom: space.giant },
-  logoHanzi: { fontSize: FS.score, color: T.textPrimary, letterSpacing: LS.tighter * FS.score, marginBottom: space.xs },
-  logoLabel: { fontSize: FS.label, color: T.textMuted },
-
-  tabs: { marginBottom: 32 },
+  logoHanzi: { fontSize: FS.score, color: T.accent, fontWeight: FW.semibold, marginBottom: space.xs },
+  logoLabel: { fontSize: FS.label, color: T.textMuted, letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 },
 
   heading: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs },
   sub:     { fontSize: FS.body, color: T.textMuted, marginBottom: space.xxxl, lineHeight: LH.body },
