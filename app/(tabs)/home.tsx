@@ -61,7 +61,7 @@ export default function HomeScreen() {
       <View style={s.header}>
         <View>
           <Text style={s.logoHanzi}>漢字</Text>
-          <Text style={s.logoLabel}>HANZIFLASH</Text>
+          <Text style={s.logoLabel}>MANDARINE</Text>
         </View>
         <Avatar
           initials={(
@@ -108,8 +108,8 @@ const s = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'flex-start', paddingHorizontal: space.xxxl, paddingTop: space.xxl, paddingBottom: space.sm,
   },
-  logoHanzi:   { fontSize: FS.subheading, color: T.textPrimary, letterSpacing: LS.tight * FS.subheading },
-  logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
+  logoHanzi:   { fontSize: FS.subheading, color: T.accent, fontWeight: FW.semibold },
+  logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' },
 
   greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },
   greetTitle: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: 6, letterSpacing: LS.tight * FS.title },

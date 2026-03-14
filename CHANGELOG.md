@@ -1,3 +1,17 @@
+# [1.2.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.1.1...v1.2.0) (2026-03-14)
+
+
+### Features
+
+* add Examples tab with annotated screen mockups to design system ([5606ebb](https://github.com/pierrebezoukhov/mandarine/commit/5606ebbe98049d90d437fff5ac6b834a2ec3b3f0))
+* add font weight reasoning to all Example screens + fix missing semibold ([6ec5afc](https://github.com/pierrebezoukhov/mandarine/commit/6ec5afcd003d1784bdd6847d0ec51aa6cd08f63a))
+* add font weight reasoning with visual demos to Rules tab ([e005f7f](https://github.com/pierrebezoukhov/mandarine/commit/e005f7f74792d3d9d7db4c6f50ee1befbde4892c))
+* add line-height reasoning with live visual demos to design system ([d21746e](https://github.com/pierrebezoukhov/mandarine/commit/d21746ed4874fed20ad03f83428bf2cca5505dd8))
+* categorized annotations with design rationale on Examples tab ([4026a21](https://github.com/pierrebezoukhov/mandarine/commit/4026a21f0fa2e6295dec6e0e66a86c9b2d54d430))
+* implement reasoned typography system with dual-scale architecture ([61a8c2f](https://github.com/pierrebezoukhov/mandarine/commit/61a8c2f6b349651a4ee4b666bf16780857e32407))
+* rebrand HANZIFLASH → MANDARINE across all screens ([f18ff52](https://github.com/pierrebezoukhov/mandarine/commit/f18ff526ac5723ecb4c5ba96422006c05ce22c07))
+* redesign auth screen — prioritize sign-in + richer logo ([3c203fe](https://github.com/pierrebezoukhov/mandarine/commit/3c203feaa19163a6b5c744e307643afffa8f5905))
+
 ## [1.1.1](https://github.com/pierrebezoukhov/mandarine/compare/v1.1.0...v1.1.1) (2026-03-12)
 
 
