@@ -3,6 +3,7 @@ import {
   Modal, View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { T, FS, FW } from '@/theme/tokens';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface BottomSheetModalProps {
   visible: boolean;
@@ -12,21 +13,23 @@ interface BottomSheetModalProps {
 }
 
 export function BottomSheetModal({ visible, onClose, title, children }: BottomSheetModalProps) {
+  const { isDesktop } = useResponsive();
+
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType={isDesktop ? 'fade' : 'slide'}
       transparent
       onRequestClose={onClose}
     >
-      <View style={s.overlay}>
+      <View style={[s.overlay, isDesktop && s.overlayDesktop]}>
         {/* Backdrop — tapping closes the sheet */}
         <TouchableOpacity style={s.backdrop} activeOpacity={1} onPress={onClose} />
 
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={s.sheet}>
-            {/* Drag handle */}
-            <View style={s.handle} />
+          <View style={[s.sheet, isDesktop && s.sheetDesktop]}>
+            {/* Drag handle — hidden on desktop */}
+            {!isDesktop && <View style={s.handle} />}
 
             {/* Header */}
             <View style={s.header}>
@@ -47,6 +50,7 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
 
 const s = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
+  overlayDesktop: { justifyContent: 'center', alignItems: 'center' },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -58,6 +62,11 @@ const s = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
     paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+  },
+  sheetDesktop: {
+    maxWidth: 480,
+    width: 480,
+    borderRadius: 20,
   },
 
   handle: {

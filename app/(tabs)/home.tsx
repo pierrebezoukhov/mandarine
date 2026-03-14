@@ -9,6 +9,7 @@ import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
 import { fetchProfile, updateProfile } from '@/lib/profile';
+import { ResponsiveShell } from '@/components/ResponsiveShell';
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
@@ -57,46 +58,48 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={s.root}>
-      {/* Header */}
-      <View style={s.header}>
-        <View>
-          <Text style={s.logoHanzi}>漢字</Text>
-          <Text style={s.logoLabel}>MANDARINE</Text>
+      <ResponsiveShell maxWidth={520}>
+        {/* Header */}
+        <View style={s.header}>
+          <View>
+            <Text style={s.logoHanzi}>漢字</Text>
+            <Text style={s.logoLabel}>MANDARINE</Text>
+          </View>
+          <Avatar
+            initials={(
+              user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
+              user?.email?.[0] ?? '?'
+            ).toUpperCase()}
+            size={36}
+            onPress={() => router.push('/profile')}
+          />
         </View>
-        <Avatar
-          initials={(
-            user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
-            user?.email?.[0] ?? '?'
-          ).toUpperCase()}
-          size={36}
-          onPress={() => router.push('/profile')}
-        />
-      </View>
 
-      {/* Greeting */}
-      <View style={s.greet}>
-        <Text style={s.greetTitle}>Hello, {name}.</Text>
-        <Text style={s.greetSub}>What would you like to do?</Text>
-      </View>
+        {/* Greeting */}
+        <View style={s.greet}>
+          <Text style={s.greetTitle}>Hello, {name}.</Text>
+          <Text style={s.greetSub}>What would you like to do?</Text>
+        </View>
 
-      {/* Actions */}
-      <View style={s.actions}>
-        <Card
-          icon="开"
-          title="New session"
-          subtitle="Start a fresh round of flashcards"
-          variant="primary"
-          onPress={startNew}
-        />
-        <Card
-          icon="续"
-          title="Resume session"
-          subtitle={hasSession ? 'Continue where you left off' : 'No session in progress'}
-          variant="secondary"
-          onPress={resumeSession}
-          disabled={!hasSession}
-        />
-      </View>
+        {/* Actions */}
+        <View style={s.actions}>
+          <Card
+            icon="开"
+            title="New session"
+            subtitle="Start a fresh round of flashcards"
+            variant="primary"
+            onPress={startNew}
+          />
+          <Card
+            icon="续"
+            title="Resume session"
+            subtitle={hasSession ? 'Continue where you left off' : 'No session in progress'}
+            variant="secondary"
+            onPress={resumeSession}
+            disabled={!hasSession}
+          />
+        </View>
+      </ResponsiveShell>
     </SafeAreaView>
   );
 }

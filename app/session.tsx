@@ -10,6 +10,7 @@ import { T, MONO, FS, FW, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
+import { ResponsiveShell } from '@/components/ResponsiveShell';
 import type { SessionConfig } from './session-setup';
 import {
   fetchCardsForSession, loadResumeState,
@@ -26,6 +27,7 @@ function SessionComplete({ got, forgot, total, onRestart }: {
   const pct = total > 0 ? Math.round((got / total) * 100) : 0;
   return (
     <SafeAreaView style={sc.root}>
+      <ResponsiveShell maxWidth={640} style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Text style={sc.seal}>印</Text>
       <Text style={sc.title}>Session complete</Text>
       <Text style={sc.sub}>{total} cards reviewed</Text>
@@ -57,6 +59,7 @@ function SessionComplete({ got, forgot, total, onRestart }: {
           }}
         />
       </View>
+      </ResponsiveShell>
     </SafeAreaView>
   );
 }
@@ -258,6 +261,7 @@ export default function SessionScreen() {
 
   return (
     <SafeAreaView style={s.root}>
+      <ResponsiveShell maxWidth={640}>
 
       {/* Top bar */}
       <View style={s.topbar}>
@@ -345,6 +349,7 @@ export default function SessionScreen() {
         </TouchableOpacity>
       </View>
 
+      </ResponsiveShell>
     </SafeAreaView>
   );
 }
