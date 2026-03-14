@@ -90,6 +90,24 @@ Provides `{ session, user, loading, signIn, signUp, signOut, resetPassword, sign
 
 All visual tokens live in `theme/tokens.ts` (exported as `T`) and `theme/spacing.ts`. No hardcoded colors anywhere in components or screens — always reference `T.*`. Components are in `components/`: `Button`, `Card`, `Chip`, `Field`, `ProgressBar`, `Section`, `SegmentedControl`, `TabSwitcher`, `BottomSheetModal`. Documentation is in `DESIGN_SYSTEM.md`.
 
+### Responsive Layout
+
+Two breakpoints: `mobile` (< 768px) and `desktop` (>= 768px). No CSS media queries — everything uses `useWindowDimensions()`.
+
+**`hooks/useResponsive.ts`** — `useResponsive()` returns `{ bp, isMobile, isDesktop, width }`. Call directly from any screen or component — no context provider needed.
+
+**`components/ResponsiveShell.tsx`** — Convenience wrapper that constrains content width on desktop and passes through unchanged on mobile. Props: `children`, `maxWidth?` (default 520), `fill?` (default true), `style?`.
+
+Default `maxWidth` values:
+- **Form screens** (auth, session-setup, home, profile): `520`
+- **Flashcard session**: `640`
+- **Reader/prose** (future): `720`
+
+**When to use what:**
+- Simple containment → wrap in `<ResponsiveShell>`
+- Custom responsive layouts (e.g. side-by-side list+detail) → use `useResponsive()` directly, skip the shell
+- `BottomSheetModal` already adapts internally (centered dialog on desktop)
+
 ### Path Alias
 
 `@/*` maps to the project root. Use `@/lib/progress`, `@/components/Button`, `@/theme/tokens`, etc.

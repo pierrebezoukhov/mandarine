@@ -9,6 +9,7 @@ import { T, FS, FW, LH } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
+import { ResponsiveShell } from '@/components/ResponsiveShell';
 
 
 // ─── Login form ──────────────────────────────────────────────────────────────
@@ -225,17 +226,19 @@ export default function AuthScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Logo */}
-        <View style={s.logo}>
-          <Text style={s.logoHanzi}>漢字</Text>
-          <Text style={s.logoLabel}>MANDARINE</Text>
-        </View>
+        <ResponsiveShell maxWidth={520} fill={false}>
+          {/* Logo */}
+          <View style={s.logo}>
+            <Text style={s.logoHanzi}>漢字</Text>
+            <Text style={s.logoLabel}>MANDARINE</Text>
+          </View>
 
 
-        {screen === 'login'   && <LoginForm   onSwitch={() => setScreen('signup')} onForgot={() => setScreen('forgot')} />}
-        {screen === 'signup'  && <SignupForm   onSwitch={() => setScreen('login')}  onSuccess={handleSignupSuccess} />}
-        {screen === 'forgot'  && <ForgotForm   onBack={() => setScreen('login')} />}
-        {screen === 'confirm' && <ConfirmScreen email={signupEmail} onBack={() => setScreen('login')} />}
+          {screen === 'login'   && <LoginForm   onSwitch={() => setScreen('signup')} onForgot={() => setScreen('forgot')} />}
+          {screen === 'signup'  && <SignupForm   onSwitch={() => setScreen('login')}  onSuccess={handleSignupSuccess} />}
+          {screen === 'forgot'  && <ForgotForm   onBack={() => setScreen('login')} />}
+          {screen === 'confirm' && <ConfirmScreen email={signupEmail} onBack={() => setScreen('login')} />}
+        </ResponsiveShell>
       </ScrollView>
     </KeyboardAvoidingView>
   );

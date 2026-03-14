@@ -15,6 +15,7 @@ import { SegmentedControl } from '@/components/SegmentedControl';
 import { BottomSheetModal } from '@/components/BottomSheetModal';
 import { Button } from '@/components/Button';
 import { deleteResumeSession, RESUME_SESSION_KEY, SESSION_CONFIG_KEY } from '@/lib/progress';
+import { ResponsiveShell } from '@/components/ResponsiveShell';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type Deck = {
@@ -138,86 +139,88 @@ export default function SessionSetupScreen() {
 
   return (
     <SafeAreaView style={s.root}>
-      {/* Header */}
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Text style={s.backText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>New Session</Text>
-        <View style={{ width: 60 }} />
-      </View>
-
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={s.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-
-        {/* ── Deck ────────────────────────────────────────────────────── */}
-        <Section label="DECK">
-          <TouchableOpacity
-            style={s.deckSelector}
-            onPress={() => setShowPicker(true)}
-            activeOpacity={0.8}
-          >
-            {loadingDecks ? (
-              <ActivityIndicator color={T.textMuted} size="small" />
-            ) : config.deck ? (
-              <View style={{ flex: 1 }}>
-                <Text style={s.deckName}>{config.deck.name}</Text>
-                <Text style={s.deckDesc} numberOfLines={1}>{config.deck.description}</Text>
-              </View>
-            ) : (
-              <Text style={s.deckPlaceholder}>Choose a deck…</Text>
-            )}
-            <Text style={s.deckCaret}>↓</Text>
+      <ResponsiveShell maxWidth={520}>
+        {/* Header */}
+        <View style={s.header}>
+          <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
+            <Text style={s.backText}>← Back</Text>
           </TouchableOpacity>
-        </Section>
+          <Text style={s.headerTitle}>New Session</Text>
+          <View style={{ width: 60 }} />
+        </View>
 
-        {/* ── Session Size ─────────────────────────────────────────────── */}
-        <Section label="CARDS PER SESSION">
-          <SegmentedControl
-            options={CARD_PRESETS.map(n => ({ label: String(n), value: n }))}
-            value={config.isCustomCount ? '' : config.cardCount}
-            onChange={v => {
-              const n = v as number;
-              setCardCount(n, n !== 10 && n !== 20 && n !== 50);
-            }}
-            allowCustom
-            customValue={config.isCustomCount ? config.cardCount : undefined}
-            onCustomChange={n => setCardCount(n, true)}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={s.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+
+          {/* ── Deck ────────────────────────────────────────────────────── */}
+          <Section label="DECK">
+            <TouchableOpacity
+              style={s.deckSelector}
+              onPress={() => setShowPicker(true)}
+              activeOpacity={0.8}
+            >
+              {loadingDecks ? (
+                <ActivityIndicator color={T.textMuted} size="small" />
+              ) : config.deck ? (
+                <View style={{ flex: 1 }}>
+                  <Text style={s.deckName}>{config.deck.name}</Text>
+                  <Text style={s.deckDesc} numberOfLines={1}>{config.deck.description}</Text>
+                </View>
+              ) : (
+                <Text style={s.deckPlaceholder}>Choose a deck…</Text>
+              )}
+              <Text style={s.deckCaret}>↓</Text>
+            </TouchableOpacity>
+          </Section>
+
+          {/* ── Session Size ─────────────────────────────────────────────── */}
+          <Section label="CARDS PER SESSION">
+            <SegmentedControl
+              options={CARD_PRESETS.map(n => ({ label: String(n), value: n }))}
+              value={config.isCustomCount ? '' : config.cardCount}
+              onChange={v => {
+                const n = v as number;
+                setCardCount(n, n !== 10 && n !== 20 && n !== 50);
+              }}
+              allowCustom
+              customValue={config.isCustomCount ? config.cardCount : undefined}
+              onCustomChange={n => setCardCount(n, true)}
+            />
+          </Section>
+
+          {/* ── Difficulty ───────────────────────────────────────────────── */}
+          <Section label="DIFFICULTY">
+            <View style={s.chips}>
+              {DIFFICULTIES.map(({ key, label, sub }) => (
+                <Chip
+                  key={key}
+                  label={label}
+                  sublabel={sub}
+                  active={config.difficulties.includes(key)}
+                  onPress={() => toggleDifficulty(key)}
+                />
+              ))}
+            </View>
+            {config.difficulties.length === 0 && (
+              <Text style={s.diffHint}>No filter selected — all card types will be mixed</Text>
+            )}
+          </Section>
+
+        </ScrollView>
+
+        {/* ── Start button ─────────────────────────────────────────────── */}
+        <View style={s.footer}>
+          <Button
+            label={`Start Session${config.deck ? `  ·  ${config.cardCount} cards` : ''}`}
+            onPress={startSession}
+            disabled={!canStart}
           />
-        </Section>
-
-        {/* ── Difficulty ───────────────────────────────────────────────── */}
-        <Section label="DIFFICULTY">
-          <View style={s.chips}>
-            {DIFFICULTIES.map(({ key, label, sub }) => (
-              <Chip
-                key={key}
-                label={label}
-                sublabel={sub}
-                active={config.difficulties.includes(key)}
-                onPress={() => toggleDifficulty(key)}
-              />
-            ))}
-          </View>
-          {config.difficulties.length === 0 && (
-            <Text style={s.diffHint}>No filter selected — all card types will be mixed</Text>
-          )}
-        </Section>
-
-      </ScrollView>
-
-      {/* ── Start button ─────────────────────────────────────────────── */}
-      <View style={s.footer}>
-        <Button
-          label={`Start Session${config.deck ? `  ·  ${config.cardCount} cards` : ''}`}
-          onPress={startSession}
-          disabled={!canStart}
-        />
-      </View>
+        </View>
+      </ResponsiveShell>
 
       {/* ── Deck picker sheet ─────────────────────────────────────────── */}
       <BottomSheetModal

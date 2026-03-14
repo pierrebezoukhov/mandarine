@@ -16,6 +16,7 @@ import {
   uploadAvatar, updateProfile,
   type Profile, type ProgressStats, type SessionSummary,
 } from '@/lib/profile';
+import { ResponsiveShell } from '@/components/ResponsiveShell';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -122,21 +123,22 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={s.root}>
-      {/* Header */}
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} style={s.headerBtn}>
-          <Text style={s.backText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={s.title}>Profile</Text>
-        <TouchableOpacity onPress={() => router.push('/settings')} style={s.headerBtn}>
-          <Text style={s.settingsIcon}>⚙️</Text>
-        </TouchableOpacity>
-      </View>
+      <ResponsiveShell maxWidth={520}>
+        {/* Header */}
+        <View style={s.header}>
+          <TouchableOpacity onPress={() => router.back()} style={s.headerBtn}>
+            <Text style={s.backText}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={s.title}>Profile</Text>
+          <TouchableOpacity onPress={() => router.push('/settings')} style={s.headerBtn}>
+            <Text style={s.settingsIcon}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView
-        contentContainerStyle={s.scroll}
-        showsVerticalScrollIndicator={false}
-      >
+        <ScrollView
+          contentContainerStyle={s.scroll}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Avatar */}
         <View style={s.avatarWrap}>
           <View style={s.avatarContainer}>
@@ -233,6 +235,7 @@ export default function ProfileScreen() {
           </Section>
         )}
       </ScrollView>
+      </ResponsiveShell>
     </SafeAreaView>
   );
 }
