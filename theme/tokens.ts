@@ -70,7 +70,7 @@ export const MONO_MEDIUM: string = Platform.OS === 'web'
 
 // Display / Title scale — Perfect Fourth (1.333), heading hierarchy.
 export const FSDisplay = {
-  hanzi:      96,  // flashcard hero character — manual override, outside scales (serif display)
+  hanzi:      108, // flashcard hero character — manual override, outside scales (serif display)
   seal:       50,  // session completion seal — decorative, outside scales
   score:      42,  // large numeric display — same as title for visual parity
   title:      42,  // screen titles / H1 — 16 × 1.333³
@@ -144,7 +144,7 @@ export const FW = {
 //   heading      32 / 40  → 1.25  (deck names, H2)
 //   title/score  42 / 48  → 1.14  (screen titles, large numerics)
 //   seal         50 / 56  → 1.12  (display-size decorative)
-//   hanzi        96 / 108 → 1.12  (hero character, serif display)
+//   hanzi        108 / 120 → 1.11  (hero character, serif display)
 export const LH = {
   label:      20,
   body:       24,
@@ -155,5 +155,5 @@ export const LH = {
   title:      48,
   score:      48,
   seal:       56,
-  hanzi:      108,
+  hanzi:      120,
 } as const;

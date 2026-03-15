@@ -584,12 +584,12 @@ const s = StyleSheet.create({
   // Meaning block (POS + definition)
   meaningBlock: { width: '100%', alignItems: 'flex-start', marginBottom: space.lg },
   posTag: {
-    fontFamily: MONO, fontSize: 10, fontWeight: FW.medium,
+    fontFamily: MONO, fontSize: 10,
     color: T.textFaint, letterSpacing: 2, textTransform: 'uppercase',
     marginBottom: space.xs,
   },
   meaningText: {
-    fontSize: 15, color: T.textPrimary,
+    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: T.textPrimary,
     lineHeight: 22, letterSpacing: 0.5,
   },
 
