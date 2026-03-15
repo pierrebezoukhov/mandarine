@@ -23,6 +23,9 @@ All tokens and components live in `theme/` and `components/` and are shared acro
    - [ProgressBar](#progressbar)
    - [Section](#section)
 5. [Conventions](#5-conventions)
+6. [Session surfaces](#6-session-surfaces)
+7. [Visual effects — web vs native](#7-visual-effects--web-vs-native)
+8. [Technical decisions](#8-technical-decisions)
 
 ---
 
@@ -36,8 +39,10 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 | Token | Value | Usage |
 |---|---|---|
 | `T.bg` | `#131109` | Screen background |
+| `T.bgDeep` | `#0c0b09` | Session screen — darker than global bg |
 | `T.surface` | `#1e1b12` | Cards, inputs, sheets |
 | `T.surface2` | `#252118` | Progress tracks, search inputs, nested surfaces |
+| `T.surfaceCard` | `#111008` | Explicit card container in session |
 
 ### Borders
 
@@ -53,7 +58,8 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 | `T.textPrimary` | `#F0EBE0` | Headings, active labels, card titles |
 | `T.textSecondary` | `#A09880` | Body text, secondary labels |
 | `T.textMuted` | `#928A78` | Section labels, placeholders, inactive states — passes WCAG AA (4.5:1) on all surfaces |
-| `T.textHanzi` | `#F5F0E8` | The large Hanzi character on flashcards |
+| `T.textHanzi` | `#f0e8d8` | The large Hanzi character on flashcards (warm parchment) |
+| `T.textFaint` | `#4a4438` | Ultra-low-emphasis: tap hints, corner ornaments |
 
 ### Accent
 
@@ -68,7 +74,7 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 | Token | Value | Usage |
 |---|---|---|
 | `T.error` | `#E05252` | Error states, "forgot" FAB, error score |
-| `T.success` | `#4A9E6B` | Success states, "got it" FAB, success score |
+| `T.success` | `#3a7a44` | Success states, "got it" button, success score |
 
 ---
 
@@ -91,7 +97,7 @@ The type system uses two independent mathematical scales plus one manual overrid
 
 | Token | Value | Role |
 |---|---|---|
-| `FSDisplay.hanzi` | 72px | Flashcard hero character (manual override — not derived from scale) |
+| `FSDisplay.hanzi` | 96px | Flashcard hero character in Noto Serif SC Light (manual override) |
 | `FSDisplay.seal` | 50px | Session completion seal |
 | `FSDisplay.score` | 42px | Large numeric display |
 | `FSDisplay.title` | 42px | Screen titles / H1 |
@@ -111,9 +117,9 @@ The type system uses two independent mathematical scales plus one manual overrid
 
 Chinese characters read more dramatically than Latin text at equivalent sizes. 1.250 keeps enough contrast between pinyin (20px), translation (16px), and example sentence (13px) without dropping below the ~12px Chinese-character legibility floor on mobile.
 
-### Character sizing (72px)
+### Character sizing (96px)
 
-The hero character is a manual override — not derived from either scale. It is the product being learned, not a heading. 72px ensures it is the unambiguous primary stimulus. The gap between 72px and the next-largest element (title at 42px) creates a deliberate rupture that signals "this is the thing."
+The hero character is a manual override — not derived from either scale. It is the product being learned, not a heading. 96px in Noto Serif SC Light ensures it is the unambiguous primary stimulus with elegant, thin strokes. The gap between 96px and the next-largest element (title at 42px) creates a deliberate rupture that signals "this is the thing."
 
 ### Line heights
 
@@ -126,28 +132,36 @@ The hero character is a manual override — not derived from either scale. It is
 | `LH.heading` | 32px | 40px | 1.25 |
 | `LH.title` / `LH.score` | 42px | 48px | 1.14 |
 | `LH.seal` | 50px | 56px | 1.12 |
-| `LH.hanzi` | 72px | 80px | 1.11 |
+| `LH.hanzi` | 96px | 108px | 1.12 |
 
 ### Font weights
 
-Three weights only. No bold (700) — it thickens Chinese character strokes, reducing legibility.
+Four weights — no bold (700). Bold thickens Chinese character strokes, reducing legibility.
 
 | Token | Weight | Role |
 |---|---|---|
+| `FW.light` | 300 | Serif Hanzi display only — thin strokes for elegance |
 | `FW.regular` | 400 | Prose, translations, pinyin, captions (default — omit from style) |
 | `FW.medium` | 500 | Interactive controls: buttons, chips, tabs, list labels |
 | `FW.semibold` | 600 | Screen headings, deck names, section titles |
 
-**Why no bold?** Size signals priority. Weight signals interactivity. Color signals role. Each weight encodes a semantic role. The hero character must be regular weight — learners should see strokes as they appear in normal reading.
+**Why no bold?** Size signals priority. Weight signals interactivity. Color signals role. Each weight encodes a semantic role. `FW.light` is used exclusively with the serif Hanzi font (Noto Serif SC) — the thinner strokes give the character an elegant, calligraphic feel at 96px.
 
-### Monospace
+### Font families
 
-| Constant | Value |
-|---|---|
-| `MONO` | `Menlo` on iOS · `monospace` on Android |
+| Constant | Native | Web | Role |
+|---|---|---|---|
+| `SERIF` | `NotoSerifSC-Light` | `"Noto Serif SC", "STSong", serif` | Hanzi hero character, example sentences |
+| `MONO` | `IBMPlexMono-Regular` | `"IBM Plex Mono", monospace` | Counters, pinyin, POS tags, badges, labels |
+| `MONO_MEDIUM` | `IBMPlexMono-Medium` | `"IBM Plex Mono", monospace` | Score strip values, interactive mono labels |
 
-`MONO` is used for counters, pinyin, part-of-speech tags, and any fixed-width numerical display.
+**Fonts are loaded via `expo-font` in `app/_layout.tsx`.** The app holds the splash screen until all fonts are ready. On web, IBM Plex Mono and Noto Serif SC are loaded via Google Fonts CDN (declared in font constants with CSS fallbacks).
+
 All other text uses the system default (San Francisco on iOS, Roboto on Android).
+
+### Font subsetting (Noto Serif SC)
+
+The full Noto Serif SC Light is ~24MB. For production, it should be subsetted to only the characters in the `cards` table using `pyftsubset`. HSK 1-6 covers ~5000 unique characters; a subset should be ~800KB-1.2MB. If new cards are added with characters outside the subset, the font falls back to system serif. Re-run the subsetting script when seeding new cards.
 
 ---
 
@@ -174,6 +188,7 @@ All other text uses the system default (San Francisco on iOS, Roboto on Android)
 
 | Name | Value (px) | Intended use |
 |---|---|---|
+| `radius.square` | 4 | Session rating buttons — minimal rounding |
 | `radius.sm` | 8 | Icon buttons |
 | `radius.md` | 10 | Segmented controls, search inputs |
 | `radius.lg` / `radius.input` | 12 | Text inputs, chips |
@@ -643,7 +658,7 @@ import { Section } from '@/components/Section';
 Always import tokens and components using the `@/` alias:
 
 ```ts
-import { T, MONO, FSDisplay, FSBody, LH, FW } from '@/theme/tokens';
+import { T, MONO, MONO_MEDIUM, SERIF, FSDisplay, FSBody, LH, FW } from '@/theme/tokens';
 import { space, radius }     from '@/theme/spacing';
 import { Button }            from '@/components/Button';
 ```
@@ -674,10 +689,84 @@ Some patterns are intentionally **not** shared components because they are speci
 | Pattern | Screen | Reason |
 |---|---|---|
 | Animated flashcard + spring | `session.tsx` | Flashcard-domain specific |
-| Hanzi / pinyin / example layout | `session.tsx` | Flashcard-domain specific |
-| FAB row (got / forgot) | `session.tsx` | Tied to card reveal logic |
+| Card container + corner ornaments | `session.tsx` | Session-specific visual treatment |
+| Hanzi / pinyin / meaning / hint layout | `session.tsx` | Flashcard-domain specific |
+| Rating buttons (Wrong / Right) | `session.tsx` | Tied to card reveal logic |
+| Scanlines + feedback flash | `session.tsx` | Session-specific atmospheric effects |
 | SessionComplete stat display | `session.tsx` | One-off summary view |
 | LoginForm / SignupForm / ForgotForm | `auth.tsx` | Auth-specific composition |
 | Deck selector TouchableOpacity row | `session-setup.tsx` | One-off trigger for BottomSheetModal |
 | HSK level progress row             | `profile.tsx`       | Specific to profile breakdown layout |
 | Recent session row                 | `profile.tsx`       | One-off summary row, not reused elsewhere |
+
+---
+
+## 6. Session surfaces
+
+The session screen (`app/session.tsx`) has its own visual treatment — darker background, explicit card container, and atmospheric effects — to create a focused "study mode" feel.
+
+### Card container
+
+The flashcard sits inside a bordered `View` with:
+- Background: `T.surfaceCard` (`#111008`)
+- Border: `T.border` (1px)
+- Shadow: `shadowRadius: 32`, elevation 12
+- Corner ornaments: `+` characters in `T.textFaint` at top-left and bottom-right
+- Scanlines: web-only `repeating-linear-gradient` overlay
+
+### 4-stage progressive reveal
+
+Each tap reveals one layer:
+
+| Stage | Shows | Purpose |
+|---|---|---|
+| 0 | Hanzi only | Test pure character recognition |
+| 1 | + Pinyin | Confirm pronunciation |
+| 2 | + POS + definition | Confirm meaning |
+| 3 | + Example sentence (collapsible) | Contextual usage with blurred translation |
+
+Double-tap is removed in favor of single-tap progression. The example sentence block is collapsible (tap "EXAMPLE" to expand) and contains a blurred translation that requires an additional tap to reveal.
+
+### Blur effect on translation
+
+- **Web:** CSS `filter: blur(5px)` on the text element
+- **Native:** Reduced opacity (0.15) as a fallback (BlurView can be added when expo-blur is installed)
+- Tap to reveal removes the blur and shows the translation in `T.textPrimary`
+
+### Rating buttons
+
+Two square-ish buttons (`borderRadius: 4`) with icon + text label:
+- **Wrong** (✕): red tint background, red border
+- **Right** (✓): green tint background, green border
+
+### Feedback flash
+
+On rating, an `Animated.View` overlay flashes red or green (0.25 opacity) over the card container, fading out over 500ms.
+
+---
+
+## 7. Visual effects — web vs native
+
+| Effect | Web | Native | Notes |
+|---|---|---|---|
+| CRT scanlines (body, card, buttons) | `repeating-linear-gradient` via `backgroundImage` | Skipped | No `background-image` in RN |
+| Noise texture | SVG `feTurbulence` overlay | Skipped | No SVG filters in RN |
+| Ink-bleed text shadow on Hanzi | `textShadow*` | `textShadow*` | Cross-platform |
+| Card outer shadow | `box-shadow` | `shadowColor`/`elevation` | Cross-platform |
+| Inset card shadow | `box-shadow: inset` | Skipped | RN has no inset shadows |
+| Feedback flash (glow on rate) | `Animated.View` overlay | `Animated.View` overlay | Cross-platform |
+| Translation blur | CSS `filter: blur(5px)` | Opacity fallback | `expo-blur` BlurView for native in future |
+| Button hover states | Web CSS `:hover` | N/A | Touch-only on mobile |
+
+---
+
+## 8. Technical decisions
+
+### IBM Plex Mono scope
+IBM Plex Mono is used only for session screen monospace roles (score strip, labels, counters, hints, badges, pinyin). The rest of the app uses system sans-serif. This avoids the 20-30% width increase that monospace causes in proportional text and keeps CJK content legible.
+
+### Reveal model: 4 stages vs binary
+The prototype used binary reveal (concealed → everything). We use 4-stage progressive reveal because each tap forces active recall at a different level (character → pronunciation → meaning → context). This is the pedagogical point of flashcards.
+
+### Keeping 2 rating buttons
+The prototype added a third "Again" button. We keep 2 (Wrong / Right) because "again" can be achieved by tapping "Wrong" — the SRS algorithm schedules the card sooner. This keeps the data model simple (`Results` stays `Record<string, 'got' | 'forgot'>`).
