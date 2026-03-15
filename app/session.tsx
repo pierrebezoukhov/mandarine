@@ -339,7 +339,7 @@ export default function SessionScreen() {
           style={s.iconBtn}
           onPress={() => router.replace('/(tabs)/home')}
         >
-          <Text style={s.iconBtnText}>✕</Text>
+          <Text style={s.iconBtnText}>×</Text>
         </TouchableOpacity>
 
         <ProgressBar current={idx + 1} total={cards.length} style={{ flex: 1 }} />
@@ -467,7 +467,6 @@ export default function SessionScreen() {
         >
           <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
           <Text style={[s.rateBtnIcon, { color: T.error }]}>✕</Text>
-          <Text style={[s.rateBtnLabel, { color: T.error }]}>Wrong</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -477,7 +476,6 @@ export default function SessionScreen() {
         >
           <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
           <Text style={[s.rateBtnIcon, { color: T.success }]}>✓</Text>
-          <Text style={[s.rateBtnLabel, { color: T.success }]}>Right</Text>
         </TouchableOpacity>
       </View>
 
@@ -497,7 +495,7 @@ const s = StyleSheet.create({
   },
   iconBtn:         { padding: space.sm, borderRadius: 8 },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: FS.subheading, color: T.textMuted },
+  iconBtnText:     { fontSize: 18, fontFamily: MONO, letterSpacing: LS.tighter * 18, color: T.textMuted },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
@@ -677,10 +675,6 @@ const s = StyleSheet.create({
     borderColor: 'rgba(58,122,68,0.6)',
   },
   rateBtnIcon: { fontSize: 20 },
-  rateBtnLabel: {
-    fontFamily: MONO, fontSize: 9, letterSpacing: 1.5,
-    textTransform: 'uppercase', marginTop: 2,
-  },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
