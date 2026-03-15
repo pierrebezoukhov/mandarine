@@ -382,23 +382,21 @@ export default function SessionScreen() {
             {/* Hanzi — serif, light weight, ink bleed */}
             <Text style={s.hanziChar}>{card.hanzi}</Text>
 
-            {/* Stage 1: Pinyin */}
-            {reveal >= 1 && (
-              <Text style={s.pinyinText}>{card.pinyin}</Text>
-            )}
+            {/* Stage 1: Pinyin — always rendered, opacity-controlled */}
+            <Text style={[s.pinyinText, reveal < 1 && { opacity: 0 }]}>
+              {card.pinyin}
+            </Text>
 
             {/* Stage 2: POS + definition */}
-            {reveal >= 2 && (
-              <View style={s.meaningBlock}>
-                <View style={s.divider} />
-                {card.part_of_speech && <Text style={s.posTag}>{card.part_of_speech}</Text>}
-                <Text style={s.meaningText}>{card.meaning}</Text>
-              </View>
-            )}
+            <View style={[s.meaningBlock, reveal < 2 && { opacity: 0 }]}>
+              <View style={s.divider} />
+              {card.part_of_speech && <Text style={s.posTag}>{card.part_of_speech}</Text>}
+              <Text style={s.meaningText}>{card.meaning}</Text>
+            </View>
 
             {/* Stage 3: Example sentence (collapsible hint block) */}
-            {reveal >= 3 && card._example && (
-              <View style={s.hintBlock}>
+            {card._example && (
+              <View style={[s.hintBlock, reveal < 3 && { opacity: 0, pointerEvents: 'none' as const }]}>
                 <TouchableOpacity
                   style={s.hintTrigger}
                   onPress={() => setHintOpen(o => !o)}
@@ -510,7 +508,7 @@ const s = StyleSheet.create({
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
-    paddingHorizontal: 20, paddingBottom: 90,
+    paddingHorizontal: 20, paddingBottom: 24,
   },
 
   // Card container — explicit bordered box
