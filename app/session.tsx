@@ -94,26 +94,25 @@ function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
   );
 }
 
-// ── Blur wrapper for translation text ──────────────────────────────────────────
-function BlurredText({ text, revealed, onReveal }: {
-  text: string; revealed: boolean; onReveal: () => void;
+// ── Blur wrapper for example pinyin + translation ────────────────────────────
+function BlurredExample({ pinyin, meaning, revealed, onReveal }: {
+  pinyin?: string; meaning?: string; revealed: boolean; onReveal: () => void;
 }) {
   return (
     <TouchableOpacity onPress={onReveal} activeOpacity={0.8}>
       <View style={s.blurWrapper}>
-        <Text
+        <View
           style={[
-            s.hintTranslation,
             !revealed && Platform.OS === 'web' && ({
               filter: 'blur(5px)',
               userSelect: 'none',
             } as any),
             !revealed && Platform.OS !== 'web' && { opacity: 0.15 },
-            revealed && { color: T.textPrimary },
           ]}
         >
-          {text}
-        </Text>
+          {pinyin && <Text style={s.hintPinyin}>{pinyin}</Text>}
+          {meaning && <Text style={s.hintTranslation}>{meaning}</Text>}
+        </View>
         {!revealed && (
           <View style={s.blurLabel}>
             <Text style={s.blurLabelText}>TAP TO REVEAL</Text>
@@ -136,6 +135,7 @@ export default function SessionScreen() {
   const [done, setDone]       = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
   const [translationRevealed, setTranslationRevealed] = useState(false);
+  const [hoveredBtn, setHoveredBtn] = useState<'forgot' | 'got' | null>(null);
 
   const { user }        = useAuth();
   const startedAt       = useRef<string>(new Date().toISOString());
@@ -222,7 +222,11 @@ export default function SessionScreen() {
   }, [idx, cards.length]);
 
   const handleTap = useCallback(() => {
-    setReveal(r => Math.min(r + 1, 2));
+    setReveal(r => {
+      const next = Math.min(r + 1, 2);
+      if (next === 2) setHintOpen(true);
+      return next;
+    });
   }, []);
 
   const rate = useCallback((result: 'got' | 'forgot') => {
@@ -237,7 +241,7 @@ export default function SessionScreen() {
     flashColor.current = result;
     flashAnim.setValue(1);
     Animated.timing(flashAnim, {
-      toValue: 0, duration: 500, useNativeDriver: true,
+      toValue: 0, duration: 600, useNativeDriver: true,
     }).start();
 
     if (!isLast) {
@@ -263,17 +267,20 @@ export default function SessionScreen() {
       }
     }
 
-    Animated.timing(cardAnim, {
-      toValue: 0, duration: 180, useNativeDriver: true,
-    }).start(() => {
-      if (isLast) { setDone(true); }
-      else {
-        setIdx(nextIdx);
-        setReveal(0);
-        setHintOpen(false);
-        setTranslationRevealed(false);
-      }
-    });
+    setTimeout(() => {
+      Animated.timing(cardAnim, {
+        toValue: 0, duration: 250, useNativeDriver: true,
+      }).start(() => {
+        if (isLast) { setDone(true); }
+        else {
+          flashAnim.setValue(0);  // kill leftover flash before new card
+          setIdx(nextIdx);
+          setReveal(0);
+          setHintOpen(false);
+          setTranslationRevealed(false);
+        }
+      });
+    }, 150);
   }, [cards, idx, results, user?.id]);
 
   const goBack = useCallback(() => {
@@ -354,11 +361,11 @@ export default function SessionScreen() {
 
       {/* Score strip: wrong · remaining · right */}
       <View style={s.scoreStrip}>
-        <Text style={[s.scoreItem, s.scoreForgot]}>✕  {forgotCount}</Text>
+        <Text style={[s.scoreItem, s.scoreForgot]}>× {forgotCount}</Text>
         <Text style={s.scoreSep}>·</Text>
         <Text style={[s.scoreItem, s.scorePending]}>{remaining}</Text>
         <Text style={s.scoreSep}>·</Text>
-        <Text style={[s.scoreItem, s.scoreGot]}>{gotCount}  ✓</Text>
+        <Text style={[s.scoreItem, s.scoreGot]}>✓ {gotCount}</Text>
       </View>
 
       {/* Card */}
@@ -380,18 +387,19 @@ export default function SessionScreen() {
             </View>
 
             {/* Hanzi — serif, light weight, ink bleed */}
-            <Text style={s.hanziChar}>{card.hanzi}</Text>
+            <Text style={s.hanziChar} adjustsFontSizeToFit numberOfLines={1}>{card.hanzi}</Text>
 
-            {/* Stage 1: Pinyin — always rendered, opacity-controlled */}
-            <Text style={[s.pinyinText, reveal < 1 && { opacity: 0 }]}>
-              {card.pinyin}
-            </Text>
+            {/* Stage 1: Pinyin + audio icon — always rendered, opacity-controlled */}
+            <View style={[s.pinyinRow, reveal < 1 && { opacity: 0 }]}>
+              <Text style={s.pinyinText}>{card.pinyin}</Text>
+              <Text style={s.pinyinAudio}>♪</Text>
+            </View>
 
             {/* Stage 2: POS + definition */}
             <View style={[s.meaningBlock, reveal < 2 && { opacity: 0 }]}>
               <View style={s.divider} />
               {card.part_of_speech && <Text style={s.posTag}>{card.part_of_speech}</Text>}
-              <Text style={s.meaningText}>{card.meaning}</Text>
+              <Text style={s.meaningText}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
             </View>
 
             {/* Stage 3: Example sentence (collapsible hint block) */}
@@ -399,7 +407,7 @@ export default function SessionScreen() {
               <View style={[s.hintBlock, reveal < 2 && { opacity: 0, pointerEvents: 'none' as const }]}>
                 <TouchableOpacity
                   style={s.hintTrigger}
-                  onPress={() => setHintOpen(o => !o)}
+                  onPress={(e) => { e.stopPropagation(); setHintOpen(o => !o); }}
                   activeOpacity={0.7}
                 >
                   <Text style={s.hintLabel}>EXAMPLE</Text>
@@ -410,45 +418,37 @@ export default function SessionScreen() {
                     <View style={s.hintDivider} />
                     {/* Example hanzi sentence */}
                     <Text style={s.hintHanzi}>{card._example.hanzi}</Text>
-                    {/* Example pinyin */}
-                    {card._example.pinyin && (
-                      <Text style={s.hintPinyin}>{card._example.pinyin}</Text>
-                    )}
-                    {/* Translation — blurred until tapped */}
-                    {card._example.meaning && (
-                      <BlurredText
-                        text={card._example.meaning}
-                        revealed={translationRevealed}
-                        onReveal={() => setTranslationRevealed(true)}
-                      />
-                    )}
+                    {/* Pinyin + translation — blurred until tapped */}
+                    <BlurredExample
+                      pinyin={card._example.pinyin}
+                      meaning={card._example.meaning}
+                      revealed={translationRevealed}
+                      onReveal={() => setTranslationRevealed(true)}
+                    />
                   </View>
               </View>
             )}
 
-            {/* Feedback flash overlay */}
+            {/* Tap hint — inside card surface */}
+            <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }]} pointerEvents="none">
+              {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
+            </Text>
+
+            {/* Feedback flash — outline only */}
             <Animated.View
               pointerEvents="none"
               style={[
                 StyleSheet.absoluteFillObject,
                 {
-                  backgroundColor: flashColor.current === 'got'
-                    ? 'rgba(58,122,68,0.25)'
-                    : 'rgba(200,56,42,0.25)',
+                  borderWidth: 2,
+                  borderColor: flashColor.current === 'got'
+                    ? T.successBright
+                    : T.errorBright,
                   opacity: flashAnim,
-                  borderRadius: 0,
                 },
               ]}
             />
           </View>
-
-          {/* Tap hint */}
-          {reveal < 2 && (
-            <Text style={s.tapHint}>
-              {reveal === 0 && 'tap · pinyin'}
-              {reveal === 1 && 'tap · meaning'}
-            </Text>
-          )}
 
         </TouchableOpacity>
       </Animated.View>
@@ -456,21 +456,46 @@ export default function SessionScreen() {
       {/* Rating buttons */}
       <View style={s.buttonRow}>
         <TouchableOpacity
-          style={[s.rateBtn, s.rateBtnForgot]}
+          style={[
+            s.rateBtn, s.rateBtnForgot,
+            hoveredBtn === 'forgot' && {
+              backgroundColor: 'rgba(200,56,42,0.22)',
+              borderColor: T.errorBright,
+            },
+          ]}
           onPress={() => rate('forgot')}
           activeOpacity={0.8}
+          {...(Platform.OS === 'web' ? {
+            onMouseEnter: () => setHoveredBtn('forgot'),
+            onMouseLeave: () => setHoveredBtn(null),
+          } as any : {})}
         >
           <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
-          <Text style={[s.rateBtnIcon, { color: T.error }]}>✕</Text>
+          <Text style={[s.rateBtnIcon, {
+            color: hoveredBtn === 'forgot' ? T.errorBright : T.error,
+            fontSize: 18,
+          }]}>×</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[s.rateBtn, s.rateBtnGot]}
+          style={[
+            s.rateBtn, s.rateBtnGot,
+            hoveredBtn === 'got' && {
+              backgroundColor: 'rgba(79,168,88,0.22)',
+              borderColor: T.successBright,
+            },
+          ]}
           onPress={() => rate('got')}
           activeOpacity={0.8}
+          {...(Platform.OS === 'web' ? {
+            onMouseEnter: () => setHoveredBtn('got'),
+            onMouseLeave: () => setHoveredBtn(null),
+          } as any : {})}
         >
           <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
-          <Text style={[s.rateBtnIcon, { color: T.success }]}>✓</Text>
+          <Text style={[s.rateBtnIcon, {
+            color: hoveredBtn === 'got' ? T.successBright : T.success,
+          }]}>✓</Text>
         </TouchableOpacity>
       </View>
 
@@ -494,10 +519,10 @@ const s = StyleSheet.create({
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: space.lg, paddingBottom: 10,
+    gap: space.md, paddingBottom: 10,
   },
   scoreItem:   { fontFamily: MONO, fontSize: FS.label, fontWeight: FW.medium },
-  scoreForgot: { color: T.error },
+  scoreForgot: { color: T.errorMuted },
   scoreGot:    { color: T.success },
   scorePending:{ color: T.textFaint },
   scoreSep:    { color: T.textFaint, fontSize: 10 },
@@ -512,7 +537,7 @@ const s = StyleSheet.create({
   cardContainer: {
     width: '100%', maxWidth: 340,
     backgroundColor: T.surfaceCard,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: T.border,
     paddingHorizontal: space.xxl,
     paddingTop: 40,
@@ -554,20 +579,27 @@ const s = StyleSheet.create({
     lineHeight: LH.hanzi,
     letterSpacing: LS.tighter * FS.hanzi,
     textAlign: 'center',
+    maxWidth: '100%',
     textShadowColor: 'rgba(232,224,208,0.12)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 40,
     marginBottom: space.xl,
   },
 
-  // Pinyin — italic, red glow
-  pinyinText: {
-    fontFamily: MONO, fontSize: 18, letterSpacing: 3,
-    color: '#e04030', fontStyle: 'italic', opacity: 0.9,
+  // Pinyin row (pinyin + audio icon)
+  pinyinRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
     marginBottom: space.lg,
+  },
+  pinyinText: {
+    fontFamily: MONO, fontSize: 18, letterSpacing: LS.loose * 18,
+    color: T.errorBright, fontStyle: 'italic', opacity: 0.9,
     textShadowColor: 'rgba(200,56,42,0.18)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 12,
+  },
+  pinyinAudio: {
+    fontSize: 12, color: T.textFaint, opacity: 0.6,
   },
 
   // Divider
@@ -584,7 +616,7 @@ const s = StyleSheet.create({
     marginBottom: space.xs,
   },
   meaningText: {
-    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: T.textPrimary,
+    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: T.textSecondary,
     lineHeight: 22, letterSpacing: 0.5,
   },
 
@@ -602,7 +634,7 @@ const s = StyleSheet.create({
   },
   hintLabel: {
     flex: 1, fontFamily: MONO, fontSize: 10,
-    letterSpacing: 2, color: T.textFaint, textTransform: 'uppercase',
+    letterSpacing: LS.loose * 10, color: T.textFaint, textTransform: 'uppercase',
   },
   hintIcon: {
     fontFamily: MONO, fontSize: 10, color: T.textFaint,
@@ -617,16 +649,16 @@ const s = StyleSheet.create({
     height: 1, backgroundColor: 'rgba(30,28,24,1)', marginBottom: space.sm,
   },
   hintHanzi: {
-    fontFamily: SERIF, fontSize: 15, color: T.textPrimary,
-    lineHeight: 22, letterSpacing: 1, marginBottom: space.sm,
+    fontFamily: SERIF, fontSize: FS.pinyin, color: T.textPrimary,
+    lineHeight: LH.pinyin, letterSpacing: 1, marginBottom: space.sm,
   },
   hintPinyin: {
     fontFamily: MONO, fontSize: 11, color: T.textSecondary,
-    fontStyle: 'italic', letterSpacing: 1, lineHeight: 17,
+    fontStyle: 'italic', letterSpacing: LS.loose * 11, lineHeight: 17,
     marginBottom: space.sm,
   },
   hintTranslation: {
-    fontFamily: MONO, fontSize: 12, color: T.textSecondary,
+    fontFamily: MONO, fontSize: 12, color: T.textMuted,
     letterSpacing: 0.5, lineHeight: 18,
   },
 
@@ -634,18 +666,18 @@ const s = StyleSheet.create({
   blurWrapper: { position: 'relative' },
   blurLabel: {
     ...StyleSheet.absoluteFillObject,
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'flex-start', justifyContent: 'center',
   },
   blurLabelText: {
     fontFamily: MONO, fontSize: 9, letterSpacing: 3,
     color: T.textFaint, textTransform: 'uppercase',
   },
 
-  // Tap hint
+  // Tap hint (inside card surface)
   tapHint: {
-    marginTop: space.lg,
+    marginTop: space.md,
     fontFamily: MONO, fontSize: 9, color: T.textFaint,
-    letterSpacing: 2, textTransform: 'uppercase',
+    letterSpacing: LS.loose * 9, textTransform: 'uppercase',
   },
 
   // Rating buttons — square-ish with text labels
@@ -660,10 +692,11 @@ const s = StyleSheet.create({
     borderWidth: 1,
     position: 'relative',
     overflow: 'hidden',
+    ...(Platform.OS === 'web' ? { transition: 'background-color 150ms, border-color 150ms' } as any : {}),
   },
   rateBtnForgot: {
-    backgroundColor: 'rgba(122,30,20,0.12)',
-    borderColor: 'rgba(122,30,20,0.6)',
+    backgroundColor: T.errorDim,
+    borderColor: 'rgba(154,48,48,0.6)',
   },
   rateBtnGot: {
     backgroundColor: 'rgba(58,122,68,0.12)',

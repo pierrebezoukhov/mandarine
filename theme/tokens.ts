@@ -33,8 +33,12 @@ export const T = {
   accentBorder: 'rgba(192,57,43,0.28)',
 
   // Semantic
-  error:        '#E05252',
+  error:        '#9a3030',
+  errorDim:     'rgba(154,48,48,0.12)',
+  errorMuted:   'rgba(154,48,48,0.55)',
+  errorBright:  '#e04030',      // hover/active state, pinyin text
   success:      '#3a7a44',      // darker green — better contrast on dark bg
+  successBright:'#4fa858',      // hover/active state for "got it"
 } as const;
 
 // ── Typography helpers ────────────────────────────────────────────────────────

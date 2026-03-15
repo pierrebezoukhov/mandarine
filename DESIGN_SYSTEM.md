@@ -73,8 +73,12 @@ All tokens and components live in `theme/` and `components/` and are shared acro
 
 | Token | Value | Usage |
 |---|---|---|
-| `T.error` | `#E05252` | Error states, "forgot" FAB, error score |
+| `T.error` | `#9a3030` | Error states, "forgot" FAB, error score |
+| `T.errorDim` | `rgba(154,48,48,0.12)` | Error background fills (forgot button, error rows) |
+| `T.errorMuted` | `rgba(154,48,48,0.55)` | Subdued error text (score counters, secondary indicators) |
+| `T.errorBright` | `#e04030` | Hover/active error state, pinyin text |
 | `T.success` | `#3a7a44` | Success states, "got it" button, success score |
+| `T.successBright` | `#4fa858` | Hover/active success state |
 
 ---
 
@@ -334,7 +338,7 @@ Labelled text input with internal focus management, error border, and inline err
 |---|---|
 | Default | `T.border` |
 | Focused | `T.borderFocus` |
-| Error | `T.error` (dim, `rgba(224,82,82,0.4)`) |
+| Error | `T.error` (dim, `rgba(154,48,48,0.4)`) |
 
 #### Usage
 
