@@ -222,7 +222,7 @@ export default function SessionScreen() {
   }, [idx, cards.length]);
 
   const handleTap = useCallback(() => {
-    setReveal(r => Math.min(r + 1, 3));
+    setReveal(r => Math.min(r + 1, 2));
   }, []);
 
   const rate = useCallback((result: 'got' | 'forgot') => {
@@ -396,7 +396,7 @@ export default function SessionScreen() {
 
             {/* Stage 3: Example sentence (collapsible hint block) */}
             {card._example && (
-              <View style={[s.hintBlock, reveal < 3 && { opacity: 0, pointerEvents: 'none' as const }]}>
+              <View style={[s.hintBlock, reveal < 2 && { opacity: 0, pointerEvents: 'none' as const }]}>
                 <TouchableOpacity
                   style={s.hintTrigger}
                   onPress={() => setHintOpen(o => !o)}
@@ -406,8 +406,7 @@ export default function SessionScreen() {
                   <Text style={[s.hintIcon, hintOpen && s.hintIconOpen]}>▾</Text>
                 </TouchableOpacity>
 
-                {hintOpen && (
-                  <View style={s.hintContent}>
+                <View style={[s.hintContent, !hintOpen && { opacity: 0 }]}>
                     <View style={s.hintDivider} />
                     {/* Example hanzi sentence */}
                     <Text style={s.hintHanzi}>{card._example.hanzi}</Text>
@@ -424,7 +423,6 @@ export default function SessionScreen() {
                       />
                     )}
                   </View>
-                )}
               </View>
             )}
 
@@ -445,11 +443,10 @@ export default function SessionScreen() {
           </View>
 
           {/* Tap hint */}
-          {reveal < 3 && (
+          {reveal < 2 && (
             <Text style={s.tapHint}>
               {reveal === 0 && 'tap · pinyin'}
               {reveal === 1 && 'tap · meaning'}
-              {reveal === 2 && 'tap · example'}
             </Text>
           )}
 
