@@ -1,3 +1,12 @@
+## [1.4.1](https://github.com/pierrebezoukhov/mandarine/compare/v1.4.0...v1.4.1) (2026-03-17)
+
+
+### Bug Fixes
+
+* group example pinyin + translation — tighter gap, demote English size ([a4dc877](https://github.com/pierrebezoukhov/mandarine/commit/a4dc8772f68aebce6af6ff4ae2c933eb6bd2a7c4))
+* responsive flashcard — dynamic maxHeight, scaled Hanzi on short viewports ([72caca9](https://github.com/pierrebezoukhov/mandarine/commit/72caca9384d3ab92c7e8c61f1ffc0f5fe647c15f))
+* tighten padding around flashcard for larger card surface ([d26aeb3](https://github.com/pierrebezoukhov/mandarine/commit/d26aeb34979246b7e695fb214126d109577cc414))
+
 # [1.4.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.3.0...v1.4.0) (2026-03-17)
 
 
