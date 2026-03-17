@@ -674,11 +674,11 @@ const s = StyleSheet.create({
   hintPinyin: {
     fontFamily: MONO, fontSize: 11, color: T.textSecondary,
     fontStyle: 'italic', letterSpacing: LS.loose * 11, lineHeight: 17,
-    marginBottom: space.sm,
+    marginBottom: space.xs,
   },
   hintTranslation: {
-    fontFamily: MONO, fontSize: 12, color: T.textMuted,
-    letterSpacing: 0.5, lineHeight: 18,
+    fontFamily: MONO, fontSize: 10, color: T.textMuted,
+    letterSpacing: 0.5, lineHeight: 16,
   },
 
   // Blur wrapper for translation
