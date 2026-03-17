@@ -1,3 +1,19 @@
+# [1.4.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.3.0...v1.4.0) (2026-03-17)
+
+
+### Bug Fixes
+
+* match flashcard text styles to prototype — larger Hanzi, mono meaning, lighter POS ([c0711f0](https://github.com/pierrebezoukhov/mandarine/commit/c0711f044383b8674cbe086a825110a023793cdc))
+* session polish — icon-only rating buttons, close icon match, dim progress counter ([10eacf9](https://github.com/pierrebezoukhov/mandarine/commit/10eacf9c9595f364fc6efcb64fd137316099e081))
+* stable flashcard size — use opacity instead of conditional rendering ([be02e71](https://github.com/pierrebezoukhov/mandarine/commit/be02e71b4c3a400cf32a7053ec75a51cfd30ecfe))
+
+
+### Features
+
+* 2-tap reveal flow — show example with meaning, no layout shift ([d6c6fda](https://github.com/pierrebezoukhov/mandarine/commit/d6c6fda7abc5f6bb286ae4917aba5171cf3d7bc5))
+* flashcard session polish — design tokens, hover states, animations ([db13399](https://github.com/pierrebezoukhov/mandarine/commit/db13399d1cac517e3a8d4d7552023b53e358a346)), closes [#9a3030](https://github.com/pierrebezoukhov/mandarine/issues/9a3030)
+* redesign flashcard session — serif Hanzi, card container, 4-stage reveal ([1b8d6d2](https://github.com/pierrebezoukhov/mandarine/commit/1b8d6d247d477c53a0d1528672592a40e5d5378b)), closes [#3a7a44](https://github.com/pierrebezoukhov/mandarine/issues/3a7a44) [#f0e8d8](https://github.com/pierrebezoukhov/mandarine/issues/f0e8d8)
+
 # [1.3.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.2.0...v1.3.0) (2026-03-14)
 
 
