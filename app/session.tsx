@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
-  Animated, ActivityIndicator, Platform,
+  Animated, ActivityIndicator, Platform, ScrollView, useWindowDimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -136,6 +136,12 @@ export default function SessionScreen() {
   const [hintOpen, setHintOpen] = useState(false);
   const [translationRevealed, setTranslationRevealed] = useState(false);
   const [hoveredBtn, setHoveredBtn] = useState<'forgot' | 'got' | null>(null);
+
+  const { height: windowHeight } = useWindowDimensions();
+  const compact = windowHeight < 700;
+  const hanziSize = compact ? 84 : FS.hanzi;
+  const hanziLH = compact ? 96 : LH.hanzi;
+  const cardMaxHeight = windowHeight - 280;
 
   const { user }        = useAuth();
   const startedAt       = useRef<string>(new Date().toISOString());
@@ -372,9 +378,12 @@ export default function SessionScreen() {
       <Animated.View
         style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }] }]}
       >
-        <TouchableOpacity style={s.cardTouchable} onPress={handleTap} activeOpacity={1}>
+        <TouchableOpacity
+          style={[s.cardTouchable, compact && { paddingBottom: 12 }]}
+          onPress={handleTap} activeOpacity={1}
+        >
           {/* Card container */}
-          <View style={s.cardContainer}>
+          <View style={[s.cardContainer, { maxHeight: cardMaxHeight }, compact && { paddingTop: 28 }]}>
             <Scanlines color="rgba(255,240,200,0.012)" gap={4} />
 
             {/* Corner ornaments */}
@@ -386,8 +395,17 @@ export default function SessionScreen() {
               <Text style={s.hskBadgeText}>HSK {card.hsk_level}</Text>
             </View>
 
+            {/* Scrollable card content — safety net for short viewports */}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              contentContainerStyle={{ alignItems: 'center', width: '100%' }}
+            >
             {/* Hanzi — serif, light weight, ink bleed */}
-            <Text style={s.hanziChar} adjustsFontSizeToFit numberOfLines={1}>{card.hanzi}</Text>
+            <Text
+              style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH, marginBottom: space.md }]}
+              adjustsFontSizeToFit numberOfLines={1}
+            >{card.hanzi}</Text>
 
             {/* Stage 1: Pinyin + audio icon — always rendered, opacity-controlled */}
             <View style={[s.pinyinRow, reveal < 1 && { opacity: 0 }]}>
@@ -433,6 +451,7 @@ export default function SessionScreen() {
             <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }]} pointerEvents="none">
               {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
             </Text>
+            </ScrollView>
 
             {/* Feedback flash — outline only */}
             <Animated.View
