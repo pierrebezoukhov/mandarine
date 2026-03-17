@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
-  Animated, ActivityIndicator, Platform,
+  Animated, ActivityIndicator, Platform, ScrollView, useWindowDimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -136,6 +136,12 @@ export default function SessionScreen() {
   const [hintOpen, setHintOpen] = useState(false);
   const [translationRevealed, setTranslationRevealed] = useState(false);
   const [hoveredBtn, setHoveredBtn] = useState<'forgot' | 'got' | null>(null);
+
+  const { height: windowHeight } = useWindowDimensions();
+  const compact = windowHeight < 700;
+  const hanziSize = compact ? 84 : FS.hanzi;
+  const hanziLH = compact ? 96 : LH.hanzi;
+  const cardMaxHeight = windowHeight - 252;
 
   const { user }        = useAuth();
   const startedAt       = useRef<string>(new Date().toISOString());
@@ -372,9 +378,12 @@ export default function SessionScreen() {
       <Animated.View
         style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }] }]}
       >
-        <TouchableOpacity style={s.cardTouchable} onPress={handleTap} activeOpacity={1}>
+        <TouchableOpacity
+          style={[s.cardTouchable, compact && { paddingBottom: 8 }]}
+          onPress={handleTap} activeOpacity={1}
+        >
           {/* Card container */}
-          <View style={s.cardContainer}>
+          <View style={[s.cardContainer, { maxHeight: cardMaxHeight }]}>
             <Scanlines color="rgba(255,240,200,0.012)" gap={4} />
 
             {/* Corner ornaments */}
@@ -386,8 +395,17 @@ export default function SessionScreen() {
               <Text style={s.hskBadgeText}>HSK {card.hsk_level}</Text>
             </View>
 
+            {/* Scrollable card content — safety net for short viewports */}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              contentContainerStyle={{ alignItems: 'center', width: '100%' }}
+            >
             {/* Hanzi — serif, light weight, ink bleed */}
-            <Text style={s.hanziChar} adjustsFontSizeToFit numberOfLines={1}>{card.hanzi}</Text>
+            <Text
+              style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH, marginBottom: space.md }]}
+              adjustsFontSizeToFit numberOfLines={1}
+            >{card.hanzi}</Text>
 
             {/* Stage 1: Pinyin + audio icon — always rendered, opacity-controlled */}
             <View style={[s.pinyinRow, reveal < 1 && { opacity: 0 }]}>
@@ -433,6 +451,7 @@ export default function SessionScreen() {
             <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }]} pointerEvents="none">
               {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
             </Text>
+            </ScrollView>
 
             {/* Feedback flash — outline only */}
             <Animated.View
@@ -530,7 +549,7 @@ const s = StyleSheet.create({
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
-    paddingHorizontal: 20, paddingBottom: 24,
+    paddingHorizontal: 20, paddingBottom: 16,
   },
 
   // Card container — explicit bordered box
@@ -540,8 +559,8 @@ const s = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: T.border,
     paddingHorizontal: space.xxl,
-    paddingTop: 40,
-    paddingBottom: space.xxl,
+    paddingTop: 28,
+    paddingBottom: space.lg,
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
@@ -655,11 +674,11 @@ const s = StyleSheet.create({
   hintPinyin: {
     fontFamily: MONO, fontSize: 11, color: T.textSecondary,
     fontStyle: 'italic', letterSpacing: LS.loose * 11, lineHeight: 17,
-    marginBottom: space.sm,
+    marginBottom: space.xs,
   },
   hintTranslation: {
-    fontFamily: MONO, fontSize: 12, color: T.textMuted,
-    letterSpacing: 0.5, lineHeight: 18,
+    fontFamily: MONO, fontSize: 10, color: T.textMuted,
+    letterSpacing: 0.5, lineHeight: 16,
   },
 
   // Blur wrapper for translation
@@ -683,7 +702,7 @@ const s = StyleSheet.create({
   // Rating buttons — square-ish with text labels
   buttonRow: {
     flexDirection: 'row', justifyContent: 'space-between',
-    paddingHorizontal: 40, paddingBottom: 36,
+    paddingHorizontal: 40, paddingBottom: 24,
     gap: space.lg,
   },
   rateBtn: {
