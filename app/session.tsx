@@ -141,7 +141,7 @@ export default function SessionScreen() {
   const compact = windowHeight < 700;
   const hanziSize = compact ? 84 : FS.hanzi;
   const hanziLH = compact ? 96 : LH.hanzi;
-  const cardMaxHeight = windowHeight - 280;
+  const cardMaxHeight = windowHeight - 252;
 
   const { user }        = useAuth();
   const startedAt       = useRef<string>(new Date().toISOString());
@@ -379,11 +379,11 @@ export default function SessionScreen() {
         style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }] }]}
       >
         <TouchableOpacity
-          style={[s.cardTouchable, compact && { paddingBottom: 12 }]}
+          style={[s.cardTouchable, compact && { paddingBottom: 8 }]}
           onPress={handleTap} activeOpacity={1}
         >
           {/* Card container */}
-          <View style={[s.cardContainer, { maxHeight: cardMaxHeight }, compact && { paddingTop: 28 }]}>
+          <View style={[s.cardContainer, { maxHeight: cardMaxHeight }]}>
             <Scanlines color="rgba(255,240,200,0.012)" gap={4} />
 
             {/* Corner ornaments */}
@@ -549,7 +549,7 @@ const s = StyleSheet.create({
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
-    paddingHorizontal: 20, paddingBottom: 24,
+    paddingHorizontal: 20, paddingBottom: 16,
   },
 
   // Card container — explicit bordered box
@@ -559,8 +559,8 @@ const s = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: T.border,
     paddingHorizontal: space.xxl,
-    paddingTop: 40,
-    paddingBottom: space.xxl,
+    paddingTop: 28,
+    paddingBottom: space.lg,
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
@@ -702,7 +702,7 @@ const s = StyleSheet.create({
   // Rating buttons — square-ish with text labels
   buttonRow: {
     flexDirection: 'row', justifyContent: 'space-between',
-    paddingHorizontal: 40, paddingBottom: 36,
+    paddingHorizontal: 40, paddingBottom: 24,
     gap: space.lg,
   },
   rateBtn: {
