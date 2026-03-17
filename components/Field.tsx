@@ -73,7 +73,7 @@ const s = StyleSheet.create({
     backgroundColor: T.surface2,
   },
   inputError: {
-    borderColor: 'rgba(224,82,82,0.5)',
+    borderColor: 'rgba(154,48,48,0.5)',
   },
   errorText: {
     fontSize: FS.label,

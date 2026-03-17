@@ -16,6 +16,7 @@ export const space = {
 
 // ── Border-radius scale ───────────────────────────────────────────────────────
 export const radius = {
+  square: 4,  // session rating buttons — minimal rounding
   sm:    8,   // icon buttons
   md:    10,  // segmented controls, search inputs
   lg:    12,  // inputs, chips, card icons

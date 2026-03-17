@@ -49,7 +49,7 @@ const s = StyleSheet.create({
   counter: {
     fontFamily: MONO,
     fontSize: FS.label,
-    color: T.textPrimary,
+    color: T.textSecondary,
   },
   counterTotal: {
     color: T.textMuted,

@@ -115,8 +115,12 @@ export default function DesignSystemScreen() {
             </ColorGroup>
 
             <ColorGroup label="SEMANTIC">
-              <Swatch token="T.error"   hex="#E05252" label="error"   usage="Error states, 'forgot' FAB" />
-              <Swatch token="T.success" hex="#4A9E6B" label="success" usage="Success states, 'got it' FAB" />
+              <Swatch token="T.error"   hex="#9a3030" label="error"   usage="Error states, 'forgot' FAB" />
+              <Swatch token="T.errorDim" hex="rgba(154,48,48,0.12)" label="errorDim" usage="Error background fills" />
+              <Swatch token="T.errorMuted" hex="rgba(154,48,48,0.55)" label="errorMuted" usage="Subdued error text" />
+              <Swatch token="T.errorBright" hex="#e04030" label="errorBright" usage="Hover/active error, pinyin text" />
+              <Swatch token="T.success" hex="#3a7a44" label="success" usage="Success states, 'got it' FAB" />
+              <Swatch token="T.successBright" hex="#4fa858" label="successBright" usage="Hover/active success" />
             </ColorGroup>
           </View>
         )}
@@ -1373,7 +1377,7 @@ export default function DesignSystemScreen() {
                 </View>
                 {/* FABs */}
                 <View style={ex.sessionFabs}>
-                  <View style={[ex.fab, { backgroundColor: 'rgba(224,82,82,0.12)', borderColor: 'rgba(224,82,82,0.25)' }]}>
+                  <View style={[ex.fab, { backgroundColor: T.errorDim, borderColor: 'rgba(154,48,48,0.25)' }]}>
                     <Text style={{ fontSize: FS.subheading, color: T.error }}>✕</Text>
                   </View>
                   <View style={[ex.fab, { backgroundColor: 'rgba(74,158,107,0.12)', borderColor: 'rgba(74,158,107,0.25)' }]}>
@@ -1402,7 +1406,7 @@ export default function DesignSystemScreen() {
                   why: 'Every text element on the flashcard is content to be read or memorised, not a control to be tapped. Regular weight keeps strokes clean on the hero character and avoids competing with the FAB icons. The hero character must be regular — bold would teach stroke forms that don\'t match real-world text.' },
                 { category: 'token', token: 'FW.medium', value: '500', note: 'Score strip counters + part-of-speech tag',
                   why: 'The score strip (✕ 2 · 3 ✓) uses medium weight because these are live counters the learner tracks during the session — they\'re closer to interactive state than passive prose. The part-of-speech tag (noun, verb) also uses medium as a categorical badge.' },
-                { category: 'token', token: 'T.error / T.success', value: '#E05252 / #4A9E6B', note: 'Semantic FAB colors',
+                { category: 'token', token: 'T.error / T.success', value: '#9a3030 / #4A9E6B', note: 'Semantic FAB colors',
                   why: 'Red and green are universally understood as wrong/right. The dim fill (12% opacity) + border pattern matches the Chip active state for visual consistency.' },
                 { category: 'component', token: 'ProgressBar', value: 'component', note: 'Fill track + MONO counter',
                   why: 'Thin and unobtrusive — positioned at the top so it\'s visible but doesn\'t compete with the flashcard. The MONO counter gives an exact position for learners who want precision.' },

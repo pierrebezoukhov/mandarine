@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
-  Animated, ActivityIndicator,
+  Animated, ActivityIndicator, Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO, FS, FW, LH, LS } from '@/theme/tokens';
-import { space } from '@/theme/spacing';
+import { T, MONO, MONO_MEDIUM, SERIF, FS, FW, LH, LS } from '@/theme/tokens';
+import { space, radius } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
@@ -64,6 +64,65 @@ function SessionComplete({ got, forgot, total, onRestart }: {
   );
 }
 
+// ── Web-only scanline overlay ──────────────────────────────────────────────────
+function Scanlines({ color = 'rgba(255,240,200,0.018)', gap = 3 }: { color?: string; gap?: number }) {
+  if (Platform.OS !== 'web') return null;
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 1,
+        // @ts-expect-error — web-only CSS property
+        backgroundImage: `repeating-linear-gradient(0deg, ${color} 0px, ${color} 1px, transparent 1px, transparent ${gap + 1}px)`,
+      }}
+    />
+  );
+}
+
+// ── Corner ornament ────────────────────────────────────────────────────────────
+function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
+  const posStyle = {
+    tl: { top: 10, left: 14 },
+    tr: { top: 10, right: 14 },
+    bl: { bottom: 10, left: 14 },
+    br: { bottom: 10, right: 14 },
+  }[position];
+
+  return (
+    <Text style={[s.cornerOrnament, posStyle]}>+</Text>
+  );
+}
+
+// ── Blur wrapper for example pinyin + translation ────────────────────────────
+function BlurredExample({ pinyin, meaning, revealed, onReveal }: {
+  pinyin?: string; meaning?: string; revealed: boolean; onReveal: () => void;
+}) {
+  return (
+    <TouchableOpacity onPress={onReveal} activeOpacity={0.8}>
+      <View style={s.blurWrapper}>
+        <View
+          style={[
+            !revealed && Platform.OS === 'web' && ({
+              filter: 'blur(5px)',
+              userSelect: 'none',
+            } as any),
+            !revealed && Platform.OS !== 'web' && { opacity: 0.15 },
+          ]}
+        >
+          {pinyin && <Text style={s.hintPinyin}>{pinyin}</Text>}
+          {meaning && <Text style={s.hintTranslation}>{meaning}</Text>}
+        </View>
+        {!revealed && (
+          <View style={s.blurLabel}>
+            <Text style={s.blurLabelText}>TAP TO REVEAL</Text>
+          </View>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+}
+
 // ── Main Session Screen ───────────────────────────────────────────────────────
 export default function SessionScreen() {
   const { resume }            = useLocalSearchParams<{ resume?: string }>();
@@ -74,14 +133,17 @@ export default function SessionScreen() {
   const [reveal, setReveal]   = useState(0);
   const [results, setResults] = useState<Results>({});
   const [done, setDone]       = useState(false);
+  const [hintOpen, setHintOpen] = useState(false);
+  const [translationRevealed, setTranslationRevealed] = useState(false);
+  const [hoveredBtn, setHoveredBtn] = useState<'forgot' | 'got' | null>(null);
 
   const { user }        = useAuth();
   const startedAt       = useRef<string>(new Date().toISOString());
   const sessionConfig   = useRef<SessionConfig | null>(null);
 
   const cardAnim = useRef(new Animated.Value(0)).current;
-  const lastTap  = useRef(0);
-  const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashAnim = useRef(new Animated.Value(0)).current;
+  const flashColor = useRef<'got' | 'forgot' | null>(null);
 
   // Load session: resume from saved state (DB first, then AsyncStorage) OR fetch fresh
   useEffect(() => {
@@ -160,16 +222,11 @@ export default function SessionScreen() {
   }, [idx, cards.length]);
 
   const handleTap = useCallback(() => {
-    const now = Date.now();
-    if (now - lastTap.current < 300) {
-      clearTimeout(tapTimer.current!);
-      setReveal(5);
-    } else {
-      tapTimer.current = setTimeout(() => {
-        setReveal(r => Math.min(r + 1, 5));
-      }, 200);
-    }
-    lastTap.current = now;
+    setReveal(r => {
+      const next = Math.min(r + 1, 2);
+      if (next === 2) setHintOpen(true);
+      return next;
+    });
   }, []);
 
   const rate = useCallback((result: 'got' | 'forgot') => {
@@ -179,6 +236,13 @@ export default function SessionScreen() {
     const isLast     = nextIdx >= cards.length;
 
     setResults(newResults);
+
+    // Feedback flash
+    flashColor.current = result;
+    flashAnim.setValue(1);
+    Animated.timing(flashAnim, {
+      toValue: 0, duration: 600, useNativeDriver: true,
+    }).start();
 
     if (!isLast) {
       // Keep resume state up-to-date in AsyncStorage and DB
@@ -203,18 +267,28 @@ export default function SessionScreen() {
       }
     }
 
-    Animated.timing(cardAnim, {
-      toValue: 0, duration: 180, useNativeDriver: true,
-    }).start(() => {
-      if (isLast) { setDone(true); }
-      else { setIdx(nextIdx); setReveal(0); }
-    });
+    setTimeout(() => {
+      Animated.timing(cardAnim, {
+        toValue: 0, duration: 250, useNativeDriver: true,
+      }).start(() => {
+        if (isLast) { setDone(true); }
+        else {
+          flashAnim.setValue(0);  // kill leftover flash before new card
+          setIdx(nextIdx);
+          setReveal(0);
+          setHintOpen(false);
+          setTranslationRevealed(false);
+        }
+      });
+    }, 150);
   }, [cards, idx, results, user?.id]);
 
   const goBack = useCallback(() => {
     if (idx === 0) return;
     setIdx(i => i - 1);
     setReveal(0);
+    setHintOpen(false);
+    setTranslationRevealed(false);
   }, [idx]);
 
   const restart = useCallback(() => {
@@ -223,6 +297,7 @@ export default function SessionScreen() {
     if (user?.id) deleteResumeSession(user.id);  // fire-and-forget
     setCards(c => [...c].sort(() => Math.random() - 0.5));
     setIdx(0); setReveal(0); setResults({}); setDone(false);
+    setHintOpen(false); setTranslationRevealed(false);
   }, [user?.id]);
 
   // ── Loading / error states ────────────────────────────────────────────────
@@ -246,6 +321,7 @@ export default function SessionScreen() {
 
   const gotCount    = Object.values(results).filter(v => v === 'got').length;
   const forgotCount = Object.values(results).filter(v => v === 'forgot').length;
+  const remaining   = cards.length - gotCount - forgotCount;
 
   if (done) {
     return (
@@ -261,6 +337,7 @@ export default function SessionScreen() {
 
   return (
     <SafeAreaView style={s.root}>
+      <Scanlines />
       <ResponsiveShell maxWidth={640}>
 
       {/* Top bar */}
@@ -269,7 +346,7 @@ export default function SessionScreen() {
           style={s.iconBtn}
           onPress={() => router.replace('/(tabs)/home')}
         >
-          <Text style={s.iconBtnText}>✕</Text>
+          <Text style={s.iconBtnText}>×</Text>
         </TouchableOpacity>
 
         <ProgressBar current={idx + 1} total={cards.length} style={{ flex: 1 }} />
@@ -282,11 +359,13 @@ export default function SessionScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Score strip */}
+      {/* Score strip: wrong · remaining · right */}
       <View style={s.scoreStrip}>
-        <Text style={[s.scoreItem, s.scoreForgot]}>✕  {forgotCount}</Text>
+        <Text style={[s.scoreItem, s.scoreForgot]}>× {forgotCount}</Text>
         <Text style={s.scoreSep}>·</Text>
-        <Text style={[s.scoreItem, s.scoreGot]}>{gotCount}  ✓</Text>
+        <Text style={[s.scoreItem, s.scorePending]}>{remaining}</Text>
+        <Text style={s.scoreSep}>·</Text>
+        <Text style={[s.scoreItem, s.scoreGot]}>✓ {gotCount}</Text>
       </View>
 
       {/* Card */}
@@ -294,58 +373,129 @@ export default function SessionScreen() {
         style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }] }]}
       >
         <TouchableOpacity style={s.cardTouchable} onPress={handleTap} activeOpacity={1}>
+          {/* Card container */}
+          <View style={s.cardContainer}>
+            <Scanlines color="rgba(255,240,200,0.012)" gap={4} />
 
-          <View style={s.hskBadge}>
-            <Text style={s.hskBadgeText}>HSK {card.hsk_level}</Text>
-          </View>
+            {/* Corner ornaments */}
+            <CornerOrnament position="tl" />
+            <CornerOrnament position="br" />
 
-          <Text style={s.hanziChar}>{card.hanzi}</Text>
-
-          {reveal >= 1 && (
-            <Text style={s.pinyinText}>{card.pinyin}</Text>
-          )}
-
-          {reveal >= 2 && card._example && (
-            <View style={s.exampleBlock}>
-              <View style={s.exDivider} />
-              <Text style={s.exHanzi}>{card._example.hanzi}</Text>
-              {reveal >= 3 && card._example.pinyin ? (
-                <Text style={s.exPinyin}>{card._example.pinyin}</Text>
-              ) : null}
+            {/* HSK badge */}
+            <View style={s.hskBadge}>
+              <Text style={s.hskBadgeText}>HSK {card.hsk_level}</Text>
             </View>
-          )}
 
-          {reveal >= 4 && card._example?.meaning && (
-            <Text style={s.exMeaning}>{card._example.meaning}</Text>
-          )}
+            {/* Hanzi — serif, light weight, ink bleed */}
+            <Text style={s.hanziChar} adjustsFontSizeToFit numberOfLines={1}>{card.hanzi}</Text>
 
-          {reveal >= 5 && (
-            <View style={s.meaningBlock}>
+            {/* Stage 1: Pinyin + audio icon — always rendered, opacity-controlled */}
+            <View style={[s.pinyinRow, reveal < 1 && { opacity: 0 }]}>
+              <Text style={s.pinyinText}>{card.pinyin}</Text>
+              <Text style={s.pinyinAudio}>♪</Text>
+            </View>
+
+            {/* Stage 2: POS + definition */}
+            <View style={[s.meaningBlock, reveal < 2 && { opacity: 0 }]}>
+              <View style={s.divider} />
               {card.part_of_speech && <Text style={s.posTag}>{card.part_of_speech}</Text>}
-              <Text style={s.meaningText}>{card.meaning}</Text>
+              <Text style={s.meaningText}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
             </View>
-          )}
 
-          {reveal < 5 && (
-            <Text style={s.tapHint}>
-              {reveal === 0 && 'tap · pinyin  ··  double tap · reveal all'}
-              {reveal === 1 && 'tap · example  ··  double tap · reveal all'}
-              {reveal === 2 && 'tap · example pinyin  ··  double tap · reveal all'}
-              {reveal === 3 && 'tap · translation  ··  double tap · reveal all'}
-              {reveal === 4 && 'tap · meaning'}
+            {/* Stage 3: Example sentence (collapsible hint block) */}
+            {card._example && (
+              <View style={[s.hintBlock, reveal < 2 && { opacity: 0, pointerEvents: 'none' as const }]}>
+                <TouchableOpacity
+                  style={s.hintTrigger}
+                  onPress={(e) => { e.stopPropagation(); setHintOpen(o => !o); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={s.hintLabel}>EXAMPLE</Text>
+                  <Text style={[s.hintIcon, hintOpen && s.hintIconOpen]}>▾</Text>
+                </TouchableOpacity>
+
+                <View style={[s.hintContent, !hintOpen && { opacity: 0 }]}>
+                    <View style={s.hintDivider} />
+                    {/* Example hanzi sentence */}
+                    <Text style={s.hintHanzi}>{card._example.hanzi}</Text>
+                    {/* Pinyin + translation — blurred until tapped */}
+                    <BlurredExample
+                      pinyin={card._example.pinyin}
+                      meaning={card._example.meaning}
+                      revealed={translationRevealed}
+                      onReveal={() => setTranslationRevealed(true)}
+                    />
+                  </View>
+              </View>
+            )}
+
+            {/* Tap hint — inside card surface */}
+            <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }]} pointerEvents="none">
+              {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
             </Text>
-          )}
+
+            {/* Feedback flash — outline only */}
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                StyleSheet.absoluteFillObject,
+                {
+                  borderWidth: 2,
+                  borderColor: flashColor.current === 'got'
+                    ? T.successBright
+                    : T.errorBright,
+                  opacity: flashAnim,
+                },
+              ]}
+            />
+          </View>
 
         </TouchableOpacity>
       </Animated.View>
 
-      {/* FABs */}
-      <View style={s.fabRow}>
-        <TouchableOpacity style={[s.fab, s.fabForgot]} onPress={() => rate('forgot')} activeOpacity={0.8}>
-          <Text style={[s.fabIcon, { color: T.error }]}>✕</Text>
+      {/* Rating buttons */}
+      <View style={s.buttonRow}>
+        <TouchableOpacity
+          style={[
+            s.rateBtn, s.rateBtnForgot,
+            hoveredBtn === 'forgot' && {
+              backgroundColor: 'rgba(200,56,42,0.22)',
+              borderColor: T.errorBright,
+            },
+          ]}
+          onPress={() => rate('forgot')}
+          activeOpacity={0.8}
+          {...(Platform.OS === 'web' ? {
+            onMouseEnter: () => setHoveredBtn('forgot'),
+            onMouseLeave: () => setHoveredBtn(null),
+          } as any : {})}
+        >
+          <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
+          <Text style={[s.rateBtnIcon, {
+            color: hoveredBtn === 'forgot' ? T.errorBright : T.error,
+            fontSize: 18,
+          }]}>×</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[s.fab, s.fabGot]} onPress={() => rate('got')} activeOpacity={0.8}>
-          <Text style={[s.fabIcon, { color: T.success }]}>✓</Text>
+
+        <TouchableOpacity
+          style={[
+            s.rateBtn, s.rateBtnGot,
+            hoveredBtn === 'got' && {
+              backgroundColor: 'rgba(79,168,88,0.22)',
+              borderColor: T.successBright,
+            },
+          ]}
+          onPress={() => rate('got')}
+          activeOpacity={0.8}
+          {...(Platform.OS === 'web' ? {
+            onMouseEnter: () => setHoveredBtn('got'),
+            onMouseLeave: () => setHoveredBtn(null),
+          } as any : {})}
+        >
+          <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
+          <Text style={[s.rateBtnIcon, {
+            color: hoveredBtn === 'got' ? T.successBright : T.success,
+          }]}>✓</Text>
         </TouchableOpacity>
       </View>
 
@@ -356,7 +506,7 @@ export default function SessionScreen() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
-  root:    { flex: 1, backgroundColor: T.bg },
+  root:    { flex: 1, backgroundColor: T.bgDeep },
   centered:{ alignItems: 'center', justifyContent: 'center' },
 
   topbar: {
@@ -365,85 +515,200 @@ const s = StyleSheet.create({
   },
   iconBtn:         { padding: space.sm, borderRadius: 8 },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: FS.subheading, color: T.textMuted },
+  iconBtnText:     { fontSize: 18, fontFamily: MONO, letterSpacing: LS.tighter * 18, color: T.textMuted },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium },
-  scoreForgot: { color: T.error },
+  scoreItem:   { fontFamily: MONO, fontSize: FS.label, fontWeight: FW.medium },
+  scoreForgot: { color: T.errorMuted },
   scoreGot:    { color: T.success },
-  scoreSep:    { color: T.textMuted, fontSize: FS.ui },
+  scorePending:{ color: T.textFaint },
+  scoreSep:    { color: T.textFaint, fontSize: 10 },
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
-    paddingHorizontal: 36, paddingBottom: 110,
+    paddingHorizontal: 20, paddingBottom: 24,
+  },
+
+  // Card container — explicit bordered box
+  cardContainer: {
+    width: '100%', maxWidth: 340,
+    backgroundColor: T.surfaceCard,
+    borderWidth: 1.5,
+    borderColor: T.border,
+    paddingHorizontal: space.xxl,
+    paddingTop: 40,
+    paddingBottom: space.xxl,
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+    // Outer shadow (cross-platform)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 32,
+    elevation: 12,
+  },
+
+  // Corner ornaments
+  cornerOrnament: {
+    position: 'absolute',
+    fontFamily: MONO,
+    fontSize: 10,
+    color: T.textFaint,
+    opacity: 0.5,
   },
 
   hskBadge: {
-    position: 'absolute', top: 20, right: 28,
-    borderWidth: 1, borderColor: T.border,
-    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100,
+    position: 'absolute', top: 10, right: 14,
   },
-  hskBadgeText: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
-
-  hanziChar: {
-    fontSize: FS.hanzi, color: T.textHanzi, lineHeight: LH.hanzi,
-    letterSpacing: LS.tighter * FS.hanzi,
-    textShadowColor: 'rgba(240,235,224,0.06)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 40,
-  },
-
-  pinyinText: {
-    fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: 3,
-    color: T.accent, opacity: 0.85, marginTop: 18,
-  },
-
-  exampleBlock: { marginTop: 22, width: '100%', alignItems: 'center' },
-  exDivider:    { width: 24, height: 1, backgroundColor: T.border, marginBottom: 14 },
-  exHanzi:      { fontSize: FS.subheading, color: '#C8BFA8', textAlign: 'center', lineHeight: LH.subheading },
-  exPinyin:     { fontFamily: MONO, fontSize: FS.label, color: '#7A7060', textAlign: 'center', letterSpacing: 1 },
-
-  exMeaning: {
-    fontSize: FS.body, color: '#8C8070', textAlign: 'center',
-    lineHeight: LH.body, marginTop: 10,
-  },
-
-  meaningBlock: { marginTop: 22, alignItems: 'center', gap: 6 },
-  posTag:       { fontFamily: MONO, fontSize: FS.label, fontWeight: FW.medium, color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase' },
-  meaningText:  { fontSize: FS.subheading, color: T.textPrimary, textAlign: 'center', lineHeight: LH.subheading, letterSpacing: LS.tight * FS.subheading },
-
-  tapHint: {
-    position: 'absolute', bottom: 72,
-    fontFamily: MONO, fontSize: FS.label, color: T.textMuted,
+  hskBadgeText: {
+    fontFamily: MONO, fontSize: 9, color: T.textFaint,
     letterSpacing: 1.5, opacity: 0.6,
   },
 
-  fabRow: {
-    position: 'absolute', bottom: 36, left: 0, right: 0,
+  // Hanzi — serif font, light weight, ink-bleed shadow
+  hanziChar: {
+    fontFamily: SERIF,
+    fontSize: FS.hanzi,
+    fontWeight: FW.light,
+    color: T.textHanzi,
+    lineHeight: LH.hanzi,
+    letterSpacing: LS.tighter * FS.hanzi,
+    textAlign: 'center',
+    maxWidth: '100%',
+    textShadowColor: 'rgba(232,224,208,0.12)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 40,
+    marginBottom: space.xl,
+  },
+
+  // Pinyin row (pinyin + audio icon)
+  pinyinRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    marginBottom: space.lg,
+  },
+  pinyinText: {
+    fontFamily: MONO, fontSize: 18, letterSpacing: LS.loose * 18,
+    color: T.errorBright, fontStyle: 'italic', opacity: 0.9,
+    textShadowColor: 'rgba(200,56,42,0.18)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
+  pinyinAudio: {
+    fontSize: 12, color: T.textFaint, opacity: 0.6,
+  },
+
+  // Divider
+  divider: {
+    width: '100%', height: 1,
+    backgroundColor: T.border, marginBottom: space.lg,
+  },
+
+  // Meaning block (POS + definition)
+  meaningBlock: { width: '100%', alignItems: 'flex-start', marginBottom: space.lg },
+  posTag: {
+    fontFamily: MONO, fontSize: 10,
+    color: T.textFaint, letterSpacing: 2, textTransform: 'uppercase',
+    marginBottom: space.xs,
+  },
+  meaningText: {
+    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: T.textSecondary,
+    lineHeight: 22, letterSpacing: 0.5,
+  },
+
+  // Hint block (collapsible example)
+  hintBlock: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'rgba(30,28,24,1)',
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    overflow: 'hidden',
+  },
+  hintTrigger: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: space.md, paddingVertical: space.sm,
+  },
+  hintLabel: {
+    flex: 1, fontFamily: MONO, fontSize: 10,
+    letterSpacing: LS.loose * 10, color: T.textFaint, textTransform: 'uppercase',
+  },
+  hintIcon: {
+    fontFamily: MONO, fontSize: 10, color: T.textFaint,
+  },
+  hintIconOpen: {
+    transform: [{ rotate: '180deg' }],
+  },
+  hintContent: {
+    paddingHorizontal: space.md, paddingBottom: space.md,
+  },
+  hintDivider: {
+    height: 1, backgroundColor: 'rgba(30,28,24,1)', marginBottom: space.sm,
+  },
+  hintHanzi: {
+    fontFamily: SERIF, fontSize: FS.pinyin, color: T.textPrimary,
+    lineHeight: LH.pinyin, letterSpacing: 1, marginBottom: space.sm,
+  },
+  hintPinyin: {
+    fontFamily: MONO, fontSize: 11, color: T.textSecondary,
+    fontStyle: 'italic', letterSpacing: LS.loose * 11, lineHeight: 17,
+    marginBottom: space.sm,
+  },
+  hintTranslation: {
+    fontFamily: MONO, fontSize: 12, color: T.textMuted,
+    letterSpacing: 0.5, lineHeight: 18,
+  },
+
+  // Blur wrapper for translation
+  blurWrapper: { position: 'relative' },
+  blurLabel: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'flex-start', justifyContent: 'center',
+  },
+  blurLabelText: {
+    fontFamily: MONO, fontSize: 9, letterSpacing: 3,
+    color: T.textFaint, textTransform: 'uppercase',
+  },
+
+  // Tap hint (inside card surface)
+  tapHint: {
+    marginTop: space.md,
+    fontFamily: MONO, fontSize: 9, color: T.textFaint,
+    letterSpacing: LS.loose * 9, textTransform: 'uppercase',
+  },
+
+  // Rating buttons — square-ish with text labels
+  buttonRow: {
     flexDirection: 'row', justifyContent: 'space-between',
-    paddingHorizontal: 40,
+    paddingHorizontal: 40, paddingBottom: 36,
+    gap: space.lg,
   },
-  fab: {
-    width: 60, height: 60, borderRadius: 30,
+  rateBtn: {
+    width: 64, height: 64, borderRadius: radius.square,
     alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1,
+    position: 'relative',
+    overflow: 'hidden',
+    ...(Platform.OS === 'web' ? { transition: 'background-color 150ms, border-color 150ms' } as any : {}),
   },
-  fabForgot: {
-    backgroundColor: 'rgba(224,82,82,0.12)',
-    borderWidth: 1, borderColor: 'rgba(224,82,82,0.25)',
+  rateBtnForgot: {
+    backgroundColor: T.errorDim,
+    borderColor: 'rgba(154,48,48,0.6)',
   },
-  fabGot: {
-    backgroundColor: 'rgba(74,158,107,0.12)',
-    borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)',
+  rateBtnGot: {
+    backgroundColor: 'rgba(58,122,68,0.12)',
+    borderColor: 'rgba(58,122,68,0.6)',
   },
-  fabIcon: { fontSize: FS.subheading },
+  rateBtnIcon: { fontSize: 20 },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
 const sc = StyleSheet.create({
   root: {
-    flex: 1, backgroundColor: T.bg,
+    flex: 1, backgroundColor: T.bgDeep,
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
   seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: space.xxxl },

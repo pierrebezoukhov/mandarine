@@ -11,8 +11,10 @@ import { Platform } from 'react-native';
 export const T = {
   // Backgrounds
   bg:           '#131109',
+  bgDeep:       '#0c0b09',      // session screen — darker than global bg
   surface:      '#1e1b12',
   surface2:     '#252118',
+  surfaceCard:  '#111008',      // explicit card container in session
 
   // Borders
   border:       'rgba(255,248,220,0.08)',
@@ -22,7 +24,8 @@ export const T = {
   textPrimary:  '#F0EBE0',
   textSecondary:'#A09880',
   textMuted:    '#928A78',
-  textHanzi:    '#F5F0E8',
+  textHanzi:    '#f0e8d8',      // warm parchment for hero character
+  textFaint:    '#4a4438',      // ultra-low-emphasis (tap hints, ornaments)
 
   // Accent (red)
   accent:       '#C0392B',
@@ -30,13 +33,27 @@ export const T = {
   accentBorder: 'rgba(192,57,43,0.28)',
 
   // Semantic
-  error:        '#E05252',
-  success:      '#4A9E6B',
+  error:        '#9a3030',
+  errorDim:     'rgba(154,48,48,0.12)',
+  errorMuted:   'rgba(154,48,48,0.55)',
+  errorBright:  '#e04030',      // hover/active state, pinyin text
+  success:      '#3a7a44',      // darker green — better contrast on dark bg
+  successBright:'#4fa858',      // hover/active state for "got it"
 } as const;
 
 // ── Typography helpers ────────────────────────────────────────────────────────
-export const MONO: string =
-  Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'monospace';
+// Serif — Noto Serif SC for Hanzi display (loaded via expo-font in _layout.tsx)
+export const SERIF: string = Platform.OS === 'web'
+  ? '"Noto Serif SC", "STSong", serif'
+  : 'NotoSerifSC-Light';
+
+// Monospace — IBM Plex Mono for session labels, counters, pinyin (loaded via expo-font)
+export const MONO: string = Platform.OS === 'web'
+  ? '"IBM Plex Mono", monospace'
+  : 'IBMPlexMono-Regular';
+export const MONO_MEDIUM: string = Platform.OS === 'web'
+  ? '"IBM Plex Mono", monospace'
+  : 'IBMPlexMono-Medium';
 
 // ── Font-size scale ───────────────────────────────────────────────────────────
 //
@@ -53,11 +70,11 @@ export const MONO: string =
 //
 //   CHARACTER — Manual override, NOT derived from either scale
 //     The Chinese character is the product being learned, not a heading.
-//     64–72px ensures it is the unambiguous primary stimulus.
+//     96px in Noto Serif SC Light ensures it is the unambiguous primary stimulus.
 
 // Display / Title scale — Perfect Fourth (1.333), heading hierarchy.
 export const FSDisplay = {
-  hanzi:      72,  // flashcard hero character — manual override, outside scales
+  hanzi:      108, // flashcard hero character — manual override, outside scales (serif display)
   seal:       50,  // session completion seal — decorative, outside scales
   score:      42,  // large numeric display — same as title for visual parity
   title:      42,  // screen titles / H1 — 16 × 1.333³
@@ -97,13 +114,14 @@ export const LS = {
 } as const;
 
 // ── Font-weight scale ─────────────────────────────────────────────────────────
-// Three values only — no bold (700). Bold thickens Chinese character strokes,
+// Four values — no bold (700). Bold thickens Chinese character strokes,
 // reducing white space between strokes and degrading legibility at display sizes.
 // Semibold (600) adds heading emphasis without muddy stroke rendering.
 //
+//   FW.light    → serif Hanzi display only — thin strokes for elegance
 //   FW.semibold → screen headings, component names, nav bar labels
 //   FW.medium   → interactive controls (Button, Chip, Tab), list primary labels
-//   FW.regular  → prose, subtitles, captions, pinyin, hero character (default; omit)
+//   FW.regular  → prose, subtitles, captions, pinyin (default; omit)
 //
 // The hero character MUST be regular weight — learners should see strokes as
 // they appear in normal reading. Adding weight teaches a visual form that
@@ -111,6 +129,7 @@ export const LS = {
 //
 // Rule of thumb: size signals priority · weight signals interactivity · color signals role.
 export const FW = {
+  light:    '300' as const,  // serif Hanzi display — thin strokes for elegance
   regular:  '400' as const,  // default prose — omit in styles, rely on system default
   medium:   '500' as const,  // interactive / list primary
   semibold: '600' as const,  // headings / titles / prominent labels
@@ -129,7 +148,7 @@ export const FW = {
 //   heading      32 / 40  → 1.25  (deck names, H2)
 //   title/score  42 / 48  → 1.14  (screen titles, large numerics)
 //   seal         50 / 56  → 1.12  (display-size decorative)
-//   hanzi        72 / 80  → 1.11  (hero character, nearly cap-height)
+//   hanzi        108 / 120 → 1.11  (hero character, serif display)
 export const LH = {
   label:      20,
   body:       24,
@@ -140,5 +159,5 @@ export const LH = {
   title:      48,
   score:      48,
   seal:       56,
-  hanzi:      80,
+  hanzi:      120,
 } as const;
