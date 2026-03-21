@@ -1,45 +1,16 @@
 import { Platform } from 'react-native';
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-// Single source of truth — import T from here in every screen and component.
-// Previously each screen had its own copy; all conflicts have been resolved:
-//   - accentDim:    0.12 (was 0.10 in session-setup)
-//   - border:       0.08 (was 0.07 in session)
-//   - error/success: canonical names (session used 'again'/'good')
-//   - textHanzi:    now global (was session-only)
+// DEPRECATED: Use `useTheme()` from `@/context/ThemeContext` instead.
+// This static export is the dark palette only and exists for backward compat
+// during the migration to dual-theme support. It will be removed once all
+// screens and components have been converted to `useTheme()`.
+//
+// New code should import: import { useTheme } from '@/context/ThemeContext';
+// and use: const { colors } = useTheme();
 
-export const T = {
-  // Backgrounds
-  bg:           '#131109',
-  bgDeep:       '#0c0b09',      // session screen — darker than global bg
-  surface:      '#1e1b12',
-  surface2:     '#252118',
-  surfaceCard:  '#111008',      // explicit card container in session
-
-  // Borders
-  border:       'rgba(255,248,220,0.08)',
-  borderFocus:  'rgba(255,248,220,0.22)',
-
-  // Text
-  textPrimary:  '#F0EBE0',
-  textSecondary:'#A09880',
-  textMuted:    '#928A78',
-  textHanzi:    '#f0e8d8',      // warm parchment for hero character
-  textFaint:    '#4a4438',      // ultra-low-emphasis (tap hints, ornaments)
-
-  // Accent (red)
-  accent:       '#C0392B',
-  accentDim:    'rgba(192,57,43,0.12)',
-  accentBorder: 'rgba(192,57,43,0.28)',
-
-  // Semantic
-  error:        '#9a3030',
-  errorDim:     'rgba(154,48,48,0.12)',
-  errorMuted:   'rgba(154,48,48,0.55)',
-  errorBright:  '#e04030',      // hover/active state, pinyin text
-  success:      '#3a7a44',      // darker green — better contrast on dark bg
-  successBright:'#4fa858',      // hover/active state for "got it"
-} as const;
+import { darkTheme } from '@/theme/colors';
+export const T = darkTheme;
 
 // ── Typography helpers ────────────────────────────────────────────────────────
 // Serif — Noto Serif SC for Hanzi display (loaded via expo-font in _layout.tsx)
@@ -84,10 +55,14 @@ export const FSDisplay = {
 
 // Body / Content scale — Major Third (1.250), readable content + UI controls.
 export const FSBody = {
-  pinyin: 20,  // pinyin romanization — 16 × 1.250¹
-  ui:     16,  // inputs, buttons, nav controls — base size
-  body:   16,  // body text, translations — base size
-  label:  13,  // example sentences, captions, section labels — 16 ÷ 1.250
+  pinyin:      20,  // pinyin romanization — 16 × 1.250¹
+  ui:          16,  // inputs, buttons, nav controls — base size
+  body:        16,  // body text, translations — base size
+  label:       13,  // example sentences, captions, section labels — 16 ÷ 1.250
+  progress:    12,  // progress counter, example translation
+  scoreNumber: 13,  // score display numbers (weight 500)
+  micro:        9,  // tap hints, button labels — minimum legible size
+  buttonLabel:  9,  // action button labels (e.g. Wrong, Right, Again)
 } as const;
 
 // Combined — all existing FS.* references continue to work unchanged.
@@ -107,10 +82,15 @@ export const FS = { ...FSDisplay, ...FSBody } as const;
 // syllable-by-syllable ("zhōng" + "guó"), and air between syllables
 // aligns with that parsing behaviour.
 export const LS = {
-  tighter: -0.05,   // score / seal / hanzi  — large display
-  tight:   -0.025,  // title / heading        — heading hierarchy
-  normal:   0,      // body / UI text         — default
-  loose:    0.025,  // available; not currently applied
+  tighter:   -0.05,   // score / seal / hanzi  — large display
+  tight:     -0.025,  // title / heading        — heading hierarchy
+  normal:     0,      // body / UI text         — default
+  loose:      0.025,  // available; not currently applied
+  wide:       0.04,   // definition text, body secondary
+  wider:      0.08,   // pinyin, score labels, sidebar brand
+  widest:     0.14,   // button labels, form labels, sidebar nav
+  ultrawide:  0.18,   // uppercase card labels (POS · HSK level)
+  extreme:    0.22,   // micro text ("Tap to reveal")
 } as const;
 
 // ── Font-weight scale ─────────────────────────────────────────────────────────
@@ -150,14 +130,17 @@ export const FW = {
 //   seal         50 / 56  → 1.12  (display-size decorative)
 //   hanzi        108 / 120 → 1.11  (hero character, serif display)
 export const LH = {
-  label:      20,
-  body:       24,
-  ui:         24,
-  pinyin:     28,
-  subheading: 28,
-  heading:    40,
-  title:      48,
-  score:      48,
-  seal:       56,
-  hanzi:      120,
+  micro:       12,  // button labels, tap hints — single line
+  progress:    12,  // progress counter — single line
+  scoreNumber: 16,  // score numbers — single line
+  label:       20,
+  body:        24,
+  ui:          24,
+  pinyin:      28,
+  subheading:  28,
+  heading:     40,
+  title:       48,
+  score:       48,
+  seal:        56,
+  hanzi:       120,
 } as const;

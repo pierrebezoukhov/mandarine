@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, FS, FW } from '@/theme/tokens';
+import { useState, useMemo } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
+import { MONO, FS, FW, LS } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface SegmentOption {
   label: string;
@@ -29,6 +31,8 @@ export function SegmentedControl({
   onCustomChange,
   style,
 }: SegmentedControlProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [customInput, setCustomInput] = useState(
     customValue !== undefined ? String(customValue) : '',
   );
@@ -90,7 +94,7 @@ export function SegmentedControl({
           onChangeText={handleCustomText}
           keyboardType="number-pad"
           placeholder="Enter number of cards"
-          placeholderTextColor={T.textMuted}
+          placeholderTextColor={colors.textFaint}
           maxLength={3}
           autoFocus
         />
@@ -99,35 +103,38 @@ export function SegmentedControl({
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   row: { flexDirection: 'row', gap: 8 },
 
   segment: {
     flex: 1,
-    paddingVertical: 11,
-    borderRadius: 10,
-    backgroundColor: T.surface,
+    paddingVertical: 10,
+    backgroundColor: t.bgCard,
     borderWidth: 1,
-    borderColor: T.border,
+    borderColor: t.border,
     alignItems: 'center',
+    ...(Platform.OS === 'web' ? { transition: 'all 150ms ease' } as any : {}),
   },
   segmentActive: {
-    backgroundColor: T.accentDim,
-    borderColor: T.accentBorder,
+    backgroundColor: t.inkRedGlow,
+    borderColor: t.inkRedDim,
   },
-  segmentText:       { fontSize: FS.body, color: T.textMuted, fontWeight: FW.medium },
-  segmentTextActive: { color: T.textPrimary },
+  segmentText:       { fontFamily: MONO, fontSize: 15, color: t.textSecondary, fontWeight: FW.light, letterSpacing: LS.wide * 15 },
+  segmentTextActive: { color: t.textPrimary },
 
   customInput: {
+    fontFamily: MONO,
     marginTop: 10,
-    backgroundColor: T.surface,
+    backgroundColor: t.bgCard,
     borderWidth: 1,
-    borderColor: T.borderFocus,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: T.textPrimary,
-    fontSize: FS.ui,
+    borderColor: t.inkRed,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: t.textPrimary,
+    fontSize: 15,
+    fontWeight: FW.light,
+    letterSpacing: LS.wide * 15,
     textAlign: 'center',
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' } as any : {}),
   },
 });

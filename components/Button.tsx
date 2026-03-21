@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
 import {
   TouchableOpacity, Text, ActivityIndicator, StyleSheet,
   ViewStyle, StyleProp,
 } from 'react-native';
-import { T, FS, FW } from '@/theme/tokens';
+import { FS, FW } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 type ButtonShape   = 'pill' | 'rounded';
@@ -28,6 +31,8 @@ export function Button({
   loading,
   style,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const isDisabled = disabled || loading;
 
   return (
@@ -46,7 +51,7 @@ export function Button({
       activeOpacity={0.82}
     >
       {loading
-        ? <ActivityIndicator color={variant === 'primary' ? '#fff' : T.textSecondary} />
+        ? <ActivityIndicator color={variant === 'primary' ? '#fff' : colors.textSecondary} />
         : <Text style={[
             s.label,
             variant === 'primary'   && s.labelPrimary,
@@ -60,7 +65,7 @@ export function Button({
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   base: {
     paddingVertical: 15,
     alignItems: 'center',
@@ -73,18 +78,18 @@ const s = StyleSheet.create({
 
   // Variants
   variantPrimary: {
-    backgroundColor: T.accent,
+    backgroundColor: t.inkRed,
   },
   variantSecondary: {
     borderWidth: 1,
-    borderColor: T.border,
-    backgroundColor: T.surface,
+    borderColor: t.border,
+    backgroundColor: t.bgCard,
   },
   variantGhost: {
     // no background, no border
   },
 
-  disabled: { opacity: 0.4 },
+  disabled: { opacity: 0.18 },
 
   // Labels
   label: {
@@ -92,6 +97,6 @@ const s = StyleSheet.create({
     fontWeight: FW.medium,
   },
   labelPrimary:   { color: '#fff' },
-  labelSecondary: { color: T.textSecondary },
-  labelGhost:     { color: T.textMuted },
+  labelSecondary: { color: t.textSecondary },
+  labelGhost:     { color: t.textSecondary },
 });

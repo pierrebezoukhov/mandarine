@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, SafeAreaView,
   TouchableOpacity, ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS, FW } from '@/theme/tokens';
+import { useTheme, type ThemeMode } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { MONO, FS, FW, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
@@ -19,9 +21,16 @@ const LANG_OPTIONS = [
   { label: 'English',  value: 'en' },
   { label: '日本語',   value: 'ja' },
 ];
+const THEME_OPTIONS = [
+  { label: 'Light', value: 'light' },
+  { label: 'Dark',  value: 'dark' },
+  { label: 'System', value: 'system' },
+];
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
+  const { colors, mode, setMode } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
 
   const [displayName, setDisplayName] = useState('');
   const [nativeLang,  setNativeLang]  = useState('fr');
@@ -56,7 +65,7 @@ export default function SettingsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.root}>
-        <ActivityIndicator color={T.accent} style={{ flex: 1 }} />
+        <ActivityIndicator color={colors.inkRed} style={{ flex: 1 }} />
       </SafeAreaView>
     );
   }
@@ -77,6 +86,15 @@ export default function SettingsScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        <Section label="APPEARANCE">
+          <Text style={s.fieldLabel}>THEME</Text>
+          <SegmentedControl
+            options={THEME_OPTIONS}
+            value={mode}
+            onChange={v => setMode(v as ThemeMode)}
+          />
+        </Section>
+
         <Section label="PERSONAL INFO">
           <Field
             label="DISPLAY NAME"
@@ -122,8 +140,8 @@ export default function SettingsScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: T.bg },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  root: { flex: 1, backgroundColor: t.bg },
 
   header: {
     flexDirection: 'row',
@@ -134,17 +152,19 @@ const s = StyleSheet.create({
     paddingBottom: space.sm,
   },
   backBtn:  { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
-  backText: { fontSize: FS.body, color: T.textSecondary },
-  title:    { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
+  backText: { fontSize: FS.body, color: t.textSecondary },
+  title:    { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
 
   scroll: { paddingHorizontal: space.xl, paddingTop: space.xl, paddingBottom: space.giant },
 
   fieldLabel: {
-    fontSize: FS.label,
-    color: T.textMuted,
+    fontFamily: MONO,
+    fontSize: 10,
+    letterSpacing: LS.widest * 10,
+    color: t.textFaint,
     textTransform: 'uppercase',
     marginBottom: space.sm,
   },
 
-  email: { fontSize: FS.body, color: T.textMuted },
+  email: { fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: t.textSecondary },
 });

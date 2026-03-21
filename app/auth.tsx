@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 import { router } from 'expo-router';
-import { T, FS, FW, LH } from '@/theme/tokens';
+import { FS, FW, LH } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
@@ -15,6 +17,8 @@ import { ResponsiveShell } from '@/components/ResponsiveShell';
 // ─── Login form ──────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () => void }) {
   const { signIn, signInWithGoogle } = useAuth();
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
@@ -81,6 +85,8 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
 // ─── Signup form ─────────────────────────────────────────────────────────────
 function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: (email: string) => void }) {
   const { signUp, signInWithGoogle } = useAuth();
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
@@ -141,6 +147,8 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
 // ─── Forgot password form ────────────────────────────────────────────────────
 function ForgotForm({ onBack }: { onBack: () => void }) {
   const { resetPassword } = useAuth();
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [email, setEmail]     = useState('');
   const [sent, setSent]       = useState(false);
   const [loading, setLoading] = useState(false);
@@ -158,11 +166,11 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   if (sent) return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: FS.subheading }}>✓</Text>
+        <Text style={{ color: colors.green, fontSize: FS.subheading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Check your inbox</Text>
       <Text style={s.successSub}>
-        We sent a reset link to <Text style={{ color: T.textSecondary }}>{email}</Text>.
+        We sent a reset link to <Text style={{ color: colors.textSecondary }}>{email}</Text>.
         {'\n'}It expires in 15 minutes.
       </Text>
       <Text style={[s.footerLink, { marginTop: 16 }]} onPress={onBack}>Back to sign in</Text>
@@ -187,15 +195,17 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
 
 // ─── Email confirmation screen ───────────────────────────────────────────────
 function ConfirmScreen({ email, onBack }: { email: string; onBack: () => void }) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: T.success, fontSize: FS.subheading }}>✓</Text>
+        <Text style={{ color: colors.green, fontSize: FS.subheading }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Confirm your email</Text>
       <Text style={s.successSub}>
         We sent a confirmation link to{'\n'}
-        <Text style={{ color: T.textSecondary }}>{email}</Text>.
+        <Text style={{ color: colors.textSecondary }}>{email}</Text>.
         {'\n\n'}Open the link then come back to sign in.
       </Text>
       <Text style={[s.footerLink, { marginTop: 16 }]} onPress={onBack}>Back to sign in</Text>
@@ -209,6 +219,8 @@ type Screen = 'login' | 'signup' | 'forgot' | 'confirm';
 export default function AuthScreen() {
   const [screen, setScreen]           = useState<Screen>('login');
   const [signupEmail, setSignupEmail] = useState('');
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
 
   const handleSignupSuccess = (email: string) => {
     setSignupEmail(email);
@@ -245,34 +257,34 @@ export default function AuthScreen() {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: T.bg },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  root:   { flex: 1, backgroundColor: t.bg },
   scroll: { flexGrow: 1, paddingHorizontal: space.xxxl, paddingBottom: space.giant },
 
   logo:      { paddingTop: 72, marginBottom: space.giant },
-  logoHanzi: { fontSize: FS.score, color: T.accent, fontWeight: FW.semibold, marginBottom: space.xs },
-  logoLabel: { fontSize: FS.label, color: T.textMuted, letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 },
+  logoHanzi: { fontSize: FS.score, color: t.inkRed, fontWeight: FW.semibold, marginBottom: space.xs },
+  logoLabel: { fontSize: FS.label, color: t.textFaint, letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 },
 
-  heading: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs },
-  sub:     { fontSize: FS.body, color: T.textMuted, marginBottom: space.xxxl, lineHeight: LH.body },
+  heading: { fontSize: FS.title, color: t.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs },
+  sub:     { fontSize: FS.body, color: t.textSecondary, marginBottom: space.xxxl, lineHeight: LH.body },
 
   ctaTop: { marginTop: space.sm },
 
   forgotBtn:  { alignSelf: 'flex-end', marginTop: -6, marginBottom: space.sm },
-  forgotText: { fontSize: FS.label, color: T.textMuted },
+  forgotText: { fontSize: FS.label, color: t.textSecondary },
 
   divider:     { flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.xl },
-  dividerLine: { flex: 1, height: 1, backgroundColor: T.border },
-  dividerText: { fontSize: FS.label, color: T.textMuted },
+  dividerLine: { flex: 1, height: 1, backgroundColor: t.border },
+  dividerText: { fontSize: FS.label, color: t.textFaint },
 
-  footer:     { marginTop: space.xxxl, textAlign: 'center', fontSize: FS.body, color: T.textMuted },
-  footerLink: { color: T.textSecondary, textDecorationLine: 'underline' },
+  footer:     { marginTop: space.xxxl, textAlign: 'center', fontSize: FS.body, color: t.textSecondary },
+  footerLink: { color: t.inkRedText, textDecorationLine: 'underline' },
 
   backBtn:  { marginBottom: space.xxl },
-  backText: { color: T.textMuted, fontSize: FS.label },
+  backText: { color: t.textSecondary, fontSize: FS.label },
 
   successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
-  successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(74,158,107,0.12)', borderWidth: 1, borderColor: 'rgba(74,158,107,0.25)', alignItems: 'center', justifyContent: 'center' },
-  successTitle: { fontSize: FS.subheading, color: T.textPrimary },
-  successSub:   { fontSize: FS.body, color: T.textMuted, textAlign: 'center', lineHeight: LH.body, maxWidth: 260 },
+  successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: t.green === '#3a7a44' ? 'rgba(58,122,68,0.12)' : 'rgba(45,110,56,0.08)', borderWidth: 1, borderColor: t.green, alignItems: 'center', justifyContent: 'center' },
+  successTitle: { fontSize: FS.subheading, color: t.textPrimary },
+  successSub:   { fontSize: FS.body, color: t.textSecondary, textAlign: 'center', lineHeight: LH.body, maxWidth: 260 },
 });

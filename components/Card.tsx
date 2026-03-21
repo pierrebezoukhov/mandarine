@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, FS, FW, LH, LS } from '@/theme/tokens';
+import { FS, FW, LH, LS } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 type CardVariant = 'primary' | 'secondary';
 
@@ -24,6 +27,9 @@ export function Card({
   disabled = false,
   style,
 }: CardProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <TouchableOpacity
       style={[
@@ -50,12 +56,12 @@ export function Card({
       </View>
 
       {/* Arrow */}
-      {!disabled && <Text style={s.arrow}>→</Text>}
+      {!disabled && <Text style={s.arrow}>{'\u2192'}</Text>}
     </TouchableOpacity>
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   base: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -66,12 +72,12 @@ const s = StyleSheet.create({
   },
 
   variantPrimary: {
-    backgroundColor: T.accentDim,
-    borderColor: 'rgba(192,57,43,0.25)',
+    backgroundColor: t.inkRedGlow,
+    borderColor: t.inkRedDim,
   },
   variantSecondary: {
-    backgroundColor: T.surface,
-    borderColor: T.border,
+    backgroundColor: t.bgCard,
+    borderColor: t.border,
   },
   disabled: { opacity: 0.45 },
 
@@ -79,22 +85,22 @@ const s = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: 'rgba(192,57,43,0.18)',
+    backgroundColor: t.inkRedGlow,
     borderWidth: 1,
-    borderColor: 'rgba(192,57,43,0.3)',
+    borderColor: t.inkRedDim,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconBoxMuted: {
-    backgroundColor: T.surface2,
-    borderColor: T.border,
+    backgroundColor: t.bgCard2,
+    borderColor: t.border,
   },
-  iconText:     { fontSize: FS.subheading, color: T.textPrimary, letterSpacing: LS.tight * FS.subheading },
-  iconTextMuted:{ color: T.textMuted },
+  iconText:     { fontSize: FS.subheading, color: t.textPrimary, letterSpacing: LS.tight * FS.subheading },
+  iconTextMuted:{ color: t.textSecondary },
 
   body:     { flex: 1 },
-  title:    { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium, marginBottom: 3 },
-  subtitle: { fontSize: FS.label, color: T.textMuted, lineHeight: LH.label },
-  textMuted:{ color: T.textMuted },
-  arrow:    { fontSize: FS.ui, color: T.textSecondary },
+  title:    { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.medium, marginBottom: 3 },
+  subtitle: { fontSize: FS.label, color: t.textSecondary, lineHeight: LH.label },
+  textMuted:{ color: t.textSecondary },
+  arrow:    { fontSize: FS.ui, color: t.textSecondary },
 });

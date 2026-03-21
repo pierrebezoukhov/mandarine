@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, SafeAreaView,
   TouchableOpacity, ActivityIndicator, Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO, FS, FW } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { MONO, FS, FW } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Avatar } from '@/components/Avatar';
 import { StatCard } from '@/components/StatCard';
@@ -36,6 +38,8 @@ function pct(n: number): string {
 
 export default function ProfileScreen() {
   const { user } = useAuth();
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
 
   const [profile,   setProfile]   = useState<Profile | null>(null);
   const [stats,     setStats]     = useState<ProgressStats | null>(null);
@@ -113,7 +117,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.root}>
-        <ActivityIndicator color={T.accent} style={{ flex: 1 }} />
+        <ActivityIndicator color={colors.inkRed} style={{ flex: 1 }} />
       </SafeAreaView>
     );
   }
@@ -149,7 +153,7 @@ export default function ProfileScreen() {
               onPress={pickAvatar}
             />
             {uploading
-              ? <ActivityIndicator size="small" color={T.textMuted} style={s.editBadge} />
+              ? <ActivityIndicator size="small" color={colors.textSecondary} style={s.editBadge} />
               : <View style={s.editBadge} pointerEvents="none">
                   <Text style={s.editIcon}>✎</Text>
                 </View>
@@ -242,8 +246,8 @@ export default function ProfileScreen() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: T.bg },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  root: { flex: 1, backgroundColor: t.bg },
 
   header: {
     flexDirection: 'row',
@@ -254,8 +258,8 @@ const s = StyleSheet.create({
     paddingBottom: space.sm,
   },
   headerBtn:   { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
-  backText:    { fontSize: FS.body, color: T.textSecondary },
-  title:       { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
+  backText:    { fontSize: FS.body, color: t.textSecondary },
+  title:       { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
   settingsIcon: { fontSize: FS.subheading, textAlign: 'right' },
 
   scroll: { paddingHorizontal: space.xl, paddingBottom: space.giant },
@@ -269,13 +273,13 @@ const s = StyleSheet.create({
     width:           26,
     height:          26,
     borderRadius:    13,
-    backgroundColor: T.surface2,
+    backgroundColor: t.bgCard2,
     borderWidth:     1,
-    borderColor:     T.border,
+    borderColor:     t.border,
     alignItems:      'center',
     justifyContent:  'center',
   },
-  editIcon: { fontSize: 11, color: T.textSecondary, lineHeight: 14 },
+  editIcon: { fontSize: 11, color: t.textSecondary, lineHeight: 14 },
 
   grid:    { flexDirection: 'row', gap: 10 },
   gridGap: { marginTop: 10 },
@@ -289,13 +293,13 @@ const s = StyleSheet.create({
   },
   hskLabel: {
     fontSize: FS.label,
-    color: T.textMuted,
+    color: t.textSecondary,
     fontFamily: MONO,
     width: 44,
   },
 
   sessionRow: { paddingVertical: space.md },
-  sessionDivider: { borderBottomWidth: 1, borderBottomColor: T.border },
-  sessionDeck: { fontSize: FS.body, color: T.textPrimary, marginBottom: space.xs },
-  sessionMeta: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
+  sessionDivider: { borderBottomWidth: 1, borderBottomColor: t.border },
+  sessionDeck: { fontSize: FS.body, color: t.textPrimary, marginBottom: space.xs },
+  sessionMeta: { fontSize: FS.label, color: t.textSecondary, fontFamily: MONO },
 });

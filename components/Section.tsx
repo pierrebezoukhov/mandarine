@@ -1,6 +1,9 @@
+import { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { ReactNode } from 'react';
-import { T, FS, LS } from '@/theme/tokens';
+import { FS, LS } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface SectionProps {
   label: string;
@@ -9,6 +12,9 @@ interface SectionProps {
 }
 
 export function Section({ label, children, style }: SectionProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={[s.wrap, style]}>
       <Text style={s.label}>{label}</Text>
@@ -17,12 +23,12 @@ export function Section({ label, children, style }: SectionProps) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   wrap:  { marginBottom: 28 },
   label: {
     fontSize: FS.label,
     letterSpacing: LS.loose * FS.label,
-    color: T.textMuted,
+    color: t.textFaint,
     marginBottom: 10,
     textTransform: 'uppercase',
   },

@@ -1,9 +1,11 @@
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 import {
   Modal, View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { T, FS, FW } from '@/theme/tokens';
+import { FS, FW } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
 import { useResponsive } from '@/hooks/useResponsive';
+import { ColorTheme } from '@/theme/colors';
 
 interface BottomSheetModalProps {
   visible: boolean;
@@ -14,6 +16,8 @@ interface BottomSheetModalProps {
 
 export function BottomSheetModal({ visible, onClose, title, children }: BottomSheetModalProps) {
   const { isDesktop } = useResponsive();
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
 
   return (
     <Modal
@@ -48,7 +52,7 @@ export function BottomSheetModal({ visible, onClose, title, children }: BottomSh
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
   overlayDesktop: { justifyContent: 'center', alignItems: 'center' },
   backdrop: {
@@ -57,7 +61,7 @@ const s = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: T.surface,
+    backgroundColor: t.bgCard,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
@@ -73,7 +77,7 @@ const s = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: T.border,
+    backgroundColor: t.border,
     alignSelf: 'center',
     marginTop: 12,
     marginBottom: 4,
@@ -85,6 +89,6 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
   },
-  title: { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
-  done:  { fontSize: FS.body, color: T.accent, fontWeight: FW.medium },
+  title: { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
+  done:  { fontSize: FS.body, color: t.inkRed, fontWeight: FW.medium },
 });

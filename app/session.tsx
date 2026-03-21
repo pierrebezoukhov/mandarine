@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
   Animated, ActivityIndicator, Platform, ScrollView, useWindowDimensions,
@@ -6,11 +6,14 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, MONO, MONO_MEDIUM, SERIF, FS, FW, LH, LS } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { MONO, MONO_MEDIUM, SERIF, FS, FW, LH, LS } from '@/theme/tokens';
 import { space, radius } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
+import { Scanlines } from '@/components/Scanlines';
 import type { SessionConfig } from './session-setup';
 import {
   fetchCardsForSession, loadResumeState,
@@ -24,6 +27,8 @@ import {
 function SessionComplete({ got, forgot, total, onRestart }: {
   got: number; forgot: number; total: number; onRestart: () => void;
 }) {
+  const { colors } = useTheme();
+  const sc = useMemo(() => makeCompleteStyles(colors), [colors]);
   const pct = total > 0 ? Math.round((got / total) * 100) : 0;
   return (
     <SafeAreaView style={sc.root}>
@@ -34,12 +39,12 @@ function SessionComplete({ got, forgot, total, onRestart }: {
 
       <View style={sc.stats}>
         <View style={sc.stat}>
-          <Text style={[sc.statVal, { color: T.success }]}>{got}</Text>
+          <Text style={[sc.statVal, { color: colors.green }]}>{got}</Text>
           <Text style={sc.statLabel}>GOT IT</Text>
         </View>
         <Text style={sc.statSep}>·</Text>
         <View style={sc.stat}>
-          <Text style={[sc.statVal, { color: T.error }]}>{forgot}</Text>
+          <Text style={[sc.statVal, { color: colors.redBtn }]}>{forgot}</Text>
           <Text style={sc.statLabel}>FORGOT</Text>
         </View>
       </View>
@@ -64,24 +69,9 @@ function SessionComplete({ got, forgot, total, onRestart }: {
   );
 }
 
-// ── Web-only scanline overlay ──────────────────────────────────────────────────
-function Scanlines({ color = 'rgba(255,240,200,0.018)', gap = 3 }: { color?: string; gap?: number }) {
-  if (Platform.OS !== 'web') return null;
-  return (
-    <View
-      pointerEvents="none"
-      style={{
-        ...StyleSheet.absoluteFillObject,
-        zIndex: 1,
-        // @ts-expect-error — web-only CSS property
-        backgroundImage: `repeating-linear-gradient(0deg, ${color} 0px, ${color} 1px, transparent 1px, transparent ${gap + 1}px)`,
-      }}
-    />
-  );
-}
-
 // ── Corner ornament ────────────────────────────────────────────────────────────
 function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
+  const { colors } = useTheme();
   const posStyle = {
     tl: { top: 10, left: 14 },
     tr: { top: 10, right: 14 },
@@ -90,7 +80,13 @@ function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
   }[position];
 
   return (
-    <Text style={[s.cornerOrnament, posStyle]}>+</Text>
+    <Text style={[{
+      position: 'absolute',
+      fontFamily: MONO,
+      fontSize: 10,
+      color: colors.inkRedDim,
+      opacity: 0.5,
+    }, posStyle]}>+</Text>
   );
 }
 
@@ -98,6 +94,8 @@ function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
 function BlurredExample({ pinyin, meaning, revealed, onReveal }: {
   pinyin?: string; meaning?: string; revealed: boolean; onReveal: () => void;
 }) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   return (
     <TouchableOpacity onPress={onReveal} activeOpacity={0.8}>
       <View style={s.blurWrapper}>
@@ -144,12 +142,19 @@ export default function SessionScreen() {
   const cardMaxHeight = windowHeight - 252;
 
   const { user }        = useAuth();
+  const { colors, isDark } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const startedAt       = useRef<string>(new Date().toISOString());
   const sessionConfig   = useRef<SessionConfig | null>(null);
 
   const cardAnim = useRef(new Animated.Value(0)).current;
   const flashAnim = useRef(new Animated.Value(0)).current;
   const flashColor = useRef<'got' | 'forgot' | null>(null);
+
+  // Stagger animations for content reveal
+  const pinyinAnim = useRef(new Animated.Value(0)).current;
+  const meaningAnim = useRef(new Animated.Value(0)).current;
+  const hintAnim = useRef(new Animated.Value(0)).current;
 
   // Load session: resume from saved state (DB first, then AsyncStorage) OR fetch fresh
   useEffect(() => {
@@ -230,7 +235,27 @@ export default function SessionScreen() {
   const handleTap = useCallback(() => {
     setReveal(r => {
       const next = Math.min(r + 1, 2);
-      if (next === 2) setHintOpen(true);
+      if (next === 1) {
+        // Stagger: animate pinyin in
+        pinyinAnim.setValue(0);
+        Animated.spring(pinyinAnim, {
+          toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
+        }).start();
+      }
+      if (next === 2) {
+        // Stagger: animate meaning, then hint block
+        meaningAnim.setValue(0);
+        hintAnim.setValue(0);
+        Animated.stagger(80, [
+          Animated.spring(meaningAnim, {
+            toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
+          }),
+          Animated.spring(hintAnim, {
+            toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
+          }),
+        ]).start();
+        setHintOpen(true);
+      }
       return next;
     });
   }, []);
@@ -280,6 +305,9 @@ export default function SessionScreen() {
         if (isLast) { setDone(true); }
         else {
           flashAnim.setValue(0);  // kill leftover flash before new card
+          pinyinAnim.setValue(0);
+          meaningAnim.setValue(0);
+          hintAnim.setValue(0);
           setIdx(nextIdx);
           setReveal(0);
           setHintOpen(false);
@@ -302,6 +330,7 @@ export default function SessionScreen() {
     AsyncStorage.removeItem(RESUME_SESSION_KEY);
     if (user?.id) deleteResumeSession(user.id);  // fire-and-forget
     setCards(c => [...c].sort(() => Math.random() - 0.5));
+    pinyinAnim.setValue(0); meaningAnim.setValue(0); hintAnim.setValue(0);
     setIdx(0); setReveal(0); setResults({}); setDone(false);
     setHintOpen(false); setTranslationRevealed(false);
   }, [user?.id]);
@@ -310,16 +339,16 @@ export default function SessionScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[s.root, s.centered]}>
-        <ActivityIndicator color={T.accent} size="large" />
+        <ActivityIndicator color={colors.inkRed} size="large" />
       </SafeAreaView>
     );
   }
   if (error) {
     return (
       <SafeAreaView style={[s.root, s.centered, { paddingHorizontal: 32 }]}>
-        <Text style={{ color: T.error, fontSize: FS.ui, textAlign: 'center' }}>{error}</Text>
+        <Text style={{ color: colors.inkRedText, fontSize: FS.ui, textAlign: 'center' }}>{error}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 24 }}>
-          <Text style={{ color: T.textMuted }}>← Go back</Text>
+          <Text style={{ color: colors.textSecondary }}>← Go back</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -340,10 +369,11 @@ export default function SessionScreen() {
 
   const card      = cards[idx];
   const cardScale = cardAnim.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] });
+  const cardTranslateY = cardAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] });
 
   return (
     <SafeAreaView style={s.root}>
-      <Scanlines />
+      <Scanlines color={colors.scanline} />
       <ResponsiveShell maxWidth={640}>
 
       {/* Top bar */}
@@ -376,7 +406,7 @@ export default function SessionScreen() {
 
       {/* Card */}
       <Animated.View
-        style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }] }]}
+        style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }, { translateY: cardTranslateY }] }]}
       >
         <TouchableOpacity
           style={[s.cardTouchable, compact && { paddingBottom: 8 }]}
@@ -384,7 +414,7 @@ export default function SessionScreen() {
         >
           {/* Card container */}
           <View style={[s.cardContainer, { maxHeight: cardMaxHeight }]}>
-            <Scanlines color="rgba(255,240,200,0.012)" gap={4} />
+            <Scanlines color={colors.scanline} gap={4} />
 
             {/* Corner ornaments */}
             <CornerOrnament position="tl" />
@@ -407,22 +437,38 @@ export default function SessionScreen() {
               adjustsFontSizeToFit numberOfLines={1}
             >{card.hanzi}</Text>
 
-            {/* Stage 1: Pinyin + audio icon — always rendered, opacity-controlled */}
-            <View style={[s.pinyinRow, reveal < 1 && { opacity: 0 }]}>
+            {/* Stage 1: Pinyin + audio icon — spring-animated reveal */}
+            <Animated.View style={[s.pinyinRow, {
+              opacity: reveal >= 1 ? pinyinAnim : 0,
+              transform: [{ translateY: reveal >= 1
+                ? pinyinAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
+                : 10 }],
+            }]}>
               <Text style={s.pinyinText}>{card.pinyin}</Text>
               <Text style={s.pinyinAudio}>♪</Text>
-            </View>
+            </Animated.View>
 
-            {/* Stage 2: POS + definition */}
-            <View style={[s.meaningBlock, reveal < 2 && { opacity: 0 }]}>
+            {/* Stage 2: POS + definition — staggered reveal */}
+            <Animated.View style={[s.meaningBlock, {
+              opacity: reveal >= 2 ? meaningAnim : 0,
+              transform: [{ translateY: reveal >= 2
+                ? meaningAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
+                : 10 }],
+            }]}>
               <View style={s.divider} />
               {card.part_of_speech && <Text style={s.posTag}>{card.part_of_speech}</Text>}
               <Text style={s.meaningText}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
-            </View>
+            </Animated.View>
 
-            {/* Stage 3: Example sentence (collapsible hint block) */}
+            {/* Stage 3: Example sentence (collapsible hint block) — staggered */}
             {card._example && (
-              <View style={[s.hintBlock, reveal < 2 && { opacity: 0, pointerEvents: 'none' as const }]}>
+              <Animated.View style={[s.hintBlock, {
+                opacity: reveal >= 2 ? hintAnim : 0,
+                transform: [{ translateY: reveal >= 2
+                  ? hintAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
+                  : 10 }],
+                pointerEvents: reveal < 2 ? 'none' as const : 'auto' as const,
+              }]}>
                 <TouchableOpacity
                   style={s.hintTrigger}
                   onPress={(e) => { e.stopPropagation(); setHintOpen(o => !o); }}
@@ -444,7 +490,7 @@ export default function SessionScreen() {
                       onReveal={() => setTranslationRevealed(true)}
                     />
                   </View>
-              </View>
+              </Animated.View>
             )}
 
             {/* Tap hint — inside card surface */}
@@ -453,7 +499,7 @@ export default function SessionScreen() {
             </Text>
             </ScrollView>
 
-            {/* Feedback flash — outline only */}
+            {/* Feedback flash — outline + glow */}
             <Animated.View
               pointerEvents="none"
               style={[
@@ -461,9 +507,14 @@ export default function SessionScreen() {
                 {
                   borderWidth: 2,
                   borderColor: flashColor.current === 'got'
-                    ? T.successBright
-                    : T.errorBright,
+                    ? colors.greenBright
+                    : colors.inkRedText,
                   opacity: flashAnim,
+                  ...(Platform.OS === 'web' ? {
+                    boxShadow: flashColor.current === 'got'
+                      ? `0 0 30px rgba(${isDark ? '79,168,88' : '58,138,66'},0.5), inset 0 0 20px rgba(${isDark ? '79,168,88' : '58,138,66'},0.15)`
+                      : `0 0 30px rgba(${isDark ? '200,56,42' : '184,48,30'},0.5), inset 0 0 20px rgba(${isDark ? '200,56,42' : '184,48,30'},0.15)`,
+                  } as any : {}),
                 },
               ]}
             />
@@ -478,8 +529,9 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnForgot,
             hoveredBtn === 'forgot' && {
-              backgroundColor: 'rgba(200,56,42,0.22)',
-              borderColor: T.errorBright,
+              backgroundColor: isDark ? 'rgba(122,30,20,0.25)' : 'rgba(184,48,30,0.16)',
+              borderColor: colors.inkRed,
+              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.inkRedGlow}` } as any : {}),
             },
           ]}
           onPress={() => rate('forgot')}
@@ -489,9 +541,9 @@ export default function SessionScreen() {
             onMouseLeave: () => setHoveredBtn(null),
           } as any : {})}
         >
-          <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
+          <Scanlines color={colors.scanline} gap={4} />
           <Text style={[s.rateBtnIcon, {
-            color: hoveredBtn === 'forgot' ? T.errorBright : T.error,
+            color: hoveredBtn === 'forgot' ? colors.inkRed : colors.inkRedDim,
             fontSize: 18,
           }]}>×</Text>
         </TouchableOpacity>
@@ -500,8 +552,9 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnGot,
             hoveredBtn === 'got' && {
-              backgroundColor: 'rgba(79,168,88,0.22)',
-              borderColor: T.successBright,
+              backgroundColor: isDark ? 'rgba(58,122,68,0.25)' : 'rgba(45,110,56,0.16)',
+              borderColor: colors.greenBright,
+              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px rgba(${isDark ? '58,122,68' : '45,110,56'},0.2)` } as any : {}),
             },
           ]}
           onPress={() => rate('got')}
@@ -511,9 +564,9 @@ export default function SessionScreen() {
             onMouseLeave: () => setHoveredBtn(null),
           } as any : {})}
         >
-          <Scanlines color="rgba(255,255,255,0.04)" gap={4} />
+          <Scanlines color={colors.scanline} gap={4} />
           <Text style={[s.rateBtnIcon, {
-            color: hoveredBtn === 'got' ? T.successBright : T.success,
+            color: hoveredBtn === 'got' ? colors.greenBright : colors.green,
           }]}>✓</Text>
         </TouchableOpacity>
       </View>
@@ -524,8 +577,8 @@ export default function SessionScreen() {
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
-const s = StyleSheet.create({
-  root:    { flex: 1, backgroundColor: T.bgDeep },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  root:    { flex: 1, backgroundColor: t.bg },
   centered:{ alignItems: 'center', justifyContent: 'center' },
 
   topbar: {
@@ -534,17 +587,17 @@ const s = StyleSheet.create({
   },
   iconBtn:         { padding: space.sm, borderRadius: 8 },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: 18, fontFamily: MONO, letterSpacing: LS.tighter * 18, color: T.textMuted },
+  iconBtnText:     { fontSize: 18, fontFamily: MONO, letterSpacing: LS.tighter * 18, color: t.textSecondary },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
   scoreItem:   { fontFamily: MONO, fontSize: FS.label, fontWeight: FW.medium },
-  scoreForgot: { color: T.errorMuted },
-  scoreGot:    { color: T.success },
-  scorePending:{ color: T.textFaint },
-  scoreSep:    { color: T.textFaint, fontSize: 10 },
+  scoreForgot: { color: t.inkRedDim },
+  scoreGot:    { color: t.green },
+  scorePending:{ color: t.textFaint },
+  scoreSep:    { color: t.textFaint, fontSize: 10 },
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
@@ -555,9 +608,9 @@ const s = StyleSheet.create({
   // Card container — explicit bordered box
   cardContainer: {
     width: '100%', maxWidth: 340,
-    backgroundColor: T.surfaceCard,
+    backgroundColor: t.bgCard,
     borderWidth: 1.5,
-    borderColor: T.border,
+    borderColor: t.border,
     paddingHorizontal: space.xxl,
     paddingTop: 28,
     paddingBottom: space.lg,
@@ -565,27 +618,18 @@ const s = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     // Outer shadow (cross-platform)
-    shadowColor: '#000',
+    shadowColor: t.cardShadow,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 1,
     shadowRadius: 32,
     elevation: 12,
-  },
-
-  // Corner ornaments
-  cornerOrnament: {
-    position: 'absolute',
-    fontFamily: MONO,
-    fontSize: 10,
-    color: T.textFaint,
-    opacity: 0.5,
   },
 
   hskBadge: {
     position: 'absolute', top: 10, right: 14,
   },
   hskBadgeText: {
-    fontFamily: MONO, fontSize: 9, color: T.textFaint,
+    fontFamily: MONO, fontSize: 9, color: t.textFaint,
     letterSpacing: 1.5, opacity: 0.6,
   },
 
@@ -594,12 +638,12 @@ const s = StyleSheet.create({
     fontFamily: SERIF,
     fontSize: FS.hanzi,
     fontWeight: FW.light,
-    color: T.textHanzi,
+    color: t.textHanzi,
     lineHeight: LH.hanzi,
     letterSpacing: LS.tighter * FS.hanzi,
     textAlign: 'center',
     maxWidth: '100%',
-    textShadowColor: 'rgba(232,224,208,0.12)',
+    textShadowColor: t.inkRedGlow,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 40,
     marginBottom: space.xl,
@@ -611,31 +655,31 @@ const s = StyleSheet.create({
     marginBottom: space.lg,
   },
   pinyinText: {
-    fontFamily: MONO, fontSize: 18, letterSpacing: LS.loose * 18,
-    color: T.errorBright, fontStyle: 'italic', opacity: 0.9,
-    textShadowColor: 'rgba(200,56,42,0.18)',
+    fontFamily: MONO, fontSize: 18, letterSpacing: LS.wider * 18,
+    color: t.inkRedText, fontStyle: 'italic', opacity: 0.9,
+    textShadowColor: t.inkRedGlow,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 12,
   },
   pinyinAudio: {
-    fontSize: 12, color: T.textFaint, opacity: 0.6,
+    fontSize: 12, color: t.textFaint, opacity: 0.6,
   },
 
   // Divider
   divider: {
     width: '100%', height: 1,
-    backgroundColor: T.border, marginBottom: space.lg,
+    backgroundColor: t.border, marginBottom: space.lg,
   },
 
   // Meaning block (POS + definition)
   meaningBlock: { width: '100%', alignItems: 'flex-start', marginBottom: space.lg },
   posTag: {
     fontFamily: MONO, fontSize: 10,
-    color: T.textFaint, letterSpacing: 2, textTransform: 'uppercase',
+    color: t.textFaint, letterSpacing: 2, textTransform: 'uppercase',
     marginBottom: space.xs,
   },
   meaningText: {
-    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: T.textSecondary,
+    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: t.textSecondary,
     lineHeight: 22, letterSpacing: 0.5,
   },
 
@@ -643,8 +687,8 @@ const s = StyleSheet.create({
   hintBlock: {
     width: '100%',
     borderWidth: 1,
-    borderColor: 'rgba(30,28,24,1)',
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderColor: t.borderDim,
+    backgroundColor: t.bgCard2,
     overflow: 'hidden',
   },
   hintTrigger: {
@@ -653,10 +697,10 @@ const s = StyleSheet.create({
   },
   hintLabel: {
     flex: 1, fontFamily: MONO, fontSize: 10,
-    letterSpacing: LS.loose * 10, color: T.textFaint, textTransform: 'uppercase',
+    letterSpacing: LS.widest * 10, color: t.textFaint, textTransform: 'uppercase',
   },
   hintIcon: {
-    fontFamily: MONO, fontSize: 10, color: T.textFaint,
+    fontFamily: MONO, fontSize: 10, color: t.textFaint,
   },
   hintIconOpen: {
     transform: [{ rotate: '180deg' }],
@@ -665,19 +709,19 @@ const s = StyleSheet.create({
     paddingHorizontal: space.md, paddingBottom: space.md,
   },
   hintDivider: {
-    height: 1, backgroundColor: 'rgba(30,28,24,1)', marginBottom: space.sm,
+    height: 1, backgroundColor: t.borderDim, marginBottom: space.sm,
   },
   hintHanzi: {
-    fontFamily: SERIF, fontSize: FS.pinyin, color: T.textPrimary,
+    fontFamily: SERIF, fontSize: FS.pinyin, color: t.textPrimary,
     lineHeight: LH.pinyin, letterSpacing: 1, marginBottom: space.sm,
   },
   hintPinyin: {
-    fontFamily: MONO, fontSize: 11, color: T.textSecondary,
-    fontStyle: 'italic', letterSpacing: LS.loose * 11, lineHeight: 17,
+    fontFamily: MONO, fontSize: 11, color: t.inkRedText,
+    fontStyle: 'italic', letterSpacing: LS.wider * 11, lineHeight: 17,
     marginBottom: space.xs,
   },
   hintTranslation: {
-    fontFamily: MONO, fontSize: 10, color: T.textMuted,
+    fontFamily: MONO, fontSize: 10, color: t.textSecondary,
     letterSpacing: 0.5, lineHeight: 16,
   },
 
@@ -689,14 +733,14 @@ const s = StyleSheet.create({
   },
   blurLabelText: {
     fontFamily: MONO, fontSize: 9, letterSpacing: 3,
-    color: T.textFaint, textTransform: 'uppercase',
+    color: t.textFaint, textTransform: 'uppercase',
   },
 
   // Tap hint (inside card surface)
   tapHint: {
     marginTop: space.md,
-    fontFamily: MONO, fontSize: 9, color: T.textFaint,
-    letterSpacing: LS.loose * 9, textTransform: 'uppercase',
+    fontFamily: MONO, fontSize: 9, color: t.textFaint,
+    letterSpacing: LS.extreme * 9, textTransform: 'uppercase',
   },
 
   // Rating buttons — square-ish with text labels
@@ -711,40 +755,42 @@ const s = StyleSheet.create({
     borderWidth: 1,
     position: 'relative',
     overflow: 'hidden',
-    ...(Platform.OS === 'web' ? { transition: 'background-color 150ms, border-color 150ms' } as any : {}),
+    ...(Platform.OS === 'web' ? { transition: 'background-color 150ms, border-color 150ms, box-shadow 200ms' } as any : {}),
   },
   rateBtnForgot: {
-    backgroundColor: T.errorDim,
-    borderColor: 'rgba(154,48,48,0.6)',
+    backgroundColor: t.inkRedGlow,
+    borderColor: t.inkRedDim,
   },
   rateBtnGot: {
-    backgroundColor: 'rgba(58,122,68,0.12)',
-    borderColor: 'rgba(58,122,68,0.6)',
+    backgroundColor: t.green === '#3a7a44'
+      ? 'rgba(58,122,68,0.12)'     // dark
+      : 'rgba(45,110,56,0.08)',     // light
+    borderColor: t.green,
   },
   rateBtnIcon: { fontSize: 20 },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
-const sc = StyleSheet.create({
+const makeCompleteStyles = (t: ColorTheme) => StyleSheet.create({
   root: {
-    flex: 1, backgroundColor: T.bgDeep,
+    flex: 1, backgroundColor: t.bg,
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
-  seal:      { fontSize: FS.seal, color: T.accent, opacity: 0.3, marginBottom: space.xxxl },
-  title:     { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tight * FS.title },
-  sub:       { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1, marginBottom: 40 },
+  seal:      { fontSize: FS.seal, color: t.inkRed, opacity: 0.3, marginBottom: space.xxxl },
+  title:     { fontSize: FS.title, color: t.textPrimary, fontWeight: FW.semibold, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tight * FS.title },
+  sub:       { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, letterSpacing: 1, marginBottom: 40 },
 
   stats:     { flexDirection: 'row', alignItems: 'center', gap: space.xxl, marginBottom: 32 },
   stat:      { alignItems: 'center' },
   statVal:   { fontSize: FS.score, lineHeight: LH.score, marginBottom: 6, letterSpacing: LS.tighter * FS.score },
-  statLabel: { fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 },
-  statSep:   { color: T.textMuted, fontSize: FS.subheading },
+  statLabel: { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, letterSpacing: 1.5 },
+  statSep:   { color: t.textSecondary, fontSize: FS.subheading },
 
   pctBadge: {
-    borderWidth: 1, borderColor: T.border, borderRadius: 100,
+    borderWidth: 1, borderColor: t.border, borderRadius: 100,
     paddingHorizontal: space.xl, paddingVertical: space.sm, marginBottom: space.giant,
   },
-  pctText: { fontFamily: MONO, fontSize: FS.body, color: T.textMuted, letterSpacing: 1 },
+  pctText: { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary, letterSpacing: 1 },
 
   actions: { width: '100%', maxWidth: 280, gap: 10 },
 });

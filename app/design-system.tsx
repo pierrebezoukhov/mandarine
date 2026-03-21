@@ -1,8 +1,11 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, useMemo, ReactNode } from 'react';
 import {
-  ScrollView, View, Text, StyleSheet, TouchableOpacity,
+  ScrollView, View, Text, StyleSheet, TouchableOpacity, ViewStyle, TextStyle,
 } from 'react-native';
-import { T, MONO, FS, FSDisplay, FSBody, LH, LS, FW } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { MONO, FS, FSDisplay, FSBody, LH, LS, FW } from '@/theme/tokens';
+import { Icon } from '@/theme/icons';
 import { space, radius } from '@/theme/spacing';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -17,10 +20,17 @@ import { Avatar } from '@/components/Avatar';
 import { BottomSheetModal } from '@/components/BottomSheetModal';
 
 // ── Nav anchors ───────────────────────────────────────────────────────────────
-const NAV_ITEMS = ['Colors', 'Typography', 'Rules', 'Spacing', 'Components', 'Examples'] as const;
+const NAV_ITEMS = ['Colors', 'Typography', 'Icons', 'Rules', 'Spacing', 'Components', 'Examples'] as const;
 
 
 export default function DesignSystemScreen() {
+  const { colors } = useTheme();
+  const t = useMemo(() => makeStyles(colors), [colors]);
+  const d = useMemo(() => makeDocStyles(colors), [colors]);
+  const c = useMemo(() => makeComponentStyles(colors), [colors]);
+  const r = useMemo(() => makeRuleStyles(colors), [colors]);
+  const e = useMemo(() => makeExampleStyles(colors), [colors]);
+
   // TabSwitcher demo state
   const [activeTab, setActiveTab] = useState('overview');
   // Chip demo state
@@ -39,32 +49,39 @@ export default function DesignSystemScreen() {
   // Nav
   const [activeNav, setActiveNav]     = useState<typeof NAV_ITEMS[number]>('Colors');
 
+  // ── Annotation groups (need colors) ────────────────────────────────────────
+  const annotationGroups: { key: AnnotationCategory; label: string; dotColor: string }[] = useMemo(() => [
+    { key: 'role',      label: 'SEMANTIC ROLES',  dotColor: colors.green },
+    { key: 'token',     label: 'TOKENS',          dotColor: colors.inkRed },
+    { key: 'component', label: 'COMPONENTS',      dotColor: colors.textSecondary },
+  ], [colors]);
+
   return (
-    <View style={s.root}>
+    <View style={t.root}>
       {/* ── Fixed header ─────────────────────────────────────────────────── */}
-      <View style={s.header}>
-        <View style={s.headerTop}>
+      <View style={t.header}>
+        <View style={t.headerTop}>
           <View>
-            <Text style={s.logoHanzi}>漢字</Text>
-            <Text style={s.logoLabel}>MANDARINE</Text>
+            <Text style={t.logoHanzi}>漢字</Text>
+            <Text style={t.logoLabel}>MANDARINE</Text>
           </View>
-          <View style={s.headerMeta}>
-            <Text style={s.versionBadge}>v1.0</Text>
-            <Text style={s.headerDate}>Design System</Text>
+          <View style={t.headerMeta}>
+            <Text style={t.versionBadge}>v2.0</Text>
+            <Text style={t.headerDate}>Design System</Text>
           </View>
         </View>
 
         {/* Nav tabs */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.navScroll}>
-          <View style={s.nav}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={t.navScroll}>
+          <View style={t.nav}>
             {NAV_ITEMS.map(item => (
               <TouchableOpacity
                 key={item}
-                style={[s.navItem, activeNav === item && s.navItemActive]}
+                style={[t.navItem, activeNav === item && t.navItemActive]}
                 onPress={() => setActiveNav(item)}
                 activeOpacity={0.7}
               >
-                <Text style={[s.navText, activeNav === item && s.navTextActive]}>
+                <Text style={[t.navText, activeNav === item && t.navTextActive]}>
                   {item}
                 </Text>
               </TouchableOpacity>
@@ -74,53 +91,55 @@ export default function DesignSystemScreen() {
       </View>
 
       {/* ── Scrollable body ──────────────────────────────────────────────── */}
-      <ScrollView style={s.scroll} contentContainerStyle={s.content}>
+      <ScrollView style={t.scroll} contentContainerStyle={t.content}>
 
         {/* ════════════════════════════════════════════════════════════════
             COLORS
         ════════════════════════════════════════════════════════════════ */}
         {activeNav === 'Colors' && (
           <View>
-            <DocHeading>Color Palette</DocHeading>
-            <DocSubheading>
-              All colors live in{' '}
-              <Text style={s.codeInline}>theme/tokens.ts</Text> and are
-              exported as the{' '}
-              <Text style={s.codeInline}>T</Text> object. Never hardcode hex
-              values — always reference a token.
+            <DocHeading colors={colors}>Color Palette</DocHeading>
+            <DocSubheading colors={colors}>
+              All colors are defined in{' '}
+              <Text style={t.codeInline}>theme/colors.ts</Text> and accessed via{' '}
+              <Text style={t.codeInline}>useTheme()</Text>. Never hardcode hex
+              values — always reference a token from the{' '}
+              <Text style={t.codeInline}>colors</Text> object.
             </DocSubheading>
 
-            <ColorGroup label="BACKGROUNDS">
-              <Swatch token="T.bg"       hex="#131109"              label="bg"       usage="Screen backgrounds" />
-              <Swatch token="T.surface"  hex="#1E1B12"              label="surface"  usage="Cards, inputs, sheets" />
-              <Swatch token="T.surface2" hex="#252118"              label="surface2" usage="Progress tracks, nested surfaces" />
+            <ColorGroup label="PAPER SURFACE" colors={colors}>
+              <Swatch token="colors.bg"       colorValue={colors.bg}       label="bg"       usage="Screen backgrounds" colors={colors} />
+              <Swatch token="colors.bgCard"   colorValue={colors.bgCard}   label="bgCard"   usage="Cards, inputs, sheets" colors={colors} />
+              <Swatch token="colors.bgCard2"  colorValue={colors.bgCard2}  label="bgCard2"  usage="Progress tracks, nested surfaces" colors={colors} />
+              <Swatch token="colors.border"   colorValue={colors.border}   label="border"   usage="Default border on all elements" colors={colors} />
+              <Swatch token="colors.borderDim" colorValue={colors.borderDim} label="borderDim" usage="Subtle dividers, dimmed borders" colors={colors} />
+              <Swatch token="colors.scanline" colorValue={colors.scanline} label="scanline" usage="CRT scanline overlay" colors={colors} />
             </ColorGroup>
 
-            <ColorGroup label="BORDERS">
-              <Swatch token="T.border"      hex="rgba(255,248,220,0.08)" label="border"      usage="Default border on all elements" />
-              <Swatch token="T.borderFocus" hex="rgba(255,248,220,0.22)" label="borderFocus" usage="Input focus ring" />
+            <ColorGroup label="RED INK SYSTEM" colors={colors}>
+              <Swatch token="colors.inkRed"     colorValue={colors.inkRed}     label="inkRed"     usage="Primary CTAs, active underlines, brand accent" colors={colors} />
+              <Swatch token="colors.inkRedDim"   colorValue={colors.inkRedDim}   label="inkRedDim"   usage="Active chip/segment border, subdued accent" colors={colors} />
+              <Swatch token="colors.inkRedGlow"  colorValue={colors.inkRedGlow}  label="inkRedGlow"  usage="Active chip/segment fill, translucent accent" colors={colors} />
+              <Swatch token="colors.inkRedText"  colorValue={colors.inkRedText}  label="inkRedText"  usage="Pinyin text, hover/active accent text" colors={colors} />
             </ColorGroup>
 
-            <ColorGroup label="TEXT">
-              <Swatch token="T.textPrimary"   hex="#F0EBE0" label="textPrimary"   usage="Headings, active labels, card titles" />
-              <Swatch token="T.textSecondary" hex="#A09880" label="textSecondary" usage="Body text, secondary labels, back buttons" />
-              <Swatch token="T.textMuted"     hex="#928A78" label="textMuted"     usage="Section labels, placeholders, inactive states" />
-              <Swatch token="T.textHanzi"     hex="#F5F0E8" label="textHanzi"     usage="Large hanzi character on flashcards" />
+            <ColorGroup label="TEXT HIERARCHY" colors={colors}>
+              <Swatch token="colors.textPrimary"   colorValue={colors.textPrimary}   label="textPrimary"   usage="Headings, active labels, card titles" colors={colors} />
+              <Swatch token="colors.textSecondary" colorValue={colors.textSecondary} label="textSecondary" usage="Body text, secondary labels, back buttons" colors={colors} />
+              <Swatch token="colors.textFaint"     colorValue={colors.textFaint}     label="textFaint"     usage="Section labels, placeholders, inactive states" colors={colors} />
+              <Swatch token="colors.textHanzi"     colorValue={colors.textHanzi}     label="textHanzi"     usage="Large hanzi character on flashcards" colors={colors} />
             </ColorGroup>
 
-            <ColorGroup label="ACCENT">
-              <Swatch token="T.accent"       hex="#C0392B"              label="accent"       usage="Primary CTAs, active underlines, pinyin" />
-              <Swatch token="T.accentDim"    hex="rgba(192,57,43,0.12)" label="accentDim"    usage="Active chip / segment fill" />
-              <Swatch token="T.accentBorder" hex="rgba(192,57,43,0.28)" label="accentBorder" usage="Active chip / segment border" />
+            <ColorGroup label="SEMANTIC" colors={colors}>
+              <Swatch token="colors.green"        colorValue={colors.green}        label="green"        usage="Success states, 'got it' button" colors={colors} />
+              <Swatch token="colors.greenBright"   colorValue={colors.greenBright}   label="greenBright"   usage="Hover/active success" colors={colors} />
+              <Swatch token="colors.redBtn"        colorValue={colors.redBtn}        label="redBtn"        usage="Error states, 'forgot' button" colors={colors} />
+              <Swatch token="colors.redBtnBright"  colorValue={colors.redBtnBright}  label="redBtnBright"  usage="Hover/active error" colors={colors} />
             </ColorGroup>
 
-            <ColorGroup label="SEMANTIC">
-              <Swatch token="T.error"   hex="#9a3030" label="error"   usage="Error states, 'forgot' FAB" />
-              <Swatch token="T.errorDim" hex="rgba(154,48,48,0.12)" label="errorDim" usage="Error background fills" />
-              <Swatch token="T.errorMuted" hex="rgba(154,48,48,0.55)" label="errorMuted" usage="Subdued error text" />
-              <Swatch token="T.errorBright" hex="#e04030" label="errorBright" usage="Hover/active error, pinyin text" />
-              <Swatch token="T.success" hex="#3a7a44" label="success" usage="Success states, 'got it' FAB" />
-              <Swatch token="T.successBright" hex="#4fa858" label="successBright" usage="Hover/active success" />
+            <ColorGroup label="CARD SHADOWS" colors={colors}>
+              <Swatch token="colors.cardShadow"      colorValue={colors.cardShadow}      label="cardShadow"      usage="Card drop shadow" colors={colors} />
+              <Swatch token="colors.cardInsetShadow"  colorValue={colors.cardInsetShadow}  label="cardInsetShadow"  usage="Card inset shadow" colors={colors} />
             </ColorGroup>
           </View>
         )}
@@ -130,23 +149,23 @@ export default function DesignSystemScreen() {
         ════════════════════════════════════════════════════════════════ */}
         {activeNav === 'Typography' && (
           <View>
-            <DocHeading>Typography</DocHeading>
-            <DocSubheading>
+            <DocHeading colors={colors}>Typography</DocHeading>
+            <DocSubheading colors={colors}>
               Font sizes split into two named groups:{' '}
-              <Text style={s.codeInline}>FSDisplay</Text> and{' '}
-              <Text style={s.codeInline}>FSBody</Text>. The combined{' '}
-              <Text style={s.codeInline}>FS</Text> export keeps all existing
+              <Text style={t.codeInline}>FSDisplay</Text> and{' '}
+              <Text style={t.codeInline}>FSBody</Text>. The combined{' '}
+              <Text style={t.codeInline}>FS</Text> export keeps all existing
               references working. Line-heights in{' '}
-              <Text style={s.codeInline}>LH</Text>; letter-spacing rules in{' '}
-              <Text style={s.codeInline}>LS</Text>. Use{' '}
-              <Text style={s.codeInline}>MONO</Text> for pinyin, counters,
-              and fixed-width numeric display.
+              <Text style={t.codeInline}>LH</Text>; letter-spacing rules in{' '}
+              <Text style={t.codeInline}>LS</Text>. Use{' '}
+              <Text style={t.codeInline}>MONO</Text> for all UI text —
+              pinyin, counters, labels, and fixed-width numeric display.
             </DocSubheading>
 
             {/* Dual-scale reasoning */}
-            <View style={s.noItalicNote}>
-              <Text style={[s.lhNote, { marginBottom: space.sm }]}>
-                <Text style={{ color: T.textPrimary, fontWeight: FW.semibold }}>Dual-Scale Architecture</Text>
+            <View style={t.noItalicNote}>
+              <Text style={[t.lhNote, { marginBottom: space.sm }]}>
+                <Text style={{ color: colors.textPrimary, fontWeight: FW.semibold }}>Dual-Scale Architecture</Text>
                 {'\n\n'}The system uses two separate mathematical scales: Body (Major Third 1.250) for
                 flashcard text roles, and Display (Perfect Fourth 1.333) for screen headings.
                 A single scale cannot serve both pedagogical and navigational hierarchies — the
@@ -165,7 +184,7 @@ export default function DesignSystemScreen() {
                 px={FSDisplay.hanzi}
                 sample="漢"
                 usage={`Flashcard character — outside prose scale · LS.tighter: ${LS.tighter * FSDisplay.hanzi}px`}
-                color={T.textHanzi}
+                color={colors.textHanzi}
                 style={{ letterSpacing: LS.tighter * FSDisplay.hanzi }}
               />
               <TypeSpecimen
@@ -173,7 +192,7 @@ export default function DesignSystemScreen() {
                 px={FSDisplay.seal}
                 sample="印"
                 usage={`Session completion seal · LH.seal: ${LH.seal}px · LS.tighter: ${LS.tighter * FSDisplay.seal}px`}
-                color={T.accent}
+                color={colors.inkRed}
                 style={{ letterSpacing: LS.tighter * FSDisplay.seal }}
               />
               <TypeSpecimen
@@ -208,9 +227,9 @@ export default function DesignSystemScreen() {
             </Section>
 
             {/* Body scale reasoning */}
-            <View style={[s.noItalicNote, { marginTop: space.lg }]}>
-              <Text style={[s.lhNote, { marginBottom: 0 }]}>
-                <Text style={{ color: T.textPrimary, fontWeight: FW.semibold }}>Why Major Third (1.250)?</Text>
+            <View style={[t.noItalicNote, { marginTop: space.lg }]}>
+              <Text style={[t.lhNote, { marginBottom: 0 }]}>
+                <Text style={{ color: colors.textPrimary, fontWeight: FW.semibold }}>Why Major Third (1.250)?</Text>
                 {'\n\n'}Chinese characters read more dramatically than Latin text — what feels
                 "medium" in English feels large in Chinese because each glyph fills its full em
                 square. 1.250 was chosen because the bottom of the stack (13px) is the critical
@@ -229,7 +248,8 @@ export default function DesignSystemScreen() {
                 sample="zhōng guó"
                 usage={`Pinyin romanization · LH.pinyin: ${LH.pinyin}px · LS.normal: 0`}
                 family={MONO}
-                color={T.accent}
+                color={colors.inkRedText}
+                italic
               />
               <TypeSpecimen
                 token="FS.ui"
@@ -242,265 +262,301 @@ export default function DesignSystemScreen() {
                 token="FS.body"
                 px={FSBody.body}
                 sample="What would you like to do today?"
-                usage={`Body text, subtitles, secondary copy · LH.body: ${LH.body}px · LS.normal: 0`}
+                usage={`Body text, translations — base size · LH.body: ${LH.body}px · LS.normal: 0`}
               />
               <TypeSpecimen
                 token="FS.label"
                 px={FSBody.label}
                 sample="DIFFICULTY"
-                usage={`Section labels, hints, captions, badges · LH.label: ${LH.label}px · LS.normal: 0`}
+                usage={`Example sentences, captions, section labels · LH.label: ${LH.label}px · LS.normal: 0`}
+                style={{ textTransform: 'uppercase' }}
+              />
+              <TypeSpecimen
+                token="FS.scoreNumber"
+                px={FSBody.scoreNumber}
+                sample="12 / 20"
+                usage={`Score display numbers (weight 500) · LH.scoreNumber: ${LH.scoreNumber}px`}
+                family={MONO}
+                bold
+              />
+              <TypeSpecimen
+                token="FS.progress"
+                px={FSBody.progress}
+                sample="5 of 20"
+                usage={`Progress counter, example translation · LH.progress: ${LH.progress}px`}
+                family={MONO}
+              />
+              <TypeSpecimen
+                token="FS.micro"
+                px={FSBody.micro}
+                sample="Tap to reveal"
+                usage={`Tap hints — minimum legible size · LH.micro: ${LH.micro}px`}
+                family={MONO}
+              />
+              <TypeSpecimen
+                token="FS.buttonLabel"
+                px={FSBody.buttonLabel}
+                sample="WRONG"
+                usage={`Action button labels (Wrong, Right, Again) · LH.micro: ${LH.micro}px`}
+                family={MONO}
                 style={{ textTransform: 'uppercase' }}
               />
             </Section>
 
             {/* Line heights — reasoning + visuals */}
             <Section label="LINE HEIGHTS — LH">
-              <Text style={s.lhNote}>
+              <Text style={t.lhNote}>
                 Line height isn't a flat multiplier — it{' '}
-                <Text style={{ color: T.textPrimary }}>tapers</Text> as font
+                <Text style={{ color: colors.textPrimary }}>tapers</Text> as font
                 size grows. Small text gets generous leading (multi-line blocks
                 where the eye must track back). Large text gets tight leading
                 (single lines read in one pass). All values snap to a{' '}
-                <Text style={s.codeInline}>4px grid</Text> so baselines stay in
+                <Text style={t.codeInline}>4px grid</Text> so baselines stay in
                 rhythm when different sizes stack vertically.
               </Text>
 
               {/* ── Token table ──────────────────────────────────── */}
-              <Text style={s.lhSectionTitle}>Token reference</Text>
+              <Text style={t.lhSectionTitle}>Token reference</Text>
               {(
                 [
-                  { name: 'label',      fs: FS.label,      lh: LH.label,      mult: '×1.54' },
-                  { name: 'body',       fs: FS.body,       lh: LH.body,       mult: '×1.50' },
-                  { name: 'ui',         fs: FS.ui,         lh: LH.ui,         mult: '×1.50' },
-                  { name: 'pinyin',     fs: FS.pinyin,     lh: LH.pinyin,     mult: '×1.40' },
-                  { name: 'subheading', fs: FS.subheading, lh: LH.subheading, mult: '×1.33' },
-                  { name: 'heading',    fs: FS.heading,    lh: LH.heading,    mult: '×1.25' },
-                  { name: 'title',      fs: FS.title,      lh: LH.title,      mult: '×1.14' },
-                  { name: 'score',      fs: FS.score,      lh: LH.score,      mult: '×1.14' },
-                  { name: 'seal',       fs: FS.seal,       lh: LH.seal,       mult: '×1.12' },
-                  { name: 'hanzi',      fs: FS.hanzi,      lh: LH.hanzi,      mult: '×1.11' },
+                  { name: 'micro',       fs: FS.micro,      lh: LH.micro,       mult: '—' },
+                  { name: 'progress',    fs: FS.progress,   lh: LH.progress,    mult: '—' },
+                  { name: 'scoreNumber', fs: FS.scoreNumber, lh: LH.scoreNumber, mult: '×1.23' },
+                  { name: 'label',       fs: FS.label,      lh: LH.label,       mult: '×1.54' },
+                  { name: 'body',        fs: FS.body,       lh: LH.body,        mult: '×1.50' },
+                  { name: 'ui',          fs: FS.ui,         lh: LH.ui,          mult: '×1.50' },
+                  { name: 'pinyin',      fs: FS.pinyin,     lh: LH.pinyin,      mult: '×1.40' },
+                  { name: 'subheading',  fs: FS.subheading, lh: LH.subheading,  mult: '×1.33' },
+                  { name: 'heading',     fs: FS.heading,    lh: LH.heading,     mult: '×1.25' },
+                  { name: 'title',       fs: FS.title,      lh: LH.title,       mult: '×1.14' },
+                  { name: 'score',       fs: FS.score,      lh: LH.score,       mult: '×1.14' },
+                  { name: 'seal',        fs: FS.seal,       lh: LH.seal,        mult: '×1.12' },
+                  { name: 'hanzi',       fs: FS.hanzi,      lh: LH.hanzi,       mult: '×1.11' },
                 ] as const
               ).map(({ name, fs, lh, mult }) => (
-                <View key={name} style={s.lhRow}>
-                  <Text style={s.lhToken}>LH.{name}</Text>
-                  <Text style={s.lhValue}>{lh}px</Text>
-                  <Text style={s.lhFormula}>FS.{name} {fs}px {mult}</Text>
+                <View key={name} style={t.lhRow}>
+                  <Text style={t.lhToken}>LH.{name}</Text>
+                  <Text style={t.lhValue}>{lh}px</Text>
+                  <Text style={t.lhFormula}>FS.{name} {fs}px {mult}</Text>
                 </View>
               ))}
 
               {/* ── LH.hanzi — hero character ────────────────────── */}
-              <Text style={s.lhSectionTitle}>LH.hanzi — 80px (ratio 1.11)</Text>
-              <Text style={s.lhNote}>
-                The hero character sits in a tight bounding box with just 8px of air.
+              <Text style={t.lhSectionTitle}>LH.hanzi — 120px (ratio 1.11)</Text>
+              <Text style={t.lhNote}>
+                The hero character sits in a tight bounding box with just 12px of air.
                 Excess leading would push pinyin and supporting text further down,
                 wasting vertical space on compact screens. The character should feel
                 like it's floating in the card centre, not inside a text container.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>session.tsx — flashcard hero</Text>
-                <View style={s.lhDemoCentered}>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>session.tsx — flashcard hero</Text>
+                <View style={t.lhDemoCentered}>
                   <Text style={{
                     fontSize: FS.hanzi, lineHeight: LH.hanzi,
-                    color: T.textHanzi, letterSpacing: LS.tighter * FS.hanzi,
+                    color: colors.textHanzi, letterSpacing: LS.tighter * FS.hanzi,
                     textAlign: 'center',
                   }}>学</Text>
                   <Text style={{
                     fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: 3,
-                    color: T.accent, opacity: 0.85, marginTop: 18, textAlign: 'center',
+                    color: colors.inkRedText, fontStyle: 'italic',
+                    marginTop: 18, textAlign: 'center',
                   }}>xué</Text>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
-                    72px character in 80px line box — 8px air keeps pinyin close
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
+                    108px character in 120px line box — 12px air keeps pinyin close
                   </Text>
                 </View>
               </View>
 
               {/* ── LH.score — session complete ──────────────────── */}
-              <Text style={s.lhSectionTitle}>LH.score — 48px (ratio 1.14)</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>LH.score — 48px (ratio 1.14)</Text>
+              <Text style={t.lhNote}>
                 Large score numerics on the session completion screen. Single-line text
                 that should feel punchy and immediate. The tight 1.14 ratio keeps numbers
                 dense — they're not prose, they're results.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>session.tsx — completion scores</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>session.tsx — completion scores</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: space.xxl, paddingVertical: space.lg }}>
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{
                       fontSize: FS.score, lineHeight: LH.score, fontFamily: MONO,
-                      color: T.success, letterSpacing: LS.tighter * FS.score,
+                      color: colors.green, letterSpacing: LS.tighter * FS.score,
                     }}>12</Text>
-                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>GOT IT</Text>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5 }}>GOT IT</Text>
                   </View>
-                  <Text style={{ color: T.textMuted, fontSize: FS.subheading }}>·</Text>
+                  <Text style={{ color: colors.textFaint, fontSize: FS.subheading }}>{Icon.separator}</Text>
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{
                       fontSize: FS.score, lineHeight: LH.score, fontFamily: MONO,
-                      color: T.error, letterSpacing: LS.tighter * FS.score,
+                      color: colors.redBtn, letterSpacing: LS.tighter * FS.score,
                     }}>8</Text>
-                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>FORGOT</Text>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5 }}>FORGOT</Text>
                   </View>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     42px numerics in 48px line box — tight, confident, no excess air
                   </Text>
                 </View>
               </View>
 
               {/* ── LH.subheading — flashcard meaning ────────────── */}
-              <Text style={s.lhSectionTitle}>LH.subheading — 28px (ratio 1.33)</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>LH.subheading — 28px (ratio 1.33)</Text>
+              <Text style={t.lhNote}>
                 Used for the flashcard's revealed meaning and example sentence in
                 Chinese. These are short phrases, not paragraphs — tight leading keeps
                 the characters connected as a sentence rather than isolated glyphs.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>session.tsx — meaning + example</Text>
-                <View style={s.lhDemoCentered}>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>session.tsx — meaning + example</Text>
+                <View style={t.lhDemoCentered}>
                   <Text style={{
                     fontSize: FS.subheading, lineHeight: LH.subheading,
-                    color: T.textPrimary, textAlign: 'center',
+                    color: colors.textPrimary, textAlign: 'center',
                     letterSpacing: LS.tight * FS.subheading,
                   }}>to study, to learn</Text>
-                  <View style={{ width: 24, height: 1, backgroundColor: T.border, marginVertical: space.md, alignSelf: 'center' }} />
+                  <View style={{ width: 24, height: 1, backgroundColor: colors.border, marginVertical: space.md, alignSelf: 'center' }} />
                   <Text style={{
                     fontSize: FS.subheading, lineHeight: LH.subheading,
-                    color: '#C8BFA8', textAlign: 'center',
+                    color: colors.textSecondary, textAlign: 'center',
                   }}>我喜欢学习中文</Text>
                   <Text style={{
                     fontFamily: MONO, fontSize: FS.label,
-                    color: '#7A7060', textAlign: 'center', letterSpacing: 1, marginTop: 4,
+                    color: colors.textFaint, textAlign: 'center', letterSpacing: 1,
+                    fontStyle: 'italic', marginTop: 4,
                   }}>wǒ xǐhuān xuéxí zhōngwén</Text>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     21px text in 28px line box — characters read as a connected sentence
                   </Text>
                 </View>
               </View>
 
               {/* ── LH.body — auth + prose ────────────────────────── */}
-              <Text style={s.lhSectionTitle}>LH.body — 24px (ratio 1.50)</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>LH.body — 24px (ratio 1.50)</Text>
+              <Text style={t.lhNote}>
                 Standard comfortable reading. Body and UI share the same 16px/24px
                 cadence, creating vertical rhythm — a body paragraph above a caption
                 keeps baselines on a predictable 4px grid. This is where most
                 multi-line text lives: auth subtitles, descriptions, success messages.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>auth.tsx — login subtitle</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>auth.tsx — login subtitle</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg }}>
                   <Text style={{
-                    fontSize: FS.title, color: T.textPrimary,
+                    fontSize: FS.title, color: colors.textPrimary,
                     letterSpacing: LS.tight * FS.title, marginBottom: space.xs,
                   }}>Welcome back</Text>
                   <Text style={{
                     fontSize: FS.body, lineHeight: LH.body,
-                    color: T.textMuted,
+                    color: colors.textFaint,
                   }}>Sign in to continue your practice.{'\n'}Your progress syncs across devices.</Text>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     16px text in 24px line box — 8px of air between lines for comfortable reading
                   </Text>
                 </View>
               </View>
 
               {/* ── LH.label — captions + small text ─────────────── */}
-              <Text style={s.lhSectionTitle}>LH.label — 20px (ratio 1.54)</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>LH.label — 20px (ratio 1.54)</Text>
+              <Text style={t.lhNote}>
                 The most generous ratio. Captions and example sentences are the densest
                 text in the app — often multi-line Chinese with complex stroke characters.
                 At 13px, characters like 龍 or 鬱 are near the legibility floor. The 1.54
                 ratio adds 7px of air between lines, preventing strokes from adjacent lines
                 from visually bleeding into each other.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>Card.tsx — subtitle · session.tsx — tap hints</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>Card.tsx — subtitle · session.tsx — tap hints</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.lg }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                     <View style={{
                       width: 36, height: 36, borderRadius: 8,
-                      backgroundColor: T.accentDim, borderWidth: 1, borderColor: T.accentBorder,
+                      backgroundColor: colors.inkRedGlow, borderWidth: 1, borderColor: colors.inkRedDim,
                       alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <Text style={{ fontSize: FS.ui, color: T.textPrimary }}>开</Text>
+                      <Text style={{ fontSize: FS.ui, color: colors.textPrimary }}>开</Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>New session</Text>
+                      <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.medium }}>New session</Text>
                       <Text style={{
                         fontSize: FS.label, lineHeight: LH.label,
-                        color: T.textMuted,
+                        color: colors.textFaint,
                       }}>Start a fresh round of flashcards{'\n'}with your selected deck and filters</Text>
                     </View>
                   </View>
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{
                       fontFamily: MONO, fontSize: FS.label, lineHeight: LH.label,
-                      color: T.textMuted, opacity: 0.6, letterSpacing: 1.5, textAlign: 'center',
-                    }}>tap · pinyin  ··  double tap · reveal all</Text>
+                      color: colors.textFaint, opacity: 0.6, letterSpacing: 1.5, textAlign: 'center',
+                    }}>tap {Icon.separator} pinyin  {Icon.separator}{Icon.separator}  double tap {Icon.separator} reveal all</Text>
                   </View>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     13px text in 20px line box — generous air prevents dense Chinese strokes from bleeding
                   </Text>
                 </View>
               </View>
 
               {/* ── LH.pinyin — phonetic annotations ─────────────── */}
-              <Text style={s.lhSectionTitle}>LH.pinyin — 28px (ratio 1.40)</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>LH.pinyin — 28px (ratio 1.40)</Text>
+              <Text style={t.lhNote}>
                 Tighter than body text because pinyin is typically a single line of
                 romanized syllables, not a paragraph. But if it wraps (long compounds),
                 28px leading prevents tone diacritics (ā, é, ǐ, ù) from colliding
                 with descenders on the line above.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>session.tsx — pinyin annotation</Text>
-                <View style={s.lhDemoCentered}>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>session.tsx — pinyin annotation</Text>
+                <View style={t.lhDemoCentered}>
                   <Text style={{
                     fontFamily: MONO, fontSize: FS.pinyin, lineHeight: LH.pinyin,
-                    color: T.accent, opacity: 0.85, letterSpacing: 3, textAlign: 'center',
+                    color: colors.inkRedText, fontStyle: 'italic',
+                    letterSpacing: 3, textAlign: 'center',
                   }}>zhōng guó rén</Text>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     20px text in 28px line box — air for tone marks without paragraph-level looseness
                   </Text>
                 </View>
               </View>
 
               {/* ── 4px grid explanation ──────────────────────────── */}
-              <Text style={s.lhSectionTitle}>Why a 4px grid?</Text>
-              <Text style={s.lhNote}>
-                Every line height is a multiple of 4: 20, 24, 28, 40, 48, 56, 80.
+              <Text style={t.lhSectionTitle}>Why a 4px grid?</Text>
+              <Text style={t.lhNote}>
+                Every line height is a multiple of 4: 12, 16, 20, 24, 28, 40, 48, 56, 120.
                 When different text sizes stack vertically — which happens constantly
                 on the flashcard and profile screens — their baselines fall on a
                 predictable rhythm. Without the grid, fractional pixel positions cause
                 sub-pixel rendering artefacts and a subtle "something feels off" in
                 the layout.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>vertical rhythm — stacked text roles</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>vertical rhythm — stacked text roles</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: 0 }}>
                   <Text style={{
                     fontSize: FS.subheading, lineHeight: LH.subheading,
-                    color: T.textPrimary, fontWeight: FW.semibold,
+                    color: colors.textPrimary, fontWeight: FW.semibold,
                   }}>HSK 1 — Basic Characters</Text>
                   <Text style={{
                     fontSize: FS.body, lineHeight: LH.body,
-                    color: T.textSecondary,
+                    color: colors.textSecondary,
                   }}>150 cards across 6 categories</Text>
                   <Text style={{
                     fontSize: FS.label, lineHeight: LH.label,
-                    color: T.textMuted,
-                  }}>Last studied 2 days ago · 71% retention</Text>
+                    color: colors.textFaint,
+                  }}>Last studied 2 days ago {Icon.separator} 71% retention</Text>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     28px → 24px → 20px — all multiples of 4, baselines stay in rhythm
                   </Text>
                 </View>
@@ -509,53 +565,118 @@ export default function DesignSystemScreen() {
 
             {/* Letter spacing */}
             <Section label="LETTER SPACING — LS">
-              <Text style={s.lhNote}>
+              <Text style={t.lhNote}>
                 Unitless em multipliers applied as{' '}
-                <Text style={s.codeInline}>letterSpacing: LS.tight * FS.title</Text>.
+                <Text style={t.codeInline}>letterSpacing: LS.tight * FS.title</Text>.
                 Display sizes tighten progressively; body/UI text uses no tracking.
                 MONO phonetic text (pinyin, badges) is exempt — positive tracking aids readability.
               </Text>
               {(
                 [
-                  { token: 'LS.tighter', em: LS.tighter,  example: `${LS.tighter * FSDisplay.score}px @ FS.score (${FSDisplay.score}px)`,  appliesTo: 'score · seal · hanzi' },
-                  { token: 'LS.tight',   em: LS.tight,    example: `${LS.tight   * FSDisplay.title}px @ FS.title (${FSDisplay.title}px)`,   appliesTo: 'title · heading · subheading' },
-                  { token: 'LS.normal',  em: LS.normal,   example: '0px',                                                                   appliesTo: 'ui · body · label (all body text)' },
-                  { token: 'LS.loose',   em: LS.loose,    example: `+${LS.loose  * FSBody.label}px @ FS.label (${FSBody.label}px)`,         appliesTo: 'available — not currently applied' },
+                  { token: 'LS.tighter',   em: LS.tighter,   example: `${LS.tighter * FSDisplay.score}px @ FS.score (${FSDisplay.score}px)`,  appliesTo: 'score · seal · hanzi' },
+                  { token: 'LS.tight',     em: LS.tight,     example: `${LS.tight   * FSDisplay.title}px @ FS.title (${FSDisplay.title}px)`,   appliesTo: 'title · heading · subheading' },
+                  { token: 'LS.normal',    em: LS.normal,    example: '0px',                                                                    appliesTo: 'ui · body · label (all body text)' },
+                  { token: 'LS.loose',     em: LS.loose,     example: `+${LS.loose  * FSBody.label}px @ FS.label (${FSBody.label}px)`,          appliesTo: 'available — not currently applied' },
+                  { token: 'LS.wide',      em: LS.wide,      example: `+${(LS.wide * FSBody.body).toFixed(2)}px @ FS.body (${FSBody.body}px)`, appliesTo: 'definition text, body secondary' },
+                  { token: 'LS.wider',     em: LS.wider,     example: `+${(LS.wider * FSBody.body).toFixed(2)}px @ FS.body (${FSBody.body}px)`, appliesTo: 'pinyin, score labels, sidebar brand' },
+                  { token: 'LS.widest',    em: LS.widest,    example: `+${(LS.widest * FSBody.label).toFixed(2)}px @ FS.label (${FSBody.label}px)`, appliesTo: 'button labels, form labels, sidebar nav' },
+                  { token: 'LS.ultrawide', em: LS.ultrawide, example: `+${(LS.ultrawide * FSBody.label).toFixed(2)}px @ FS.label (${FSBody.label}px)`, appliesTo: 'uppercase card labels (POS · HSK)' },
+                  { token: 'LS.extreme',   em: LS.extreme,   example: `+${(LS.extreme * FSBody.micro).toFixed(2)}px @ FS.micro (${FSBody.micro}px)`, appliesTo: 'micro text ("Tap to reveal")' },
                 ] as const
               ).map(({ token, em, example, appliesTo }) => (
-                <View key={token} style={s.lhRow}>
-                  <Text style={s.lhToken}>{token}</Text>
-                  <Text style={s.lhValue}>{em > 0 ? `+${em}` : em}em</Text>
-                  <Text style={s.lhFormula}>{example} · {appliesTo}</Text>
+                <View key={token} style={t.lhRow}>
+                  <Text style={t.lhToken}>{token}</Text>
+                  <Text style={t.lhValue}>{em > 0 ? `+${em}` : em}em</Text>
+                  <Text style={t.lhFormula}>{example} · {appliesTo}</Text>
                 </View>
               ))}
             </Section>
 
             {/* Monospace callout */}
             <Section label="MONOSPACE — MONO">
-              <View style={s.monoRow}>
-                <View style={s.monoDemo}>
-                  <Text style={s.monoSample}>pīn yīn</Text>
-                  <Text style={s.monoCaption}>FS.pinyin · MONO · T.accent</Text>
+              <View style={t.monoRow}>
+                <View style={t.monoDemo}>
+                  <Text style={[t.monoSample, { color: colors.inkRedText, fontStyle: 'italic' }]}>pīn yīn</Text>
+                  <Text style={t.monoCaption}>FS.pinyin · MONO · inkRedText</Text>
                 </View>
-                <View style={s.monoDesc}>
-                  <Text style={s.propName}>Used for</Text>
-                  <Text style={s.propValue}>Pinyin pronunciation, score counters, HSK badges, part-of-speech tags, session metadata</Text>
+                <View style={t.monoDesc}>
+                  <Text style={t.propName}>Used for</Text>
+                  <Text style={t.propValue}>All UI text — pinyin pronunciation, score counters, HSK badges, part-of-speech tags, session metadata, button labels, form labels, progress indicators</Text>
                 </View>
               </View>
             </Section>
 
             {/* Italic usage */}
             <Section label="ITALIC USAGE">
-              <View style={s.noItalicNote}>
-                <Text style={s.noItalicText}>
-                  Italic is not used in this design system. Emphasis is expressed
-                  through <Text style={s.codeInline}>color</Text>,{' '}
-                  <Text style={s.codeInline}>fontWeight</Text>, and{' '}
-                  <Text style={s.codeInline}>FS</Text> size hierarchy only.
+              <View style={t.noItalicNote}>
+                <Text style={t.noItalicText}>
+                  Italic is used for <Text style={t.codeInline}>pinyin</Text> text in
+                  the new design system. Pinyin is rendered in MONO font with{' '}
+                  <Text style={t.codeInline}>fontStyle: 'italic'</Text> and{' '}
+                  <Text style={t.codeInline}>colors.inkRedText</Text> color,
+                  distinguishing phonetic annotations from all other text roles.
+                  No other text role uses italic.
                 </Text>
+                <View style={{ marginTop: space.md, alignItems: 'center' }}>
+                  <Text style={{
+                    fontFamily: MONO, fontSize: FS.pinyin,
+                    color: colors.inkRedText, fontStyle: 'italic',
+                    letterSpacing: 3,
+                  }}>zhōng guó</Text>
+                </View>
               </View>
             </Section>
+          </View>
+        )}
+
+        {/* ════════════════════════════════════════════════════════════════
+            ICONS
+        ════════════════════════════════════════════════════════════════ */}
+        {activeNav === 'Icons' && (
+          <View>
+            <DocHeading colors={colors}>Iconography</DocHeading>
+            <DocSubheading colors={colors}>
+              All icons are pure ASCII/Unicode characters from{' '}
+              <Text style={t.codeInline}>theme/icons.ts</Text>, rendered in MONO
+              font. No SVG icon sets — icons inherit color from semantic context.
+              Import via <Text style={t.codeInline}>Icon.name</Text>.
+            </DocSubheading>
+
+            <View style={{ gap: space.sm }}>
+              {(
+                [
+                  { name: 'close',     char: Icon.close,     usage: 'Close/dismiss buttons, "wrong" indicator' },
+                  { name: 'next',      char: Icon.next,      usage: 'Forward navigation, card arrows' },
+                  { name: 'ornament',  char: Icon.ornament,  usage: 'Decorative separator, card corners' },
+                  { name: 'dropdown',  char: Icon.dropdown,  usage: 'Dropdown/select indicators' },
+                  { name: 'audio',     char: Icon.audio,     usage: 'Audio playback trigger' },
+                  { name: 'separator', char: Icon.separator, usage: 'Inline text separator (score strips, metadata)' },
+                  { name: 'correct',   char: Icon.correct,   usage: '"Got it" indicator, success states' },
+                  { name: 'repeat',    char: Icon.repeat,    usage: '"Study again" action' },
+                  { name: 'left',      char: Icon.left,      usage: 'Back navigation' },
+                  { name: 'right',     char: Icon.right,     usage: 'Forward navigation' },
+                ] as const
+              ).map(({ name, char, usage }) => (
+                <View key={name} style={{
+                  flexDirection: 'row', alignItems: 'center', gap: space.lg,
+                  backgroundColor: colors.bgCard, borderRadius: radius.lg,
+                  borderWidth: 1, borderColor: colors.border, padding: space.md,
+                }}>
+                  <View style={{
+                    width: 48, height: 48, alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: colors.bgCard2, borderRadius: radius.sm,
+                    borderWidth: 1, borderColor: colors.border,
+                  }}>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.subheading, color: colors.textPrimary }}>{char}</Text>
+                  </View>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.body, color: colors.textPrimary }}>Icon.{name}</Text>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint }}>'{char}'</Text>
+                    <Text style={{ fontSize: FS.label, color: colors.textSecondary, marginTop: 2 }}>{usage}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
@@ -564,207 +685,216 @@ export default function DesignSystemScreen() {
         ════════════════════════════════════════════════════════════════ */}
         {activeNav === 'Rules' && (
           <View>
-            <DocHeading>Type Rules</DocHeading>
-            <DocSubheading>
-              How{' '}<Text style={s.codeInline}>FS</Text>,{' '}
-              <Text style={s.codeInline}>FW</Text>,{' '}
+            <DocHeading colors={colors}>Type Rules</DocHeading>
+            <DocSubheading colors={colors}>
+              How{' '}<Text style={t.codeInline}>FS</Text>,{' '}
+              <Text style={t.codeInline}>FW</Text>,{' '}
               color, and{' '}
-              <Text style={s.codeInline}>LS</Text>{' '}
+              <Text style={t.codeInline}>LS</Text>{' '}
               combine to build hierarchy.{' '}
               Size signals priority · weight signals interactivity · color signals role.
             </DocSubheading>
 
             {/* ── Font weight ───────────────────────────────────────── */}
             <Section label="FONT WEIGHT — FW">
-              {/* ── Why only three weights ─────────────────────── */}
-              <Text style={s.lhSectionTitle}>Why three weights — and no bold?</Text>
-              <Text style={s.lhNote}>
+              {/* ── Why only four weights ─────────────────────── */}
+              <Text style={t.lhSectionTitle}>Why four weights — and no bold?</Text>
+              <Text style={t.lhNote}>
                 Each weight encodes a{' '}
-                <Text style={{ color: T.textPrimary }}>semantic role</Text>, not a
-                level of emphasis. The three axes work together: size signals
+                <Text style={{ color: colors.textPrimary }}>semantic role</Text>, not a
+                level of emphasis. The four axes work together: size signals
                 priority, weight signals interactivity, color signals role. With
-                three clearly separated weights, peripheral vision can distinguish
+                four clearly separated weights, peripheral vision can distinguish
                 "structural landmark" from "tappable control" from "readable
-                content" without consciously parsing it.
+                content" from "elegant display" without consciously parsing it.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>why not bold (700)?</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>why not bold (700)?</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg }}>
-                  <Text style={s.lhNote}>
+                  <Text style={t.lhNote}>
                     Bold thickens Chinese character strokes, reducing white space
                     between strokes — the very space that makes characters legible.
                     At display sizes (32px+), bold Chinese text feels muddy.
                     Semibold (600) adds heading emphasis without degrading stroke
                     clarity. The hero character{' '}
-                    <Text style={{ color: T.textPrimary }}>must</Text> be regular
+                    <Text style={{ color: colors.textPrimary }}>must</Text> be regular
                     weight — learners should see strokes as they appear in real-world
                     text. Adding weight teaches a visual form that doesn't transfer.
                   </Text>
                   <View style={{ flexDirection: 'row', gap: space.xxl, marginTop: space.lg, justifyContent: 'center' }}>
                     <View style={{ alignItems: 'center', gap: space.xs }}>
-                      <Text style={{ fontSize: 40, color: T.textHanzi }}>学</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.success }}>400 regular ✓</Text>
-                      <Text style={{ fontSize: FS.label, color: T.textMuted }}>Clear strokes</Text>
+                      <Text style={{ fontSize: 40, color: colors.textHanzi }}>学</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.green }}>400 regular {Icon.correct}</Text>
+                      <Text style={{ fontSize: FS.label, color: colors.textFaint }}>Clear strokes</Text>
                     </View>
                     <View style={{ alignItems: 'center', gap: space.xs }}>
-                      <Text style={{ fontSize: 40, color: T.textHanzi, fontWeight: '700' }}>学</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.error }}>700 bold ✕</Text>
-                      <Text style={{ fontSize: FS.label, color: T.textMuted }}>Muddy strokes</Text>
+                      <Text style={{ fontSize: 40, color: colors.textHanzi, fontWeight: '700' }}>学</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.redBtn }}>700 bold {Icon.close}</Text>
+                      <Text style={{ fontSize: FS.label, color: colors.textFaint }}>Muddy strokes</Text>
                     </View>
                   </View>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     Compare stroke clarity — bold fills the counter-spaces that make 学 legible
                   </Text>
                 </View>
               </View>
 
-              {/* ── The three weights ──────────────────────────── */}
-              <Text style={s.lhSectionTitle}>FW.semibold — 600 — structural landmarks</Text>
-              <Text style={s.lhNote}>
+              {/* ── The four weights ──────────────────────────── */}
+              <Text style={t.lhSectionTitle}>FW.light — 300 — elegant display + form inputs</Text>
+              <Text style={t.lhNote}>
+                Thin strokes for serif Hanzi display and elegant form inputs.
+                FW.light is used for the hero character in serif, form input text,
+                and definition/meaning text. The light weight keeps forms feeling
+                refined and ensures the hero character's strokes are as close to
+                natural handwriting as possible.
+              </Text>
+
+              <Text style={t.lhSectionTitle}>FW.semibold — 600 — structural landmarks</Text>
+              <Text style={t.lhNote}>
                 Signals "this is a navigation waypoint." Semibold text answers the
                 question "where am I?" — screen titles, header bar labels, component
                 names in the design system. Combined with display-scale sizing, it
                 creates confident headings without the heaviness of bold.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>used in: profile, settings, session-setup headers · BottomSheetModal title</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>used in: profile, settings, session-setup headers · BottomSheetModal title</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.md }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
-                    <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>New Session</Text>
+                    <Text style={{ fontSize: FS.body, color: colors.textSecondary }}>{Icon.left} Back</Text>
+                    <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>New Session</Text>
                     <View style={{ width: 44 }} />
                   </View>
-                  <View style={{ height: 1, backgroundColor: T.border }} />
+                  <View style={{ height: 1, backgroundColor: colors.border }} />
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
-                    <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Profile</Text>
-                    <Text style={{ fontSize: FS.subheading }}>⚙️</Text>
+                    <Text style={{ fontSize: FS.body, color: colors.textSecondary }}>{Icon.left} Back</Text>
+                    <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>Profile</Text>
+                    <View style={{ width: 44 }} />
                   </View>
-                  <View style={{ height: 1, backgroundColor: T.border }} />
+                  <View style={{ height: 1, backgroundColor: colors.border }} />
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Select Deck</Text>
-                    <Text style={{ fontSize: FS.body, color: T.accent, fontWeight: FW.medium }}>Done</Text>
+                    <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>Select Deck</Text>
+                    <Text style={{ fontSize: FS.body, color: colors.inkRed, fontWeight: FW.medium }}>Done</Text>
                   </View>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     Same FS.ui size (16px) as body text, but semibold weight makes it a landmark
                   </Text>
                 </View>
               </View>
 
-              <Text style={s.lhSectionTitle}>FW.medium — 500 — interactive controls</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>FW.medium — 500 — interactive controls</Text>
+              <Text style={t.lhNote}>
                 Signals "this can be tapped." Medium weight is heavier than prose
                 (distinguishing it from passive text) but lighter than headings
                 (it's an affordance, not a landmark). The learner's finger knows
                 where to go before their eyes finish scanning.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>used in: Button, Chip, TabSwitcher, SegmentedControl, Card.title, deck name</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>used in: Button, Chip, TabSwitcher, SegmentedControl, Card.title, deck name</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.md }}>
                   <Button label="Start Session" onPress={() => {}} />
                   <View style={{ flexDirection: 'row', gap: space.sm }}>
                     <View style={{
-                      flex: 1, paddingVertical: 11, borderRadius: 10,
-                      backgroundColor: T.accentDim, borderWidth: 1, borderColor: T.accentBorder,
+                      flex: 1, paddingVertical: 11, borderRadius: 0,
+                      backgroundColor: colors.inkRedGlow, borderWidth: 1, borderColor: colors.inkRedDim,
                       alignItems: 'center',
                     }}>
-                      <Text style={{ fontSize: FS.body, color: T.textPrimary, fontWeight: FW.medium }}>20</Text>
+                      <Text style={{ fontSize: FS.body, color: colors.textPrimary, fontWeight: FW.medium }}>20</Text>
                     </View>
                     <View style={{
-                      flex: 1, paddingVertical: 11, borderRadius: 10,
-                      backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
+                      flex: 1, paddingVertical: 11, borderRadius: 0,
+                      backgroundColor: colors.bgCard, borderWidth: 1, borderColor: colors.border,
                       alignItems: 'center',
                     }}>
-                      <Text style={{ fontSize: FS.body, color: T.textMuted, fontWeight: FW.medium }}>50</Text>
+                      <Text style={{ fontSize: FS.body, color: colors.textFaint, fontWeight: FW.medium }}>50</Text>
                     </View>
                   </View>
                   <View style={{
                     flexDirection: 'row', alignItems: 'center', gap: space.md,
-                    backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
-                    borderRadius: 14, paddingHorizontal: space.lg, paddingVertical: 12,
+                    backgroundColor: colors.bgCard, borderWidth: 1, borderColor: colors.border,
+                    borderRadius: 0, paddingHorizontal: space.lg, paddingVertical: 12,
                   }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>HSK 1 — Basics</Text>
-                      <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2 }}>150 common characters</Text>
+                      <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.medium }}>HSK 1 — Basics</Text>
+                      <Text style={{ fontSize: FS.label, color: colors.textFaint, marginTop: 2 }}>150 common characters</Text>
                     </View>
-                    <Text style={{ fontSize: FS.body, color: T.textMuted }}>↓</Text>
+                    <Text style={{ fontSize: FS.body, color: colors.textFaint }}>{Icon.dropdown}</Text>
                   </View>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     Medium weight on all tappable labels — buttons, segments, deck selector
                   </Text>
                 </View>
               </View>
 
-              <Text style={s.lhSectionTitle}>FW.regular — 400 — readable content</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>FW.regular — 400 — readable content</Text>
+              <Text style={t.lhNote}>
                 The default. Never written explicitly in stylesheets — omitting{' '}
-                <Text style={s.codeInline}>fontWeight</Text> produces regular.
+                <Text style={t.codeInline}>fontWeight</Text> produces regular.
                 Most text in a learning app is{' '}
-                <Text style={{ color: T.textPrimary }}>read</Text>, not acted
+                <Text style={{ color: colors.textPrimary }}>read</Text>, not acted
                 upon. Regular weight keeps reading text quiet so the hero character,
                 headings, and interactive controls can do their jobs.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>used in: subtitles, descriptions, captions, pinyin, example sentences, translations</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>used in: subtitles, descriptions, captions, example sentences, translations</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.sm }}>
-                  <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
-                  <Text style={{ fontSize: FS.label, color: T.textMuted, lineHeight: LH.label }}>Start a fresh round of flashcards{'\n'}with your selected deck and filters</Text>
-                  <Text style={{ fontFamily: MONO, fontSize: FS.pinyin, color: T.accent, opacity: 0.85, letterSpacing: 3, marginTop: space.sm }}>zhōng guó rén</Text>
-                  <Text style={{ fontSize: FS.subheading, color: '#C8BFA8', marginTop: space.xs }}>我喜欢学习中文</Text>
-                  <Text style={{ fontFamily: MONO, fontSize: FS.label, color: '#7A7060', letterSpacing: 1 }}>wǒ xǐhuān xuéxí zhōngwén</Text>
+                  <Text style={{ fontSize: FS.body, color: colors.textFaint }}>What would you like to do?</Text>
+                  <Text style={{ fontSize: FS.label, color: colors.textFaint, lineHeight: LH.label }}>Start a fresh round of flashcards{'\n'}with your selected deck and filters</Text>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.pinyin, color: colors.inkRedText, fontStyle: 'italic', letterSpacing: 3, marginTop: space.sm }}>zhōng guó rén</Text>
+                  <Text style={{ fontSize: FS.subheading, color: colors.textSecondary, marginTop: space.xs }}>我喜欢学习中文</Text>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1, fontStyle: 'italic' }}>wǒ xǐhuān xuéxí zhōngwén</Text>
                 </View>
-                <View style={s.lhDemoAnnotation}>
-                  <Text style={s.lhDemoAnnotationText}>
+                <View style={t.lhDemoAnnotation}>
+                  <Text style={t.lhDemoAnnotationText}>
                     No fontWeight in any of these styles — regular keeps content subordinate to controls and headings
                   </Text>
                 </View>
               </View>
 
               {/* ── Where weights collide ─────────────────────── */}
-              <Text style={s.lhSectionTitle}>Where weight resolves ambiguity</Text>
-              <Text style={s.lhNote}>
+              <Text style={t.lhSectionTitle}>Where weight resolves ambiguity</Text>
+              <Text style={t.lhNote}>
                 Weight matters most where sizes are close. Two text elements at
                 nearly the same size can have completely different roles if their
                 weights differ. Without weight as a second axis, these pairs
                 would be indistinguishable.
               </Text>
-              <View style={s.lhDemoCard}>
-                <Text style={s.lhDemoLabel}>same size, different weight → different role</Text>
+              <View style={t.lhDemoCard}>
+                <Text style={t.lhDemoLabel}>same size, different weight {Icon.right} different role</Text>
                 <View style={{ paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.lg }}>
                   <View style={{ gap: space.xs }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                      <Text style={{ fontSize: FS.subheading, color: T.textPrimary, fontWeight: FW.semibold }}>Card Heading</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>21px · 600</Text>
+                      <Text style={{ fontSize: FS.subheading, color: colors.textPrimary, fontWeight: FW.semibold }}>Card Heading</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint }}>21px · 600</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.pinyin, color: T.accent, opacity: 0.85, letterSpacing: 3 }}>zhōng guó</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>20px · 400</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.pinyin, color: colors.inkRedText, fontStyle: 'italic', letterSpacing: 3 }}>zhōng guó</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint }}>20px · 400</Text>
                     </View>
-                    <Text style={s.lhNote}>
+                    <Text style={t.lhNote}>
                       Only 1px apart, but weight (600 vs 400) + tracking + font family make
                       their roles unambiguous. The heading is a landmark; the pinyin is a
                       pronunciation guide.
                     </Text>
                   </View>
-                  <View style={{ height: 1, backgroundColor: T.border }} />
+                  <View style={{ height: 1, backgroundColor: colors.border }} />
                   <View style={{ gap: space.xs }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>Start Session</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>16px · 500</Text>
+                      <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.medium }}>Start Session</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint }}>16px · 500</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                      <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted }}>16px · 400</Text>
+                      <Text style={{ fontSize: FS.body, color: colors.textFaint }}>What would you like to do?</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint }}>16px · 400</Text>
                     </View>
-                    <Text style={s.lhNote}>
+                    <Text style={t.lhNote}>
                       Identical font size, but medium weight signals "tap me" while regular
-                      signals "read me." Color reinforces: primary for interactive, muted for
+                      signals "read me." Color reinforces: primary for interactive, faint for
                       passive.
                     </Text>
                   </View>
@@ -772,13 +902,22 @@ export default function DesignSystemScreen() {
               </View>
 
               {/* ── Original reference rows ───────────────────── */}
-              <Text style={s.lhSectionTitle}>Token reference</Text>
+              <Text style={t.lhSectionTitle}>Token reference</Text>
+              <WeightRow
+                token="FW.light"
+                value="'300'"
+                sample="学 · definition"
+                rule="Serif Hanzi display · form inputs · definition text"
+                where="hero character (serif), Field input text, meaning/definition labels"
+                colors={colors}
+              />
               <WeightRow
                 token="FW.semibold"
                 value="'600'"
                 sample="Session complete"
                 rule="Screen headings · component names · nav bar labels"
                 where="profile title, session-setup headerTitle, BottomSheetModal title, cs.name"
+                colors={colors}
               />
               <WeightRow
                 token="FW.medium"
@@ -786,6 +925,7 @@ export default function DesignSystemScreen() {
                 sample="Start Session"
                 rule="Interactive controls · list / card primary labels"
                 where="Button, Chip, TabSwitcher, SegmentedControl, Card.title, deckName"
+                colors={colors}
               />
               <WeightRow
                 token="FW.regular"
@@ -793,50 +933,51 @@ export default function DesignSystemScreen() {
                 sample="Continue where you left off"
                 rule="Prose · subtitles · captions · metadata — omit fontWeight in style"
                 where="greetSub, descriptions, Section.label, tapHint, all body copy"
+                colors={colors}
               />
             </Section>
 
             {/* ── Text color hierarchy ──────────────────────────────── */}
             <Section label="TEXT COLOR HIERARCHY">
-              <Text style={s.lhNote}>
+              <Text style={t.lhNote}>
                 Color tracks role, not size. The same{' '}
-                <Text style={s.codeInline}>FS.label</Text> caption can be{' '}
-                <Text style={s.codeInline}>T.textMuted</Text> (hint) or{' '}
-                <Text style={s.codeInline}>T.textPrimary</Text> (MONO badge token) —
+                <Text style={t.codeInline}>FS.label</Text> caption can be{' '}
+                <Text style={t.codeInline}>colors.textFaint</Text> (hint) or{' '}
+                <Text style={t.codeInline}>colors.textPrimary</Text> (MONO badge token) —
                 choose based on how much attention the text should draw.
               </Text>
               <ColorRoleRow
-                token="T.textPrimary"
-                hex="#F0EBE0"
+                token="colors.textPrimary"
                 rule="Active labels, headings, primary content — maximum contrast"
                 where="all heading text, active tab/chip labels, input values"
+                colors={colors}
               />
               <ColorRoleRow
-                token="T.textSecondary"
-                hex="#A09880"
+                token="colors.textSecondary"
                 rule="Supporting text — present but not competing for focus"
                 where="body copy, subtitles, back buttons, descriptions"
+                colors={colors}
               />
               <ColorRoleRow
-                token="T.textMuted"
-                hex="#928A78"
-                rule="Passive / background text — recedes, WCAG AA compliant (4.5:1)"
+                token="colors.textFaint"
+                rule="Passive / background text — recedes, minimal contrast"
                 where="section labels, placeholders, inactive states, captions"
+                colors={colors}
               />
             </Section>
 
             {/* ── Role guide ────────────────────────────────────────── */}
             <Section label="ROLE GUIDE — full token combination per text role">
-              <Text style={s.lhNote}>
+              <Text style={t.lhNote}>
                 Every text element in the app maps to one of these roles.
                 LS applies only to display-scale tokens; body scale always uses{' '}
-                <Text style={s.codeInline}>LS.normal</Text>.
+                <Text style={t.codeInline}>LS.normal</Text>.
               </Text>
               {([
                 {
                   role: 'Page heading',
                   sample: 'Session complete',
-                  size: FS.title,   fw: FW.semibold,  color: T.textPrimary,
+                  size: FS.title,   fw: FW.semibold,  color: colors.textPrimary,
                   fsKey: 'FS.title',   fwKey: 'FW.semibold', colorKey: 'textPrimary',
                   lsKey: 'LS.tight',
                   where: 'sc.title · greetTitle',
@@ -844,7 +985,7 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Deck name / H2',
                   sample: 'HSK Level 1',
-                  size: FS.heading, fw: FW.semibold,  color: T.textPrimary,
+                  size: FS.heading, fw: FW.semibold,  color: colors.textPrimary,
                   fsKey: 'FS.heading', fwKey: 'FW.semibold', colorKey: 'textPrimary',
                   lsKey: 'LS.tight',
                   where: 'deck headings · section H2',
@@ -852,7 +993,7 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Sub-heading',
                   sample: 'New Session',
-                  size: FS.subheading, fw: FW.semibold,  color: T.textPrimary,
+                  size: FS.subheading, fw: FW.semibold,  color: colors.textPrimary,
                   fsKey: 'FS.subheading', fwKey: 'FW.semibold', colorKey: 'textPrimary',
                   lsKey: 'LS.tight',
                   where: 'cs.name · headerTitle · card headings',
@@ -860,7 +1001,7 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Header bar label',
                   sample: 'New Session',
-                  size: FS.ui,      fw: FW.semibold,  color: T.textPrimary,
+                  size: FS.ui,      fw: FW.semibold,  color: colors.textPrimary,
                   fsKey: 'FS.ui',      fwKey: 'FW.semibold', colorKey: 'textPrimary',
                   lsKey: '—',
                   where: 'session-setup headerTitle · BottomSheetModal title · settings title',
@@ -868,7 +1009,7 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Body text',
                   sample: 'Continue where you left off',
-                  size: FS.body,    fw: undefined,    color: T.textSecondary,
+                  size: FS.body,    fw: undefined,    color: colors.textSecondary,
                   fsKey: 'FS.body',    fwKey: '—',           colorKey: 'textSecondary',
                   lsKey: '—',
                   where: 'greetSub · Card.subtitle · descriptions',
@@ -876,7 +1017,7 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Interactive label',
                   sample: 'Start Session',
-                  size: FS.ui,      fw: FW.medium,    color: T.textPrimary,
+                  size: FS.ui,      fw: FW.medium,    color: colors.textPrimary,
                   fsKey: 'FS.ui',      fwKey: 'FW.medium',   colorKey: 'textPrimary',
                   lsKey: '—',
                   where: 'Button · Card.title · deckName · rowName',
@@ -884,7 +1025,7 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Toggle / tab label',
                   sample: 'New',
-                  size: FS.body,    fw: FW.medium,    color: T.textSecondary,
+                  size: FS.body,    fw: FW.medium,    color: colors.textSecondary,
                   fsKey: 'FS.body',    fwKey: 'FW.medium',   colorKey: 'textSecondary',
                   lsKey: '—',
                   where: 'Chip · TabSwitcher · SegmentedControl (inactive state)',
@@ -892,16 +1033,16 @@ export default function DesignSystemScreen() {
                 {
                   role: 'Section label',
                   sample: 'DECK',
-                  size: FS.label,   fw: undefined,    color: T.textMuted,
-                  fsKey: 'FS.label',   fwKey: '—',           colorKey: 'textMuted',
+                  size: FS.label,   fw: undefined,    color: colors.textFaint,
+                  fsKey: 'FS.label',   fwKey: '—',           colorKey: 'textFaint',
                   lsKey: '— uppercase',
                   where: 'Section component · cs.tableHeading · demoLabel',
                 },
                 {
                   role: 'Caption / hint',
                   sample: 'tap · pinyin  ··  double tap',
-                  size: FS.label,   fw: undefined,    color: T.textMuted,
-                  fsKey: 'FS.label',   fwKey: '—',           colorKey: 'textMuted',
+                  size: FS.label,   fw: undefined,    color: colors.textFaint,
+                  fsKey: 'FS.label',   fwKey: '—',           colorKey: 'textFaint',
                   lsKey: 'MONO',
                   where: 'tapHint · avatarHint · session metadata',
                 },
@@ -918,6 +1059,7 @@ export default function DesignSystemScreen() {
                   colorKey={colorKey}
                   lsKey={lsKey}
                   where={where}
+                  colors={colors}
                 />
               ))}
             </Section>
@@ -929,35 +1071,35 @@ export default function DesignSystemScreen() {
         ════════════════════════════════════════════════════════════════ */}
         {activeNav === 'Spacing' && (
           <View>
-            <DocHeading>Spacing & Radius</DocHeading>
-            <DocSubheading>
+            <DocHeading colors={colors}>Spacing & Radius</DocHeading>
+            <DocSubheading colors={colors}>
               Spacing tokens are exported as{' '}
-              <Text style={s.codeInline}>space</Text> and border-radius tokens
-              as <Text style={s.codeInline}>radius</Text> from{' '}
-              <Text style={s.codeInline}>theme/spacing.ts</Text>.
+              <Text style={t.codeInline}>space</Text> and border-radius tokens
+              as <Text style={t.codeInline}>radius</Text> from{' '}
+              <Text style={t.codeInline}>theme/spacing.ts</Text>.
             </DocSubheading>
 
             <Section label="SPACING SCALE">
               {(Object.keys(space) as (keyof typeof space)[]).map(name => { const val = space[name]; return (
-                <View key={name} style={s.spacingRow}>
-                  <View style={s.spacingMeta}>
-                    <Text style={s.tokenName}>space.{name}</Text>
-                    <Text style={s.tokenValue}>{val}px</Text>
+                <View key={name} style={t.spacingRow}>
+                  <View style={t.spacingMeta}>
+                    <Text style={t.tokenName}>space.{name}</Text>
+                    <Text style={t.tokenValue}>{val}px</Text>
                   </View>
-                  <View style={s.spacingBarWrap}>
-                    <View style={[s.spacingBar, { width: val * 3 }]} />
+                  <View style={t.spacingBarWrap}>
+                    <View style={[t.spacingBar, { width: val * 3 }]} />
                   </View>
                 </View>
               ); })}
             </Section>
 
             <Section label="BORDER RADIUS SCALE">
-              <View style={s.radiusGrid}>
+              <View style={t.radiusGrid}>
                 {(Object.keys(radius) as (keyof typeof radius)[]).map(name => { const val = radius[name]; return (
-                  <View key={name} style={s.radiusItem}>
-                    <View style={[s.radiusBox, { borderRadius: val }]} />
-                    <Text style={s.tokenName}>radius.{name}</Text>
-                    <Text style={s.tokenValue}>{val}px</Text>
+                  <View key={name} style={t.radiusItem}>
+                    <View style={[t.radiusBox, { borderRadius: val }]} />
+                    <Text style={t.tokenName}>radius.{name}</Text>
+                    <Text style={t.tokenValue}>{val}px</Text>
                   </View>
                 ); })}
               </View>
@@ -970,10 +1112,10 @@ export default function DesignSystemScreen() {
         ════════════════════════════════════════════════════════════════ */}
         {activeNav === 'Components' && (
           <View>
-            <DocHeading>Components</DocHeading>
-            <DocSubheading>
-              All components live in <Text style={s.codeInline}>components/</Text> and
-              are imported via the <Text style={s.codeInline}>@/</Text> alias.
+            <DocHeading colors={colors}>Components</DocHeading>
+            <DocSubheading colors={colors}>
+              All components live in <Text style={t.codeInline}>components/</Text> and
+              are imported via the <Text style={t.codeInline}>@/</Text> alias.
               They consume only tokens — no hardcoded values.
             </DocSubheading>
 
@@ -981,13 +1123,13 @@ export default function DesignSystemScreen() {
             <ComponentSection
               name="Button"
               file="components/Button.tsx"
-              description="Primary call-to-action. Supports three variants, two shapes, disabled, and loading states."
+              description="Primary call-to-action. Supports three variants, two shapes, disabled, and loading states. Disabled opacity is 0.18."
               props={[
                 { name: 'label',    type: 'string',                               desc: 'Button text' },
                 { name: 'onPress',  type: '() => void',                           desc: 'Press handler' },
                 { name: 'variant',  type: "'primary' | 'secondary' | 'ghost'",    desc: "Default: 'primary'" },
                 { name: 'shape',    type: "'pill' | 'rounded'",                   desc: "Default: 'pill'" },
-                { name: 'disabled', type: 'boolean',                              desc: 'Dims to 40% opacity' },
+                { name: 'disabled', type: 'boolean',                              desc: 'Dims to 18% opacity' },
                 { name: 'loading',  type: 'boolean',                              desc: 'Shows ActivityIndicator' },
               ]}
               usedIn={[
@@ -996,24 +1138,25 @@ export default function DesignSystemScreen() {
                 { screen: 'session.tsx',       context: '"Study again" and "Back to home" on completion screen' },
                 { screen: 'settings.tsx',      context: '"Save" (primary) and "Sign out" (ghost)' },
               ]}
+              colors={colors}
             >
-              <Text style={s.demoLabel}>Variants</Text>
-              <View style={s.buttonRow}>
-                <Button label="Primary"   onPress={() => {}} variant="primary"   style={s.buttonFlex} />
-                <Button label="Secondary" onPress={() => {}} variant="secondary" style={s.buttonFlex} />
-                <Button label="Ghost"     onPress={() => {}} variant="ghost"     style={s.buttonFlex} />
+              <Text style={t.demoLabel}>Variants</Text>
+              <View style={t.buttonRow}>
+                <Button label="Primary"   onPress={() => {}} variant="primary"   style={t.buttonFlex} />
+                <Button label="Secondary" onPress={() => {}} variant="secondary" style={t.buttonFlex} />
+                <Button label="Ghost"     onPress={() => {}} variant="ghost"     style={t.buttonFlex} />
               </View>
 
-              <Text style={[s.demoLabel, { marginTop: space.lg }]}>Shapes</Text>
-              <View style={s.buttonRow}>
-                <Button label="Pill"    onPress={() => {}} shape="pill"    style={s.buttonFlex} />
-                <Button label="Rounded" onPress={() => {}} shape="rounded" style={s.buttonFlex} />
+              <Text style={[t.demoLabel, { marginTop: space.lg }]}>Shapes</Text>
+              <View style={t.buttonRow}>
+                <Button label="Pill"    onPress={() => {}} shape="pill"    style={t.buttonFlex} />
+                <Button label="Rounded" onPress={() => {}} shape="rounded" style={t.buttonFlex} />
               </View>
 
-              <Text style={[s.demoLabel, { marginTop: space.lg }]}>States</Text>
-              <View style={s.buttonRow}>
-                <Button label="Disabled" onPress={() => {}} disabled style={s.buttonFlex} />
-                <Button label="Loading"  onPress={() => {}} loading  style={s.buttonFlex} />
+              <Text style={[t.demoLabel, { marginTop: space.lg }]}>States</Text>
+              <View style={t.buttonRow}>
+                <Button label="Disabled" onPress={() => {}} disabled style={t.buttonFlex} />
+                <Button label="Loading"  onPress={() => {}} loading  style={t.buttonFlex} />
               </View>
             </ComponentSection>
 
@@ -1033,8 +1176,9 @@ export default function DesignSystemScreen() {
               usedIn={[
                 { screen: 'home.tsx', context: '"New session" (primary) and "Resume session" (secondary, disableable)' },
               ]}
+              colors={colors}
             >
-              <View style={s.gap12}>
+              <View style={t.gap12}>
                 <Card icon="学" title="New Session"    subtitle="Start a fresh flashcard session"   onPress={() => {}} variant="primary" />
                 <Card icon="习" title="Resume Session" subtitle="Continue from where you left off"  onPress={() => {}} variant="secondary" />
                 <Card icon="复" title="Disabled Card"  subtitle="No active session to resume"       onPress={() => {}} variant="secondary" disabled />
@@ -1045,7 +1189,7 @@ export default function DesignSystemScreen() {
             <ComponentSection
               name="Chip"
               file="components/Chip.tsx"
-              description="Selectable toggle row with a dot indicator, label, and optional sublabel."
+              description="Selectable toggle row with a dot indicator, label, and optional sublabel. Square corners."
               props={[
                 { name: 'label',    type: 'string',       desc: 'Primary label' },
                 { name: 'sublabel', type: 'string',       desc: 'Secondary descriptor (optional)' },
@@ -1055,8 +1199,9 @@ export default function DesignSystemScreen() {
               usedIn={[
                 { screen: 'session-setup.tsx', context: '"New", "Review", "Hard" difficulty filter toggles' },
               ]}
+              colors={colors}
             >
-              <View style={s.gap12}>
+              <View style={t.gap12}>
                 <Chip label="New"    sublabel="Cards you haven't seen yet" active={chipNew}    onPress={() => setChipNew((v: boolean) => !v)} />
                 <Chip label="Review" sublabel="Cards you got last time"    active={chipReview} onPress={() => setChipReview((v: boolean) => !v)} />
                 <Chip label="Hard"   sublabel="Cards you forgot"           active={chipHard}   onPress={() => setChipHard((v: boolean) => !v)} />
@@ -1067,7 +1212,7 @@ export default function DesignSystemScreen() {
             <ComponentSection
               name="Field"
               file="components/Field.tsx"
-              description="Labelled text input with focus state, error border, and inline error message."
+              description="Labelled text input with focus state, error border, and inline error message. Square corners, MONO font, 15px weight 300."
               props={[
                 { name: 'label',           type: 'string',              desc: 'Uppercase label above input' },
                 { name: 'value',           type: 'string',              desc: 'Controlled value' },
@@ -1081,6 +1226,7 @@ export default function DesignSystemScreen() {
                 { screen: 'auth.tsx',      context: 'Email and password inputs on login, signup, forgot forms' },
                 { screen: 'settings.tsx',  context: 'Display name input in Personal Info section' },
               ]}
+              colors={colors}
             >
               <Field label="DEFAULT"  value={fieldDefault}  onChange={setFieldDefault} placeholder="your@email.com" />
               <Field label="ERROR"    value={fieldError}    onChange={setFieldError}   hasError errorText="Please enter a valid email address." />
@@ -1100,8 +1246,9 @@ export default function DesignSystemScreen() {
                 { screen: 'session.tsx', context: 'Top bar — shows current / total card count during a session' },
                 { screen: 'profile.tsx', context: 'By HSK Level section — got / seen breakdown per level' },
               ]}
+              colors={colors}
             >
-              <View style={s.gap12}>
+              <View style={t.gap12}>
                 <ProgressBar current={0}  total={20} />
                 <ProgressBar current={8}  total={20} />
                 <ProgressBar current={20} total={20} />
@@ -1122,10 +1269,11 @@ export default function DesignSystemScreen() {
                 { screen: 'profile.tsx',       context: 'Global Progress, By HSK Level, Recent Sessions groups' },
                 { screen: 'settings.tsx',      context: 'Personal Info, Account groups' },
               ]}
+              colors={colors}
             >
               <Section label="EXAMPLE SECTION">
-                <View style={s.sectionPlaceholder}>
-                  <Text style={s.sectionPlaceholderText}>Children go here</Text>
+                <View style={t.sectionPlaceholder}>
+                  <Text style={t.sectionPlaceholderText}>Children go here</Text>
                 </View>
               </Section>
             </ComponentSection>
@@ -1134,7 +1282,7 @@ export default function DesignSystemScreen() {
             <ComponentSection
               name="SegmentedControl"
               file="components/SegmentedControl.tsx"
-              description="Horizontal row of preset option segments with optional custom numeric input revealed when 'Custom' is selected."
+              description="Horizontal row of preset option segments with optional custom numeric input. Square corners."
               props={[
                 { name: 'options',        type: '{ label: string; value: number | string }[]', desc: 'Preset segments' },
                 { name: 'value',          type: 'number | string',                             desc: 'Currently selected value' },
@@ -1147,6 +1295,7 @@ export default function DesignSystemScreen() {
                 { screen: 'session-setup.tsx', context: 'Card count presets (10 / 20 / 50) + custom input' },
                 { screen: 'settings.tsx',      context: 'Native language selector and HSK goal selector' },
               ]}
+              colors={colors}
             >
               <SegmentedControl
                 options={[
@@ -1174,14 +1323,15 @@ export default function DesignSystemScreen() {
               usedIn={[
                 { screen: 'profile.tsx', context: 'Global Progress section — Sessions, Cards seen, Guessed, Mastered, Avg/session' },
               ]}
+              colors={colors}
             >
-              <View style={s.statGrid}>
-                <StatCard label="Sessions"   value={42}    style={s.statFlex} />
-                <StatCard label="Cards seen" value="1 240" style={s.statFlex} />
+              <View style={t.statGrid}>
+                <StatCard label="Sessions"   value={42}    style={t.statFlex} />
+                <StatCard label="Cards seen" value="1 240" style={t.statFlex} />
               </View>
-              <View style={[s.statGrid, { marginTop: space.sm }]}>
-                <StatCard label="Guessed"    value={980}   style={s.statFlex} />
-                <StatCard label="Avg / session" value={29} style={s.statFlex} />
+              <View style={[t.statGrid, { marginTop: space.sm }]}>
+                <StatCard label="Guessed"    value={980}   style={t.statFlex} />
+                <StatCard label="Avg / session" value={29} style={t.statFlex} />
               </View>
             </ComponentSection>
 
@@ -1198,6 +1348,7 @@ export default function DesignSystemScreen() {
               usedIn={[
                 { screen: 'auth.tsx', context: 'Toggles between "Sign in" and "Create account" forms' },
               ]}
+              colors={colors}
             >
               <TabSwitcher
                 tabs={[
@@ -1217,7 +1368,7 @@ export default function DesignSystemScreen() {
               description="Circular profile photo with an initials fallback. Scales the font size relative to the diameter."
               props={[
                 { name: 'uri',      type: 'string | null', desc: 'Photo URL — falls back to initials when absent' },
-                { name: 'initials', type: 'string',        desc: "1–2 chars shown when no photo. Default: '?'" },
+                { name: 'initials', type: 'string',        desc: "1-2 chars shown when no photo. Default: '?'" },
                 { name: 'size',     type: 'number',        desc: 'Diameter in pixels. Default: 80' },
                 { name: 'onPress',  type: '() => void',    desc: 'When provided, wraps in TouchableOpacity' },
               ]}
@@ -1225,19 +1376,20 @@ export default function DesignSystemScreen() {
                 { screen: 'home.tsx',    context: 'Header — top-right profile icon (size 36)' },
                 { screen: 'profile.tsx', context: 'Avatar section — large editable profile photo (size 96)' },
               ]}
+              colors={colors}
             >
-              <View style={s.avatarRow}>
-                <View style={s.avatarItem}>
+              <View style={t.avatarRow}>
+                <View style={t.avatarItem}>
                   <Avatar initials="PB" size={80} />
-                  <Text style={s.avatarLabel}>initials · 80px</Text>
+                  <Text style={t.avatarLabel}>initials · 80px</Text>
                 </View>
-                <View style={s.avatarItem}>
+                <View style={t.avatarItem}>
                   <Avatar initials="YL" size={48} />
-                  <Text style={s.avatarLabel}>initials · 48px</Text>
+                  <Text style={t.avatarLabel}>initials · 48px</Text>
                 </View>
-                <View style={s.avatarItem}>
+                <View style={t.avatarItem}>
                   <Avatar initials="AB" size={36} onPress={() => {}} />
-                  <Text style={s.avatarLabel}>tappable · 36px</Text>
+                  <Text style={t.avatarLabel}>tappable · 36px</Text>
                 </View>
               </View>
             </ComponentSection>
@@ -1256,6 +1408,7 @@ export default function DesignSystemScreen() {
               usedIn={[
                 { screen: 'session-setup.tsx', context: 'Deck picker — search input + scrollable deck list' },
               ]}
+              colors={colors}
             >
               <Button label="Open Bottom Sheet" onPress={() => setSheetOpen(true)} />
               <BottomSheetModal
@@ -1263,10 +1416,10 @@ export default function DesignSystemScreen() {
                 onClose={() => setSheetOpen(false)}
                 title="Select Deck"
               >
-                <View style={s.sheetContent}>
-                  <Text style={s.sheetContentText}>HSK 1 — 150 cards</Text>
-                  <Text style={s.sheetContentText}>HSK 2 — 150 cards</Text>
-                  <Text style={s.sheetContentText}>HSK 3 — 300 cards</Text>
+                <View style={t.sheetContent}>
+                  <Text style={t.sheetContentText}>HSK 1 — 150 cards</Text>
+                  <Text style={t.sheetContentText}>HSK 2 — 150 cards</Text>
+                  <Text style={t.sheetContentText}>HSK 3 — 300 cards</Text>
                 </View>
               </BottomSheetModal>
             </ComponentSection>
@@ -1278,32 +1431,32 @@ export default function DesignSystemScreen() {
         ════════════════════════════════════════════════════════════════ */}
         {activeNav === 'Examples' && (
           <View>
-            <DocHeading>Screen Examples</DocHeading>
-            <DocSubheading>
+            <DocHeading colors={colors}>Screen Examples</DocHeading>
+            <DocSubheading colors={colors}>
               Placeholder mockups of every screen, annotated with the exact
               design system tokens and components used. The left side shows
               the screen; the right side shows what's driving each element.
             </DocSubheading>
 
             {/* ── HOME ─────────────────────────────────────────────── */}
-            <ScreenExample title="Home" file="app/(tabs)/home.tsx">
+            <ScreenExample title="Home" file="app/(tabs)/home.tsx" colors={colors}>
               {/* Phone frame content */}
-              <PhoneFrame>
+              <PhoneFrame colors={colors}>
                 {/* Header */}
-                <View style={ex.homeHeader}>
+                <View style={e.homeHeader}>
                   <View>
-                    <Text style={{ fontSize: FS.subheading, color: T.accent, fontWeight: FW.semibold }}>漢字</Text>
-                    <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' }}>MANDARINE</Text>
+                    <Text style={{ fontSize: FS.subheading, color: colors.inkRed, fontWeight: FW.semibold }}>漢字</Text>
+                    <Text style={{ fontSize: FS.label, color: colors.textFaint, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' }}>MANDARINE</Text>
                   </View>
                   <Avatar initials="PB" size={28} />
                 </View>
                 {/* Greeting */}
-                <View style={ex.homeGreet}>
-                  <Text style={{ fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, letterSpacing: LS.tight * FS.title, marginBottom: 4 }}>Hello, Pierre.</Text>
-                  <Text style={{ fontSize: FS.body, color: T.textMuted }}>What would you like to do?</Text>
+                <View style={e.homeGreet}>
+                  <Text style={{ fontSize: FS.title, color: colors.textPrimary, fontWeight: FW.semibold, letterSpacing: LS.tight * FS.title, marginBottom: 4 }}>Hello, Pierre.</Text>
+                  <Text style={{ fontSize: FS.body, color: colors.textFaint }}>What would you like to do?</Text>
                 </View>
                 {/* Cards */}
-                <View style={ex.homeCards}>
+                <View style={e.homeCards}>
                   <Card icon="开" title="New session" subtitle="Start a fresh round of flashcards" variant="primary" onPress={() => {}} />
                   <Card icon="续" title="Resume session" subtitle="No session in progress" variant="secondary" onPress={() => {}} disabled />
                 </View>
@@ -1314,134 +1467,115 @@ export default function DesignSystemScreen() {
                   why: 'Persistent brand identity that grounds the user — the hanzi characters signal "you are in a Chinese learning app" before reading any Latin text.' },
                 { category: 'role', token: 'Personal greeting', value: '—', note: 'First focal point after launch',
                   why: 'Establishes personal connection before presenting actions. Name + question pattern invites the user to choose, not just consume.' },
-                { category: 'role', token: 'Primary action', value: '—', note: 'New session card, accent-tinted',
+                { category: 'role', token: 'Primary action', value: '—', note: 'New session card, ink-red-tinted',
                   why: 'Accent fill on the icon box draws the eye to the most common action. Hanzi icon reinforces that tapping starts a learning experience.' },
                 { category: 'token', token: 'FS.title', value: '42px', note: 'Greeting text — display scale +3',
                   why: 'Needs to dominate the screen without competing with the smaller logo hanzi above. The 20px gap between 42px and 21px makes hierarchy unambiguous.' },
                 { category: 'token', token: 'FW.semibold', value: '600', note: 'Greeting weight — structural landmark',
-                  why: 'The greeting is the screen\'s primary heading — semibold signals "this is where you are." Without it, the 42px text at regular weight would feel like a large subtitle rather than a confident anchor.' },
-                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Logo hanzi + subtitle — passive text',
-                  why: 'The logo hanzi is a brand mark, not a heading — regular weight keeps it quiet. The subtitle is read after the greeting, so it stays regular to avoid competing. Weight is omitted from the stylesheet; the system default handles it.' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Card titles — "New session", "Resume session"',
-                  why: 'Card titles are tappable labels. Medium weight distinguishes them from the regular-weight subtitle below each card, signalling interactivity without the authority of semibold.' },
-                { category: 'token', token: 'FS.label', value: '13px', note: 'Card subtitles — "Start a fresh round…", "No session in progress"',
-                  why: 'Body scale −1 keeps subtitles clearly subordinate to the 16px card title. At regular weight and T.textMuted color, they provide context without competing for attention. The 20px line height (LH.label, ratio 1.54) gives generous air in case the subtitle wraps to two lines — important because these descriptions help the user decide which card to tap.' },
-                { category: 'token', token: 'FS.subheading', value: '21px', note: 'Logo hanzi — display scale +1',
-                  why: 'Small enough to be a brand mark, not a heading. Tight letter-spacing (LS.tight) makes the two characters feel like a logo, not text.' },
-                { category: 'token', token: 'T.bg', value: '#131109', note: 'Screen background',
-                  why: 'Near-black warm base prevents the amber text palette from feeling washed out. Dark theme is a deliberate choice for a study app — reduces eye strain in extended sessions.' },
+                  why: 'The greeting is the screen\'s primary heading — semibold signals "this is where you are."' },
+                { category: 'token', token: 'colors.bg', value: 'dynamic', note: 'Screen background',
+                  why: 'Themed background adapts to light/dark mode. Dark theme reduces eye strain in extended sessions; light theme suits daytime study.' },
                 { category: 'component', token: 'Avatar', value: '28px', note: 'Initials fallback, tappable',
                   why: 'Small size signals "navigation shortcut", not "profile display". Initials fallback means the header works even before the user uploads a photo.' },
                 { category: 'component', token: 'Card', value: 'primary + secondary', note: 'Action rows with hanzi icons',
-                  why: 'Two variants create visual priority — primary (accent-tinted) for the main CTA, secondary (surface) for the conditional resume action. Disabled state at 45% opacity communicates "not available" without hiding the option.' },
-              ]} />
+                  why: 'Two variants create visual priority — primary (ink-red-tinted) for the main CTA, secondary (bgCard) for the conditional resume action.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
 
             {/* ── SESSION (FLASHCARD) ──────────────────────────────── */}
-            <ScreenExample title="Session — Flashcard" file="app/session.tsx">
-              <PhoneFrame>
+            <ScreenExample title="Session — Flashcard" file="app/session.tsx" colors={colors}>
+              <PhoneFrame colors={colors}>
                 {/* Top bar */}
-                <View style={ex.sessionTopbar}>
-                  <Text style={{ fontSize: FS.subheading, color: T.textMuted }}>✕</Text>
+                <View style={e.sessionTopbar}>
+                  <Text style={{ fontSize: FS.subheading, color: colors.textFaint }}>{Icon.close}</Text>
                   <ProgressBar current={5} total={20} style={{ flex: 1 }} />
-                  <Text style={{ fontSize: FS.subheading, color: T.textMuted }}>‹</Text>
+                  <Text style={{ fontSize: FS.subheading, color: colors.textFaint }}>{Icon.left}</Text>
                 </View>
                 {/* Score strip */}
-                <View style={ex.sessionScoreStrip}>
-                  <Text style={{ fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: T.error }}>✕  2</Text>
-                  <Text style={{ color: T.textMuted, fontSize: FS.ui }}>·</Text>
-                  <Text style={{ fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: T.success }}>3  ✓</Text>
+                <View style={e.sessionScoreStrip}>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: colors.redBtn }}>{Icon.close}  2</Text>
+                  <Text style={{ color: colors.textFaint, fontSize: FS.ui }}>{Icon.separator}</Text>
+                  <Text style={{ fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: colors.green }}>3  {Icon.correct}</Text>
                 </View>
                 {/* Card area */}
-                <View style={ex.sessionCardArea}>
-                  <View style={ex.sessionHskBadge}>
-                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>HSK 1</Text>
+                <View style={e.sessionCardArea}>
+                  <View style={[e.sessionHskBadge, { borderColor: colors.border }]}>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5 }}>HSK 1</Text>
                   </View>
                   <Text style={{
-                    fontSize: FS.hanzi, lineHeight: LH.hanzi, color: T.textHanzi,
+                    fontSize: FS.hanzi, lineHeight: LH.hanzi, color: colors.textHanzi,
                     letterSpacing: LS.tighter * FS.hanzi, textAlign: 'center',
                   }}>学</Text>
                   <Text style={{
                     fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: 3,
-                    color: T.accent, opacity: 0.85, marginTop: 14, textAlign: 'center',
+                    color: colors.inkRedText, fontStyle: 'italic',
+                    marginTop: 14, textAlign: 'center',
                   }}>xué</Text>
-                  <View style={{ width: 24, height: 1, backgroundColor: T.border, marginTop: 16, alignSelf: 'center' }} />
+                  <View style={{ width: 24, height: 1, backgroundColor: colors.border, marginTop: 16, alignSelf: 'center' }} />
                   <Text style={{
                     fontSize: FS.subheading, lineHeight: LH.subheading,
-                    color: '#C8BFA8', textAlign: 'center', marginTop: 12,
+                    color: colors.textSecondary, textAlign: 'center', marginTop: 12,
                   }}>我喜欢学习</Text>
                   <Text style={{
-                    fontFamily: MONO, fontSize: FS.label, color: '#7A7060',
-                    textAlign: 'center', letterSpacing: 1, marginTop: 4,
+                    fontFamily: MONO, fontSize: FS.label, color: colors.textFaint,
+                    textAlign: 'center', letterSpacing: 1, fontStyle: 'italic', marginTop: 4,
                   }}>wǒ xǐhuān xuéxí</Text>
                 </View>
                 {/* FABs */}
-                <View style={ex.sessionFabs}>
-                  <View style={[ex.fab, { backgroundColor: T.errorDim, borderColor: 'rgba(154,48,48,0.25)' }]}>
-                    <Text style={{ fontSize: FS.subheading, color: T.error }}>✕</Text>
+                <View style={e.sessionFabs}>
+                  <View style={[e.fab, { backgroundColor: colors.inkRedGlow, borderColor: colors.inkRedDim }]}>
+                    <Text style={{ fontSize: FS.subheading, color: colors.redBtn }}>{Icon.close}</Text>
                   </View>
-                  <View style={[ex.fab, { backgroundColor: 'rgba(74,158,107,0.12)', borderColor: 'rgba(74,158,107,0.25)' }]}>
-                    <Text style={{ fontSize: FS.subheading, color: T.success }}>✓</Text>
+                  <View style={[e.fab, { backgroundColor: 'rgba(74,158,107,0.12)', borderColor: 'rgba(74,158,107,0.25)' }]}>
+                    <Text style={{ fontSize: FS.subheading, color: colors.green }}>{Icon.correct}</Text>
                   </View>
                 </View>
               </PhoneFrame>
               <AnnotationList items={[
                 { category: 'role', token: 'Hero stimulus', value: '—', note: 'The character is the product being learned',
-                  why: 'Sized at 72px to create a deliberate rupture in the type scale — the 30px gap from the next-largest element (42px title) signals "this is not a heading, this is the thing you\'re memorising."' },
+                  why: 'Sized at 108px to create a deliberate rupture in the type scale — the gap from the next-largest element signals "this is not a heading, this is the thing you\'re memorising."' },
                 { category: 'role', token: 'Progressive reveal', value: '5 taps', note: 'Character → pinyin → example → translation → meaning',
-                  why: 'Forces active recall. The learner must try to remember before seeing the answer. Each tap adds one layer of context, matching spaced-repetition pedagogy.' },
-                { category: 'role', token: 'Binary judgement', value: '✕ / ✓', note: 'Forgot and Got It floating actions',
-                  why: 'Two large FABs at thumb reach. Red/green semantic colors make the choice visceral — no reading required. Position at screen bottom matches mobile thumb zones.' },
-                { category: 'token', token: 'FS.hanzi', value: '72px', note: 'Manual override — outside both scales',
-                  why: 'A pedagogical decision, not aesthetic. The brain must instantly identify what is being learned. Derived scale sizes would tie character sizing to heading changes — but this should be stable.' },
-                { category: 'token', token: 'LH.hanzi', value: '80px', note: 'Ratio 1.11 — 8px air',
-                  why: 'Tight bounding box keeps pinyin close to the character it describes. Excess leading would waste vertical space on compact screens.' },
-                { category: 'token', token: 'T.textHanzi', value: '#F5F0E8', note: 'Dedicated character color',
-                  why: 'Slightly warmer and brighter than T.textPrimary — makes the hero character glow against the dark background while remaining distinct from heading text.' },
-                { category: 'token', token: 'FS.pinyin', value: '20px', note: 'Body scale +1 — MONO font',
-                  why: 'One step above base so it\'s visibly subordinate to the character but clearly larger than body text. MONO font + loose tracking aids syllable-by-syllable parsing.' },
-                { category: 'token', token: 'FS.subheading', value: '21px', note: 'Example sentence in Chinese',
-                  why: 'Same scale step as pinyin but in the display register (no MONO, tight tracking). Shows the character in context — a sentence, not an isolated glyph.' },
-                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'All flashcard text — hero character, pinyin, examples, meaning',
-                  why: 'Every text element on the flashcard is content to be read or memorised, not a control to be tapped. Regular weight keeps strokes clean on the hero character and avoids competing with the FAB icons. The hero character must be regular — bold would teach stroke forms that don\'t match real-world text.' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Score strip counters + part-of-speech tag',
-                  why: 'The score strip (✕ 2 · 3 ✓) uses medium weight because these are live counters the learner tracks during the session — they\'re closer to interactive state than passive prose. The part-of-speech tag (noun, verb) also uses medium as a categorical badge.' },
-                { category: 'token', token: 'T.error / T.success', value: '#9a3030 / #4A9E6B', note: 'Semantic FAB colors',
-                  why: 'Red and green are universally understood as wrong/right. The dim fill (12% opacity) + border pattern matches the Chip active state for visual consistency.' },
+                  why: 'Forces active recall. The learner must try to remember before seeing the answer.' },
+                { category: 'token', token: 'FS.hanzi', value: '108px', note: 'Manual override — outside both scales',
+                  why: 'A pedagogical decision, not aesthetic. The brain must instantly identify what is being learned.' },
+                { category: 'token', token: 'colors.inkRedText', value: 'dynamic', note: 'Pinyin text color',
+                  why: 'Pinyin uses inkRedText in italic MONO — the red distinguishes phonetic annotation from meaning text.' },
+                { category: 'token', token: 'colors.textHanzi', value: 'dynamic', note: 'Dedicated character color',
+                  why: 'Slightly warmer and brighter than textPrimary — makes the hero character glow while remaining distinct from heading text.' },
                 { category: 'component', token: 'ProgressBar', value: 'component', note: 'Fill track + MONO counter',
-                  why: 'Thin and unobtrusive — positioned at the top so it\'s visible but doesn\'t compete with the flashcard. The MONO counter gives an exact position for learners who want precision.' },
-              ]} />
+                  why: 'Thin and unobtrusive — positioned at the top so it\'s visible but doesn\'t compete with the flashcard.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
 
             {/* ── SESSION COMPLETE ─────────────────────────────────── */}
-            <ScreenExample title="Session — Complete" file="app/session.tsx">
-              <PhoneFrame>
-                <View style={ex.completeCentered}>
-                  <Text style={{ fontSize: FS.seal, color: T.accent, opacity: 0.3 }}>印</Text>
+            <ScreenExample title="Session — Complete" file="app/session.tsx" colors={colors}>
+              <PhoneFrame colors={colors}>
+                <View style={e.completeCentered}>
+                  <Text style={{ fontSize: FS.seal, color: colors.inkRed, opacity: 0.3 }}>印</Text>
                   <Text style={{
-                    fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, textAlign: 'center',
+                    fontSize: FS.title, color: colors.textPrimary, fontWeight: FW.semibold, textAlign: 'center',
                     letterSpacing: LS.tight * FS.title, marginTop: space.xxl,
                   }}>Session complete</Text>
                   <Text style={{
-                    fontFamily: MONO, fontSize: FS.label, color: T.textMuted,
+                    fontFamily: MONO, fontSize: FS.label, color: colors.textFaint,
                     letterSpacing: 1, marginTop: space.sm,
                   }}>20 cards reviewed</Text>
                   <View style={{ flexDirection: 'row', gap: space.xxl, marginTop: space.xxl, alignItems: 'center' }}>
                     <View style={{ alignItems: 'center' }}>
-                      <Text style={{ fontSize: FS.score, lineHeight: LH.score, color: T.success, letterSpacing: LS.tighter * FS.score }}>14</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>GOT IT</Text>
+                      <Text style={{ fontSize: FS.score, lineHeight: LH.score, color: colors.green, letterSpacing: LS.tighter * FS.score }}>14</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5 }}>GOT IT</Text>
                     </View>
-                    <Text style={{ color: T.textMuted, fontSize: FS.subheading }}>·</Text>
+                    <Text style={{ color: colors.textFaint, fontSize: FS.subheading }}>{Icon.separator}</Text>
                     <View style={{ alignItems: 'center' }}>
-                      <Text style={{ fontSize: FS.score, lineHeight: LH.score, color: T.error, letterSpacing: LS.tighter * FS.score }}>6</Text>
-                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5 }}>FORGOT</Text>
+                      <Text style={{ fontSize: FS.score, lineHeight: LH.score, color: colors.redBtn, letterSpacing: LS.tighter * FS.score }}>6</Text>
+                      <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5 }}>FORGOT</Text>
                     </View>
                   </View>
                   <View style={{
-                    borderWidth: 1, borderColor: T.border, borderRadius: 100,
+                    borderWidth: 1, borderColor: colors.border, borderRadius: 100,
                     paddingHorizontal: space.xl, paddingVertical: space.sm, marginTop: space.xxl,
                   }}>
-                    <Text style={{ fontFamily: MONO, fontSize: FS.body, color: T.textMuted, letterSpacing: 1 }}>70% retention</Text>
+                    <Text style={{ fontFamily: MONO, fontSize: FS.body, color: colors.textFaint, letterSpacing: 1 }}>70% retention</Text>
                   </View>
                   <View style={{ width: '100%', gap: 10, marginTop: space.giant, paddingHorizontal: space.lg }}>
                     <Button label="Study again" onPress={() => {}} />
@@ -1451,45 +1585,35 @@ export default function DesignSystemScreen() {
               </PhoneFrame>
               <AnnotationList items={[
                 { category: 'role', token: 'Reward moment', value: '—', note: 'Celebration after completing a session',
-                  why: 'The seal character "印" at 30% opacity creates a watermark-like presence — decorative, not informational. It rewards completion without being loud.' },
+                  why: 'The seal character at 30% opacity creates a watermark-like presence — decorative, not informational.' },
                 { category: 'role', token: 'Performance summary', value: '—', note: 'Got/forgot split + retention percentage',
-                  why: 'Learners need immediate feedback to calibrate their confidence. The binary got/forgot split is more actionable than a single percentage — it shows where to focus.' },
-                { category: 'role', token: 'Next action', value: '—', note: 'Study again vs. go home',
-                  why: 'Primary button encourages continued practice (the habit loop). Secondary button offers an exit without guilt. No tertiary options — decision fatigue after a study session is real.' },
+                  why: 'Learners need immediate feedback. The binary split is more actionable than a single percentage.' },
                 { category: 'token', token: 'FS.seal', value: '50px', note: 'Decorative — outside both scales',
-                  why: 'Deliberately between the character size (72px) and title size (42px). It\'s not content — it\'s atmosphere. The 30% opacity keeps it from competing with the actual results.' },
-                { category: 'token', token: 'FW.semibold', value: '600', note: '"Session complete" heading',
-                  why: 'Screen-level heading gets semibold to match home and auth headings. Without it, the 42px title at regular weight would blur with the nearby MONO score numerics — semibold establishes it as the structural anchor of the completion screen.' },
-                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Seal, score numerics, retention badge, subtitle',
-                  why: 'All data display elements stay regular. Score numerics (14, 6) are differentiated from the heading by MONO font + tighter tracking, not by weight. The seal is decorative. The "20 cards reviewed" subtitle and "70% retention" badge are informational — regular weight keeps them subordinate.' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Button labels — "Study again", "Back to home"',
-                  why: 'Buttons are the only interactive elements on this screen. Medium weight signals tappability against the surrounding regular-weight data display.' },
-                { category: 'token', token: 'FS.score', value: '42px', note: 'Large numerics in MONO font',
-                  why: 'Same size as FS.title for visual parity, but MONO font and tighter tracking (LS.tighter −0.05em) distinguish numbers from headings. The tight 48px line height makes them feel punchy.' },
-                { category: 'token', token: 'LS.tighter', value: '−0.05em', note: 'Dense tracking for display numerics',
-                  why: 'Large MONO digits at default tracking look loose and unintentional. Negative tracking pulls them into a cohesive number, not a sequence of isolated characters.' },
+                  why: 'Deliberately between the character size and title size. It\'s atmosphere, not content.' },
+                { category: 'token', token: 'colors.inkRed', value: 'dynamic', note: 'Seal color',
+                  why: 'Uses inkRed at 30% opacity for the watermark effect — consistent with the brand accent.' },
                 { category: 'component', token: 'Button', value: 'primary + secondary', note: 'Stacked action pair',
-                  why: 'Primary pill shape with accent fill draws the eye to "Study again" — the desired behavior. Secondary outlined button is visible but recessive, matching the app\'s "continue or exit" pattern.' },
-              ]} />
+                  why: 'Primary draws the eye to "Study again." Secondary offers an exit without guilt.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
 
             {/* ── SESSION SETUP ────────────────────────────────────── */}
-            <ScreenExample title="Session Setup" file="app/session-setup.tsx">
-              <PhoneFrame>
+            <ScreenExample title="Session Setup" file="app/session-setup.tsx" colors={colors}>
+              <PhoneFrame colors={colors}>
                 {/* Header */}
-                <View style={ex.setupHeader}>
-                  <Text style={{ fontSize: FS.body, color: T.textMuted }}>← Back</Text>
-                  <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>New Session</Text>
+                <View style={e.setupHeader}>
+                  <Text style={{ fontSize: FS.body, color: colors.textFaint }}>{Icon.left} Back</Text>
+                  <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>New Session</Text>
                   <View style={{ width: 44 }} />
                 </View>
                 {/* Deck */}
                 <Section label="DECK">
-                  <View style={ex.deckSelector}>
+                  <View style={[e.deckSelector, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium }}>HSK 1 — Basics</Text>
-                      <Text style={{ fontSize: FS.label, color: T.textMuted, marginTop: 2 }}>150 common characters</Text>
+                      <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.medium }}>HSK 1 — Basics</Text>
+                      <Text style={{ fontSize: FS.label, color: colors.textFaint, marginTop: 2 }}>150 common characters</Text>
                     </View>
-                    <Text style={{ fontSize: FS.body, color: T.textMuted }}>↓</Text>
+                    <Text style={{ fontSize: FS.body, color: colors.textFaint }}>{Icon.dropdown}</Text>
                   </View>
                 </Section>
                 {/* Cards per session */}
@@ -1511,86 +1635,66 @@ export default function DesignSystemScreen() {
               </PhoneFrame>
               <AnnotationList items={[
                 { category: 'role', token: 'Configuration flow', value: '—', note: 'Three decisions: deck, count, difficulty',
-                  why: 'Structured top-to-bottom to match decision order. The learner picks what to study, how much, and at what level — each in its own Section with a clear label.' },
+                  why: 'Structured top-to-bottom to match decision order.' },
                 { category: 'role', token: 'Constrained choice', value: '—', note: 'Presets with optional custom override',
-                  why: 'Presets (10/20/50) cover 90% of use cases and reduce decision fatigue. The custom input is hidden behind an extra tap — available but not distracting.' },
-                { category: 'role', token: 'Filter toggles', value: '—', note: 'Multi-select difficulty chips',
-                  why: 'Chips are multi-select (not radio buttons) because learners often want mixed difficulty. The dot indicator + sublabel pattern explains each option without a tooltip.' },
-                { category: 'token', token: 'FW.semibold', value: '600', note: 'Header bar title',
-                  why: 'Signals "structural landmark" — tells the user where they are in the nav hierarchy. Same weight pattern as profile and settings headers for consistency.' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Deck name in selector row',
-                  why: 'Medium weight signals "this is tappable" — distinguishing it from regular body text. The learner knows they can change the deck before consciously reading the affordance.' },
-                { category: 'token', token: 'T.accentDim + T.accentBorder', value: '0.12 / 0.28', note: 'Active state accent pattern',
-                  why: 'Translucent accent fill + slightly stronger accent border creates a consistent "selected" treatment used across Chip, SegmentedControl, and Card primary. The opacity values (12%/28%) are low enough to keep the dark theme from feeling heavy.' },
-                { category: 'component', token: 'Section', value: 'component', note: 'Uppercase label + 28px bottom margin',
-                  why: 'Provides consistent visual grouping across setup, profile, and settings screens. Uppercase + loose tracking makes labels scannable without being loud.' },
-                { category: 'component', token: 'SegmentedControl', value: 'component', note: 'Preset row + custom input',
-                  why: 'Single-select between presets with an optional custom numeric input. Chosen over a slider because discrete counts (10/20/50) are more meaningful than a continuous range for flashcard sessions.' },
-                { category: 'component', token: 'Chip', value: 'component', note: 'Toggle row with dot + sublabel',
-                  why: 'Multi-select filter pattern. The dot indicator is more subtle than a checkbox — it fits the minimal aesthetic while still providing clear state feedback through color change.' },
-              ]} />
+                  why: 'Presets cover 90% of use cases and reduce decision fatigue.' },
+                { category: 'token', token: 'colors.inkRedGlow + colors.inkRedDim', value: 'dynamic', note: 'Active state ink-red pattern',
+                  why: 'Translucent ink-red fill + slightly stronger ink-red border creates a consistent "selected" treatment.' },
+                { category: 'component', token: 'SegmentedControl', value: 'component', note: 'Preset row + custom input (square corners)',
+                  why: 'Single-select between presets with optional custom numeric input.' },
+                { category: 'component', token: 'Chip', value: 'component', note: 'Toggle row with dot + sublabel (square corners)',
+                  why: 'Multi-select filter pattern. The dot indicator fits the minimal aesthetic.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
 
             {/* ── AUTH ─────────────────────────────────────────────── */}
-            <ScreenExample title="Auth — Sign In" file="app/auth.tsx">
-              <PhoneFrame>
+            <ScreenExample title="Auth — Sign In" file="app/auth.tsx" colors={colors}>
+              <PhoneFrame colors={colors}>
                 <View style={{ paddingHorizontal: space.xl }}>
                   {/* Logo */}
                   <View style={{ paddingTop: space.giant }}>
-                    <Text style={{ fontSize: FS.score, color: T.accent, fontWeight: FW.semibold, marginBottom: space.xs }}>漢字</Text>
-                    <Text style={{ fontSize: FS.label, color: T.textMuted, letterSpacing: 4, textTransform: 'uppercase' }}>MANDARINE</Text>
+                    <Text style={{ fontSize: FS.score, color: colors.inkRed, fontWeight: FW.semibold, marginBottom: space.xs }}>漢字</Text>
+                    <Text style={{ fontSize: FS.label, color: colors.textFaint, letterSpacing: 4, textTransform: 'uppercase' }}>MANDARINE</Text>
                   </View>
                   {/* Form */}
-                  <Text style={{ fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs }}>Welcome back</Text>
-                  <Text style={{ fontSize: FS.body, color: T.textMuted, lineHeight: LH.body, marginBottom: space.xxl }}>Sign in to continue your practice.</Text>
+                  <Text style={{ fontSize: FS.title, color: colors.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs }}>Welcome back</Text>
+                  <Text style={{ fontSize: FS.body, color: colors.textFaint, lineHeight: LH.body, marginBottom: space.xxl }}>Sign in to continue your practice.</Text>
                   <Field label="EMAIL" value="" onChange={() => {}} placeholder="you@example.com" />
                   <Field label="PASSWORD" value="" onChange={() => {}} placeholder="••••••••" secureTextEntry />
                   <Button label="Sign in" onPress={() => {}} disabled style={{ marginTop: space.sm }} />
                   {/* Divider */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.xl }}>
-                    <View style={{ flex: 1, height: 1, backgroundColor: T.border }} />
-                    <Text style={{ fontSize: FS.label, color: T.textMuted }}>or</Text>
-                    <View style={{ flex: 1, height: 1, backgroundColor: T.border }} />
+                    <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+                    <Text style={{ fontSize: FS.label, color: colors.textFaint }}>or</Text>
+                    <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
                   </View>
                   <Button label="Continue with Google" onPress={() => {}} variant="secondary" />
                 </View>
               </PhoneFrame>
               <AnnotationList items={[
                 { category: 'role', token: 'Brand entry point', value: '—', note: 'Large logo character at top',
-                  why: 'First screen new users see. The oversized hanzi immediately communicates "this is a Chinese learning app" before any Latin text is read — works even for non-Chinese-speakers.' },
+                  why: 'First screen new users see. The oversized hanzi immediately communicates "this is a Chinese learning app."' },
                 { category: 'role', token: 'Mode switcher', value: '—', note: 'Sign in / Create account tabs',
-                  why: 'Tabs rather than separate screens because the forms are nearly identical. Switching is instant — no navigation, no lost state. The underline indicator shows current mode at a glance.' },
-                { category: 'role', token: 'Error recovery', value: '—', note: 'Inline field errors + forgot password',
-                  why: 'Errors appear directly below the offending field, not as a toast or alert. This keeps context — the user sees what\'s wrong and where to fix it simultaneously.' },
+                  why: 'Tabs rather than separate screens because the forms are nearly identical.' },
                 { category: 'token', token: 'FS.title', value: '42px', note: 'Form heading — "Welcome back"',
-                  why: 'Matches the home screen greeting size for familiarity. Users who sign out and back in see the same typographic weight — the app feels continuous, not restarted.' },
-                { category: 'token', token: 'FW.semibold', value: '600', note: '"Welcome back" / "Start learning" heading',
-                  why: 'Screen-level heading gets semibold — same pattern as the home greeting. Signals structural landmark so the user instantly knows which form they\'re looking at (sign in vs. create vs. forgot).' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Tab labels + button labels + "Done" / "Forgot?"',
-                  why: 'Every tappable text element on the auth screen uses medium weight. TabSwitcher labels ("Sign in", "Create account"), Button labels, and the "Forgot password?" link all share this weight to create a consistent "tappable" signal.' },
-                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Subtitle, field labels, placeholders, "or" divider, footer',
-                  why: 'Everything that isn\'t a heading or a control stays regular. Field labels are uppercase but regular weight — the uppercase treatment provides enough emphasis without adding visual weight that would compete with the form heading.' },
-                { category: 'token', token: 'LH.body', value: '24px', note: 'Subtitle prose — 1.50 ratio',
-                  why: 'The subtitle ("Sign in to continue your practice") may wrap to two lines on narrow phones. 1.50 ratio ensures comfortable reading without the subtitle feeling like a separate paragraph.' },
-                { category: 'token', token: 'T.border / T.borderFocus', value: '0.08 / 0.22', note: 'Input border states',
-                  why: 'Default border at 8% is barely visible — the input exists but doesn\'t demand attention. Focus ring at 22% brightens enough to confirm "you\'re typing here" without being harsh on the dark background.' },
-                { category: 'component', token: 'TabSwitcher', value: 'component', note: 'Underline indicator tabs',
-                  why: 'Minimal tab pattern — no background fills, just an underline. FW.medium weight on labels signals interactivity while the underline provides state feedback.' },
-                { category: 'component', token: 'Field', value: 'component', note: 'Labelled input with error states',
-                  why: 'Uppercase label above the input (not a floating label) because Chinese text entry may need more visual room. Three border states (default, focus, error) provide clear feedback without icons.' },
+                  why: 'Matches the home screen greeting size for familiarity.' },
+                { category: 'token', token: 'colors.border / colors.inkRed', value: 'dynamic', note: 'Input border states',
+                  why: 'Default border is subtle; focus ring uses inkRed to confirm "you\'re typing here."' },
+                { category: 'component', token: 'Field', value: 'component', note: 'Labelled input with error states (square corners, MONO, weight 300)',
+                  why: 'Uppercase label above the input. Three border states (default, focus, error) provide clear feedback.' },
                 { category: 'component', token: 'Button', value: 'primary + secondary', note: 'Email CTA + OAuth option',
-                  why: 'Primary for the email flow (most users). Secondary for Google OAuth — present but visually subordinate. The "or" divider makes the hierarchy explicit.' },
-              ]} />
+                  why: 'Primary for the email flow. Secondary for Google OAuth — present but visually subordinate.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
 
             {/* ── PROFILE ─────────────────────────────────────────── */}
-            <ScreenExample title="Profile" file="app/profile.tsx">
-              <PhoneFrame>
+            <ScreenExample title="Profile" file="app/profile.tsx" colors={colors}>
+              <PhoneFrame colors={colors}>
                 {/* Header */}
-                <View style={ex.setupHeader}>
-                  <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
-                  <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Profile</Text>
-                  <Text style={{ fontSize: FS.subheading, textAlign: 'right', width: 44 }}>⚙️</Text>
+                <View style={e.setupHeader}>
+                  <Text style={{ fontSize: FS.body, color: colors.textSecondary }}>{Icon.left} Back</Text>
+                  <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>Profile</Text>
+                  <View style={{ width: 44 }} />
                 </View>
                 {/* Avatar */}
                 <View style={{ alignItems: 'center', paddingVertical: space.xxl }}>
@@ -1610,10 +1714,10 @@ export default function DesignSystemScreen() {
                 {/* HSK breakdown */}
                 <Section label="BY HSK LEVEL">
                   <View style={{ gap: space.md }}>
-                    {[{ l: 1, c: 120, t: 150 }, { l: 2, c: 80, t: 150 }, { l: 3, c: 30, t: 300 }].map(({ l, c, t }) => (
+                    {[{ l: 1, c2: 120, t2: 150 }, { l: 2, c2: 80, t2: 150 }, { l: 3, c2: 30, t2: 300 }].map(({ l, c2, t2 }) => (
                       <View key={l} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-                        <Text style={{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO, width: 40 }}>HSK {l}</Text>
-                        <ProgressBar current={c} total={t} style={{ flex: 1 }} />
+                        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO, width: 40 }}>HSK {l}</Text>
+                        <ProgressBar current={c2} total={t2} style={{ flex: 1 }} />
                       </View>
                     ))}
                   </View>
@@ -1621,50 +1725,40 @@ export default function DesignSystemScreen() {
               </PhoneFrame>
               <AnnotationList items={[
                 { category: 'role', token: 'Identity anchor', value: '—', note: 'Large avatar at screen centre',
-                  why: 'The profile screen is the only place the user sees themselves. The 72px avatar dominates the top half, making the screen feel personal before any data appears below.' },
+                  why: 'The profile screen is the only place the user sees themselves. The 72px avatar dominates the top half.' },
                 { category: 'role', token: 'Progress dashboard', value: '—', note: 'Stats grid + HSK breakdown',
-                  why: 'Two complementary views: aggregate numbers (how much) and per-level bars (where). The grid-then-breakdown layout lets the user scan totals first, then drill into specifics.' },
-                { category: 'role', token: 'Motivation signal', value: '—', note: 'Recent sessions list',
-                  why: 'Showing recent sessions with dates and scores creates a visible streak. Learners see their own consistency — or gaps — which is a stronger motivator than abstract numbers.' },
+                  why: 'Two complementary views: aggregate numbers (how much) and per-level bars (where).' },
                 { category: 'token', token: 'FW.semibold', value: '600', note: 'Header title — "Profile"',
-                  why: 'Same weight as session-setup and settings headers. Consistent header treatment across all non-tab screens lets the user trust the navigation pattern without relearning.' },
-                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Back button, stat values, HSK labels, session rows',
-                  why: 'All data display on the profile screen is regular weight. StatCard values use MONO font — the monospace letterform provides enough visual distinctiveness without needing medium or semibold. Session deck names and meta text are informational, not interactive.' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Avatar initials',
-                  why: 'The Avatar component uses medium weight for its initials fallback text — a subtle signal that the avatar is tappable (to change the photo), consistent with the medium-weight-means-interactive rule.' },
-                { category: 'token', token: 'FS.title', value: '42px', note: 'StatCard value in MONO',
-                  why: 'Large MONO numerics make stats feel like a scoreboard. The tight tracking (LS.tight) keeps multi-digit numbers compact and cohesive.' },
-                { category: 'token', token: 'T.surface', value: '#1e1b12', note: 'StatCard and row backgrounds',
-                  why: 'One step up from T.bg — creates card elevation on the dark background without shadows. The subtle lift separates data groups from the screen canvas.' },
-                { category: 'component', token: 'Avatar', value: '72px', note: 'Tappable with edit badge',
-                  why: 'Larger than the home screen (28px) because this is the identity context. The edit badge overlay signals tappability without adding a separate "change photo" button.' },
+                  why: 'Same weight as session-setup and settings headers. Consistent header treatment across all screens.' },
+                { category: 'token', token: 'colors.bgCard', value: 'dynamic', note: 'StatCard and row backgrounds',
+                  why: 'One step up from colors.bg — creates card elevation without shadows.' },
                 { category: 'component', token: 'StatCard', value: 'component', note: '2-column grid with flex: 1',
-                  why: 'Equal-width cards prevent any metric from feeling more important than another. The MONO font for values and uppercase labels for descriptions create a consistent data-display pattern.' },
+                  why: 'Equal-width cards. MONO font for values and uppercase labels for descriptions.' },
                 { category: 'component', token: 'ProgressBar', value: 'component', note: 'HSK level breakdown rows',
-                  why: 'Reused from the session screen but in a different context — here it shows mastery per level rather than session progress. The MONO counter (got/seen) gives precision alongside the visual bar.' },
-              ]} />
+                  why: 'Reused from the session screen but showing mastery per level rather than session progress.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
 
             {/* ── SETTINGS ────────────────────────────────────────── */}
-            <ScreenExample title="Settings" file="app/settings.tsx">
-              <PhoneFrame>
+            <ScreenExample title="Settings" file="app/settings.tsx" colors={colors}>
+              <PhoneFrame colors={colors}>
                 {/* Header */}
-                <View style={ex.setupHeader}>
-                  <Text style={{ fontSize: FS.body, color: T.textSecondary }}>← Back</Text>
-                  <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold }}>Settings</Text>
+                <View style={e.setupHeader}>
+                  <Text style={{ fontSize: FS.body, color: colors.textSecondary }}>{Icon.left} Back</Text>
+                  <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>Settings</Text>
                   <View style={{ width: 44 }} />
                 </View>
                 <View style={{ paddingHorizontal: space.sm }}>
                   <Section label="PERSONAL INFO">
                     <Field label="DISPLAY NAME" value="Pierre" onChange={() => {}} placeholder="Your first name" />
-                    <Text style={{ fontSize: FS.label, color: T.textMuted, textTransform: 'uppercase', marginBottom: space.sm }}>NATIVE LANGUAGE</Text>
+                    <Text style={{ fontSize: FS.label, color: colors.textFaint, textTransform: 'uppercase', marginBottom: space.sm }}>NATIVE LANGUAGE</Text>
                     <SegmentedControl
-                      options={[{ label: 'Français', value: 'fr' }, { label: 'English', value: 'en' }, { label: '日本語', value: 'ja' }]}
+                      options={[{ label: 'Francais', value: 'fr' }, { label: 'English', value: 'en' }, { label: '日本語', value: 'ja' }]}
                       value="fr"
                       onChange={() => {}}
                       style={{ marginBottom: space.lg }}
                     />
-                    <Text style={{ fontSize: FS.label, color: T.textMuted, textTransform: 'uppercase', marginBottom: space.sm }}>HSK GOAL</Text>
+                    <Text style={{ fontSize: FS.label, color: colors.textFaint, textTransform: 'uppercase', marginBottom: space.sm }}>HSK GOAL</Text>
                     <SegmentedControl
                       options={[1, 2, 3, 4, 5, 6].map(n => ({ label: String(n), value: n }))}
                       value={6}
@@ -1672,7 +1766,7 @@ export default function DesignSystemScreen() {
                     />
                   </Section>
                   <Section label="ACCOUNT">
-                    <Text style={{ fontSize: FS.body, color: T.textMuted }}>pierre@example.com</Text>
+                    <Text style={{ fontSize: FS.body, color: colors.textFaint }}>pierre@example.com</Text>
                   </Section>
                   <Button label="Save" onPress={() => {}} style={{ marginBottom: 12 }} />
                   <Button label="Sign out" variant="ghost" onPress={() => {}} />
@@ -1680,34 +1774,24 @@ export default function DesignSystemScreen() {
               </PhoneFrame>
               <AnnotationList items={[
                 { category: 'role', token: 'Preference form', value: '—', note: 'Name, language, HSK goal',
-                  why: 'Three settings that directly affect the learning experience. Grouped under "Personal Info" because they describe who the learner is, not how the app behaves.' },
+                  why: 'Three settings that directly affect the learning experience.' },
                 { category: 'role', token: 'Destructive action', value: '—', note: 'Sign out at the bottom, ghost style',
-                  why: 'Ghost variant (no background, no border) makes sign-out visually recessive — present but not inviting. Positioning below Save ensures the learner sees the constructive action first.' },
+                  why: 'Ghost variant makes sign-out visually recessive — present but not inviting.' },
                 { category: 'token', token: 'FW.semibold', value: '600', note: '"Settings" header title',
-                  why: 'Consistent header pattern across all non-tab screens (profile, session-setup, settings). The user recognises the same structural weight at the top of every detail screen.' },
-                { category: 'token', token: 'FW.medium', value: '500', note: 'Segment labels + button labels',
-                  why: 'SegmentedControl labels ("Français", "English", HSK numbers) and Button labels use medium to signal tappability. The active segment is distinguished by accent color, not weight — weight stays consistent across active and inactive states.' },
-                { category: 'token', token: 'FW.regular', value: '400 (omitted)', note: 'Field labels, input text, email, back button',
-                  why: 'Form labels are uppercase regular — the uppercase is enough emphasis. Input text (the display name value) is regular because it\'s editable content, not a control label. The email address is passive display text.' },
-                { category: 'token', token: 'FS.label', value: '13px', note: 'Form labels — uppercase, spaced',
-                  why: 'Body scale −1 at uppercase with loose tracking matches the Section component pattern. Small labels above controls create a form rhythm that\'s consistent with session-setup.' },
-                { category: 'token', token: 'T.textMuted', value: '#928A78', note: 'Account email + passive text',
-                  why: 'Passes WCAG AA (4.5:1 contrast on T.bg). The email is displayed but not editable — muted color signals "this is information, not an input" without needing a disabled state.' },
-                { category: 'token', token: 'space.xl', value: '20px', note: 'Horizontal padding throughout',
-                  why: 'Consistent with session-setup and profile screens. The 20px inset keeps content away from screen edges on all device widths while maximizing form field width.' },
-                { category: 'component', token: 'Field', value: 'component', note: 'Display name text input',
-                  why: 'Same component as the auth screen — reuse means the learner recognises the input pattern (uppercase label, bordered box, focus ring) without relearning.' },
-                { category: 'component', token: 'SegmentedControl', value: 'component', note: 'Language + HSK selectors',
-                  why: 'Presets are ideal for small, known option sets (3 languages, 6 HSK levels). No custom input needed here — unlike card count, these are fixed enumerations.' },
-                { category: 'component', token: 'Button', value: 'primary + ghost', note: 'Save and sign out',
-                  why: 'Save uses the primary accent fill — it\'s the intended action. Sign out uses ghost (text only) — available but deliberately de-emphasised to prevent accidental logouts.' },
-              ]} />
+                  why: 'Consistent header pattern across all non-tab screens.' },
+                { category: 'token', token: 'colors.textFaint', value: 'dynamic', note: 'Account email + passive text',
+                  why: 'The email is displayed but not editable — faint color signals "information, not input."' },
+                { category: 'component', token: 'Field', value: 'component', note: 'Display name text input (square corners)',
+                  why: 'Same component as the auth screen — reuse means the learner recognises the input pattern.' },
+                { category: 'component', token: 'SegmentedControl', value: 'component', note: 'Language + HSK selectors (square corners)',
+                  why: 'Presets are ideal for small, known option sets.' },
+              ]} annotationGroups={annotationGroups} colors={colors} />
             </ScreenExample>
           </View>
         )}
 
-        <View style={s.footer}>
-          <Text style={s.footerText}>Mandarine Design System · 2026</Text>
+        <View style={t.footer}>
+          <Text style={t.footerText}>Mandarine Design System · 2026</Text>
         </View>
       </ScrollView>
     </View>
@@ -1716,26 +1800,42 @@ export default function DesignSystemScreen() {
 
 // ── Examples tab sub-components ───────────────────────────────────────────────
 
-function PhoneFrame({ children }: { children: ReactNode }) {
+function PhoneFrame({ children, colors }: { children: ReactNode; colors: ColorTheme }) {
   return (
-    <View style={ex.phone}>
-      <View style={ex.phoneNotch} />
-      <View style={ex.phoneContent}>{children}</View>
-      <View style={ex.phoneHomeBar} />
+    <View style={{
+      width: 260, minHeight: 480, backgroundColor: colors.bg,
+      borderRightWidth: 1, borderRightColor: colors.border, overflow: 'hidden',
+    }}>
+      <View style={{
+        width: 80, height: 4, borderRadius: 2, backgroundColor: colors.bgCard2,
+        alignSelf: 'center', marginTop: space.sm, marginBottom: space.sm,
+      }} />
+      <View style={{ flex: 1, overflow: 'hidden' }}>{children}</View>
+      <View style={{
+        width: 56, height: 3, borderRadius: 2, backgroundColor: colors.bgCard2,
+        alignSelf: 'center', marginTop: space.sm, marginBottom: space.sm,
+      }} />
     </View>
   );
 }
 
-function ScreenExample({ title, file, children }: {
-  title: string; file: string; children: ReactNode;
+function ScreenExample({ title, file, children, colors }: {
+  title: string; file: string; children: ReactNode; colors: ColorTheme;
 }) {
   return (
-    <View style={ex.exampleWrap}>
-      <View style={ex.exampleHeader}>
-        <Text style={ex.exampleTitle}>{title}</Text>
-        <Text style={ex.exampleFile}>{file}</Text>
+    <View style={{
+      marginBottom: space.huge, borderWidth: 1, borderColor: colors.border,
+      borderRadius: radius.card, overflow: 'hidden',
+    }}>
+      <View style={{
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        backgroundColor: colors.bgCard, paddingHorizontal: space.lg, paddingVertical: space.md,
+        borderBottomWidth: 1, borderBottomColor: colors.border,
+      }}>
+        <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: FW.semibold }}>{title}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{file}</Text>
       </View>
-      <View style={ex.exampleBody}>
+      <View style={{ flexDirection: 'row' }}>
         {children}
       </View>
     </View>
@@ -1752,30 +1852,36 @@ interface AnnotationItem {
   why: string;
 }
 
-const ANNOTATION_GROUPS: { key: AnnotationCategory; label: string; dotColor: string }[] = [
-  { key: 'role',      label: 'SEMANTIC ROLES',  dotColor: T.success },
-  { key: 'token',     label: 'TOKENS',          dotColor: T.accent },
-  { key: 'component', label: 'COMPONENTS',      dotColor: T.textSecondary },
-];
-
-function AnnotationList({ items }: { items: AnnotationItem[] }) {
+function AnnotationList({ items, annotationGroups, colors }: {
+  items: AnnotationItem[];
+  annotationGroups: { key: AnnotationCategory; label: string; dotColor: string }[];
+  colors: ColorTheme;
+}) {
   return (
-    <View style={ex.annotationList}>
-      {ANNOTATION_GROUPS
+    <View style={{ flex: 1, backgroundColor: colors.bgCard, paddingHorizontal: space.md, paddingVertical: space.md }}>
+      {annotationGroups
         .filter(g => items.some(i => i.category === g.key))
         .map((group, gi) => (
-        <View key={group.key} style={gi > 0 ? ex.annotationSectionGap : undefined}>
-          <Text style={ex.annotationHeading}>{group.label}</Text>
+        <View key={group.key} style={gi > 0 ? { marginTop: space.lg } : undefined}>
+          <Text style={{
+            fontSize: FS.label, color: colors.textFaint, letterSpacing: 2,
+            marginBottom: space.md, fontFamily: MONO,
+          }}>{group.label}</Text>
           {items.filter(i => i.category === group.key).map((item, i) => (
-            <View key={i} style={ex.annotationRow}>
-              <View style={[ex.annotationDot, { backgroundColor: group.dotColor }]} />
-              <View style={ex.annotationMeta}>
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: space.sm, marginBottom: space.md }}>
+              <View style={{
+                width: 5, height: 5, borderRadius: 3, backgroundColor: group.dotColor, marginTop: 5,
+              }} />
+              <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-                  <Text style={ex.annotationToken}>{item.token}</Text>
-                  <Text style={ex.annotationValue}>{item.value}</Text>
+                  <Text style={{
+                    fontSize: FS.label, color: colors.inkRed, fontFamily: MONO,
+                    backgroundColor: colors.inkRedGlow, paddingHorizontal: 4, borderRadius: 3, overflow: 'hidden',
+                  }}>{item.token}</Text>
+                  <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{item.value}</Text>
                 </View>
-                <Text style={ex.annotationNote}>{item.note}</Text>
-                {item.why ? <Text style={ex.annotationWhy}>{item.why}</Text> : null}
+                <Text style={{ fontSize: FS.label, color: colors.textSecondary, marginTop: 2, lineHeight: LH.label }}>{item.note}</Text>
+                {item.why ? <Text style={{ fontSize: FS.label, color: colors.textFaint, marginTop: 3, lineHeight: LH.label, fontStyle: 'italic' }}>{item.why}</Text> : null}
               </View>
             </View>
           ))}
@@ -1787,35 +1893,48 @@ function AnnotationList({ items }: { items: AnnotationItem[] }) {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function DocHeading({ children }: { children: string }) {
-  return <Text style={ds.docHeading}>{children}</Text>;
+function DocHeading({ children, colors }: { children: string; colors: ColorTheme }) {
+  return <Text style={{
+    fontSize: FS.title, color: colors.textPrimary, fontWeight: FW.semibold, marginBottom: space.sm,
+  }}>{children}</Text>;
 }
 
-function DocSubheading({ children }: { children: ReactNode }) {
-  return <Text style={ds.docSubheading}>{children}</Text>;
+function DocSubheading({ children, colors }: { children: ReactNode; colors: ColorTheme }) {
+  return <Text style={{
+    fontSize: FS.body, color: colors.textSecondary, lineHeight: 22, marginBottom: space.xxl,
+  }}>{children}</Text>;
 }
 
-function ColorGroup({ label, children }: { label: string; children: ReactNode }) {
+function ColorGroup({ label, children, colors }: { label: string; children: ReactNode; colors: ColorTheme }) {
   return (
-    <View style={ds.colorGroup}>
-      <Text style={ds.colorGroupLabel}>{label}</Text>
-      <View style={ds.colorGroupGrid}>{children}</View>
+    <View style={{ marginBottom: space.xxl }}>
+      <Text style={{
+        fontSize: FS.label, color: colors.textFaint, letterSpacing: 2.5,
+        textTransform: 'uppercase', marginBottom: space.md,
+      }}>{label}</Text>
+      <View style={{ gap: space.sm }}>{children}</View>
     </View>
   );
 }
 
 function Swatch({
-  token, hex, label, usage,
-}: { token: string; hex: string; label: string; usage: string }) {
-  // derive a display color for the swatch — use the hex directly when possible
-  const swatchBg = hex;
+  token, colorValue, label, usage, colors,
+}: { token: string; colorValue: string; label: string; usage: string; colors: ColorTheme }) {
   return (
-    <View style={ds.swatch}>
-      <View style={[ds.swatchBox, { backgroundColor: swatchBg }]} />
-      <View style={ds.swatchMeta}>
-        <Text style={ds.swatchToken}>{token}</Text>
-        <Text style={ds.swatchHex}>{hex}</Text>
-        <Text style={ds.swatchUsage}>{usage}</Text>
+    <View style={{
+      flexDirection: 'row', alignItems: 'center', gap: space.lg,
+      backgroundColor: colors.bgCard, borderRadius: radius.lg,
+      borderWidth: 1, borderColor: colors.border, padding: space.md,
+    }}>
+      <View style={{
+        width: 48, height: 48, borderRadius: radius.sm,
+        borderWidth: 1, borderColor: 'rgba(128,128,128,0.15)',
+        backgroundColor: colorValue,
+      }} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={{ fontSize: FS.body, color: colors.textPrimary, fontFamily: MONO }}>{token}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{colorValue}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textSecondary, marginTop: 2 }}>{usage}</Text>
       </View>
     </View>
   );
@@ -1834,14 +1953,18 @@ interface TypeSpecimenProps {
 }
 
 function TypeSpecimen({ token, px, sample, usage, family, color, italic, bold, style }: TypeSpecimenProps) {
+  const { colors } = useTheme();
   return (
-    <View style={ds.specimen}>
-      <View style={ds.specimenSample}>
+    <View style={{
+      flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1,
+      borderBottomColor: colors.border, paddingVertical: space.md, gap: space.lg, minHeight: 64,
+    }}>
+      <View style={{ width: 160, overflow: 'hidden' }}>
         <Text
           style={[
             {
               fontSize:   px,
-              color:      color ?? T.textPrimary,
+              color:      color ?? colors.textPrimary,
               fontFamily: family,
               fontStyle:  italic ? 'italic'  : 'normal',
               fontWeight: bold   ? FW.semibold : 'normal',
@@ -1854,10 +1977,10 @@ function TypeSpecimen({ token, px, sample, usage, family, color, italic, bold, s
           {sample}
         </Text>
       </View>
-      <View style={ds.specimenMeta}>
-        <Text style={ds.specimenToken}>{token}</Text>
-        <Text style={ds.specimenPx}>{px}px</Text>
-        <Text style={ds.specimenUsage}>{usage}</Text>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={{ fontSize: FS.label, color: colors.textPrimary, fontFamily: MONO }}>{token}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.inkRed, fontFamily: MONO }}>{px}px</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint }}>{usage}</Text>
       </View>
     </View>
   );
@@ -1867,7 +1990,7 @@ interface PropDef { name: string; type: string; desc: string; }
 interface UsedIn  { screen: string; context: string; }
 
 function ComponentSection({
-  name, file, description, props: propDefs, usedIn, children,
+  name, file, description, props: propDefs, usedIn, children, colors,
 }: {
   name: string;
   file: string;
@@ -1875,42 +1998,55 @@ function ComponentSection({
   props: PropDef[];
   usedIn: UsedIn[];
   children: ReactNode;
+  colors: ColorTheme;
 }) {
   return (
-    <View style={cs.wrap}>
+    <View style={{
+      backgroundColor: colors.bgCard, borderWidth: 1, borderColor: colors.border,
+      borderRadius: radius.card, padding: space.xxl, marginBottom: space.xxl,
+    }}>
       {/* Header */}
-      <View style={cs.header}>
-        <Text style={cs.name}>{name}</Text>
-        <Text style={cs.file}>{file}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: space.sm }}>
+        <Text style={{ fontSize: FS.subheading, color: colors.textPrimary, fontWeight: FW.semibold }}>{name}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{file}</Text>
       </View>
-      <Text style={cs.desc}>{description}</Text>
+      <Text style={{ fontSize: FS.body, color: colors.textSecondary, lineHeight: 20, marginBottom: space.xxl }}>{description}</Text>
 
       {/* Live demo */}
-      <View style={cs.demo}>{children}</View>
+      <View style={{
+        backgroundColor: colors.bgCard2, borderRadius: radius.lg, padding: space.lg,
+        marginBottom: space.xxl, borderWidth: 1, borderColor: colors.border,
+      }}>{children}</View>
 
       {/* Props table */}
-      <Text style={cs.tableHeading}>Props</Text>
-      <View style={cs.table}>
-        <View style={[cs.row, cs.tableHeader]}>
-          <Text style={[cs.cell, cs.cellProp, cs.th]}>Prop</Text>
-          <Text style={[cs.cell, cs.cellType, cs.th]}>Type</Text>
-          <Text style={[cs.cell, cs.cellDesc, cs.th]}>Description</Text>
+      <Text style={{
+        fontSize: FS.label, color: colors.textFaint, letterSpacing: 2.5,
+        textTransform: 'uppercase', marginBottom: space.sm,
+      }}>Props</Text>
+      <View style={{ borderWidth: 1, borderColor: colors.border, borderRadius: radius.lg, overflow: 'hidden', marginBottom: space.lg }}>
+        <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.bgCard2 }}>
+          <Text style={{ flex: 1.2, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5, textTransform: 'uppercase' }}>Prop</Text>
+          <Text style={{ flex: 2, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5, textTransform: 'uppercase' }}>Type</Text>
+          <Text style={{ flex: 2, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: FS.label, color: colors.textFaint, letterSpacing: 1.5, textTransform: 'uppercase' }}>Description</Text>
         </View>
         {propDefs.map(p => (
-          <View key={p.name} style={cs.row}>
-            <Text style={[cs.cell, cs.cellProp, cs.propName]}>{p.name}</Text>
-            <Text style={[cs.cell, cs.cellType, cs.propType]}>{p.type}</Text>
-            <Text style={[cs.cell, cs.cellDesc, cs.propDesc]}>{p.desc}</Text>
+          <View key={p.name} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>
+            <Text style={{ flex: 1.2, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: FS.label, color: colors.textPrimary, fontFamily: MONO }}>{p.name}</Text>
+            <Text style={{ flex: 2, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: FS.label, color: colors.inkRed, fontFamily: MONO }}>{p.type}</Text>
+            <Text style={{ flex: 2, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: FS.label, color: colors.textSecondary }}>{p.desc}</Text>
           </View>
         ))}
       </View>
 
       {/* Used in */}
-      <Text style={cs.tableHeading}>Used in</Text>
+      <Text style={{
+        fontSize: FS.label, color: colors.textFaint, letterSpacing: 2.5,
+        textTransform: 'uppercase', marginBottom: space.sm,
+      }}>Used in</Text>
       {usedIn.map(u => (
-        <View key={u.screen} style={cs.usedRow}>
-          <Text style={cs.usedScreen}>{u.screen}</Text>
-          <Text style={cs.usedContext}>{u.context}</Text>
+        <View key={u.screen} style={{ flexDirection: 'row', gap: space.md, paddingVertical: space.xs, alignItems: 'flex-start' }}>
+          <Text style={{ fontSize: FS.label, color: colors.textPrimary, fontFamily: MONO, width: 130 }}>{u.screen}</Text>
+          <Text style={{ flex: 1, fontSize: FS.label, color: colors.textSecondary }}>{u.context}</Text>
         </View>
       ))}
     </View>
@@ -1919,724 +2055,470 @@ function ComponentSection({
 
 // ── Rules tab components ──────────────────────────────────────────────────────
 
-function WeightRow({ token, value, sample, rule, where }: {
-  token: string; value: string; sample: string; rule: string; where: string;
+function WeightRow({ token, value, sample, rule, where, colors }: {
+  token: string; value: string; sample: string; rule: string; where: string; colors: ColorTheme;
 }) {
-  const fw = value.startsWith("'600'") ? FW.semibold : value.startsWith("'500'") ? FW.medium : undefined;
+  const fw = value.startsWith("'600'") ? FW.semibold
+    : value.startsWith("'500'") ? FW.medium
+    : value.startsWith("'300'") ? FW.light
+    : undefined;
   return (
-    <View style={rules.weightRow}>
-      <View style={rules.weightSample}>
-        <Text style={{ fontSize: FS.ui, color: T.textPrimary, fontWeight: fw }} numberOfLines={1} adjustsFontSizeToFit>
+    <View style={{
+      flexDirection: 'row', alignItems: 'flex-start', borderBottomWidth: 1,
+      borderBottomColor: colors.border, paddingVertical: space.md, gap: space.lg, minHeight: 64,
+    }}>
+      <View style={{ width: 140, justifyContent: 'center' }}>
+        <Text style={{ fontSize: FS.ui, color: colors.textPrimary, fontWeight: fw }} numberOfLines={1} adjustsFontSizeToFit>
           {sample}
         </Text>
       </View>
-      <View style={rules.weightMeta}>
-        <View style={rules.tokenRow}>
-          <Text style={rules.tokenBadge}>{token}</Text>
-          <Text style={rules.valueBadge}>{value}</Text>
+      <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+          <Text style={{
+            fontFamily: MONO, fontSize: FS.label, color: colors.inkRed,
+            backgroundColor: colors.inkRedGlow, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden',
+          }}>{token}</Text>
+          <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, paddingHorizontal: 5, paddingVertical: 1 }}>{value}</Text>
         </View>
-        <Text style={rules.ruleText}>{rule}</Text>
-        <Text style={rules.whereText}>{where}</Text>
+        <Text style={{ fontSize: FS.body, color: colors.textSecondary, lineHeight: LH.body }}>{rule}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{where}</Text>
       </View>
     </View>
   );
 }
 
-function ColorRoleRow({ token, hex, rule, where }: {
-  token: string; hex: string; rule: string; where: string;
+function ColorRoleRow({ token, rule, where, colors }: {
+  token: string; rule: string; where: string; colors: ColorTheme;
 }) {
-  const color = (T as Record<string, string>)[token.replace('T.', '')];
+  const colorKey = token.replace('colors.', '') as keyof ColorTheme;
+  const color = colors[colorKey] as string;
+  const hex = color;
   return (
-    <View style={rules.weightRow}>
-      <View style={rules.colorSample}>
+    <View style={{
+      flexDirection: 'row', alignItems: 'flex-start', borderBottomWidth: 1,
+      borderBottomColor: colors.border, paddingVertical: space.md, gap: space.lg, minHeight: 64,
+    }}>
+      <View style={{ width: 140, justifyContent: 'center' }}>
         <Text style={{ fontSize: FS.body, color, fontWeight: FW.medium }} numberOfLines={2}>
           The quick{'\n'}brown fox
         </Text>
       </View>
-      <View style={rules.weightMeta}>
-        <View style={rules.tokenRow}>
-          <Text style={rules.tokenBadge}>{token}</Text>
-          <Text style={rules.valueBadge}>{hex}</Text>
+      <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+          <Text style={{
+            fontFamily: MONO, fontSize: FS.label, color: colors.inkRed,
+            backgroundColor: colors.inkRedGlow, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden',
+          }}>{token}</Text>
+          <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, paddingHorizontal: 5, paddingVertical: 1 }}>{hex}</Text>
         </View>
-        <Text style={rules.ruleText}>{rule}</Text>
-        <Text style={rules.whereText}>{where}</Text>
+        <Text style={{ fontSize: FS.body, color: colors.textSecondary, lineHeight: LH.body }}>{rule}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{where}</Text>
       </View>
     </View>
   );
 }
 
-function RoleRow({ role, sample, size, fw, color, fsKey, fwKey, colorKey, lsKey, where }: {
+function RoleRow({ role, sample, size, fw, color, fsKey, fwKey, colorKey, lsKey, where, colors }: {
   role: string; sample: string; size: number;
   fw: typeof FW.semibold | typeof FW.medium | undefined;
   color: string; fsKey: string; fwKey: string; colorKey: string; lsKey: string; where: string;
+  colors: ColorTheme;
 }) {
   return (
-    <View style={rules.roleRow}>
-      <View style={rules.roleSample}>
+    <View style={{
+      flexDirection: 'row', alignItems: 'flex-start', borderBottomWidth: 1,
+      borderBottomColor: colors.border, paddingVertical: space.md, gap: space.lg, minHeight: 64,
+    }}>
+      <View style={{ width: 140, justifyContent: 'center' }}>
         <Text style={{ fontSize: Math.min(size, FS.heading), color, fontWeight: fw }} numberOfLines={2} adjustsFontSizeToFit>
           {sample}
         </Text>
       </View>
-      <View style={rules.weightMeta}>
-        <Text style={rules.roleName}>{role}</Text>
-        <View style={rules.tokenRow}>
-          <Text style={rules.tokenBadge}>{fsKey}</Text>
-          <Text style={rules.tokenBadge}>{fwKey}</Text>
-          <Text style={[rules.tokenBadge, { color: T.textSecondary, backgroundColor: 'transparent' }]}>{colorKey}</Text>
-          {lsKey !== '—' && <Text style={rules.tokenBadge}>{lsKey}</Text>}
+      <View style={{ flex: 1, gap: 4 }}>
+        <Text style={{ fontSize: FS.body, color: colors.textPrimary, fontWeight: FW.medium, marginBottom: 2 }}>{role}</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+          <Text style={{
+            fontFamily: MONO, fontSize: FS.label, color: colors.inkRed,
+            backgroundColor: colors.inkRedGlow, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden',
+          }}>{fsKey}</Text>
+          <Text style={{
+            fontFamily: MONO, fontSize: FS.label, color: colors.inkRed,
+            backgroundColor: colors.inkRedGlow, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden',
+          }}>{fwKey}</Text>
+          <Text style={{
+            fontFamily: MONO, fontSize: FS.label, color: colors.textSecondary,
+            backgroundColor: 'transparent', paddingHorizontal: 5, paddingVertical: 1,
+          }}>{colorKey}</Text>
+          {lsKey !== '—' && <Text style={{
+            fontFamily: MONO, fontSize: FS.label, color: colors.inkRed,
+            backgroundColor: colors.inkRedGlow, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden',
+          }}>{lsKey}</Text>}
         </View>
-        <Text style={rules.whereText}>{where}</Text>
+        <Text style={{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO }}>{where}</Text>
       </View>
     </View>
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
+// ── Style factories ──────────────────────────────────────────────────────────
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: T.bg },
+function makeStyles(colors: ColorTheme) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: colors.bg },
 
-  // Header
-  header: {
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    backgroundColor: T.bg,
-    paddingTop: space.xxl,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingHorizontal: space.xxl,
-    paddingBottom: space.lg,
-  },
-  logoHanzi: {
-    fontSize: FS.heading,
-    color: T.accent,
-    fontWeight: FW.semibold,
-  },
-  logoLabel: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    letterSpacing: 4,
-    textTransform: 'uppercase',
-    marginTop: 2,
-  },
-  headerMeta: { alignItems: 'flex-end', gap: 4 },
-  versionBadge: {
-    fontSize: FS.label,
-    color: T.accent,
-    backgroundColor: T.accentDim,
-    borderWidth: 1,
-    borderColor: T.accentBorder,
-    borderRadius: radius.pill,
-    paddingHorizontal: space.sm,
-    paddingVertical: 2,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    fontFamily: MONO,
-  },
-  headerDate: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    fontFamily: MONO,
-    letterSpacing: 0.5,
-  },
+    // Header
+    header: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.bg,
+      paddingTop: space.xxl,
+    },
+    headerTop: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      paddingHorizontal: space.xxl,
+      paddingBottom: space.lg,
+    },
+    logoHanzi: {
+      fontSize: FS.heading,
+      color: colors.inkRed,
+      fontWeight: FW.semibold,
+    },
+    logoLabel: {
+      fontSize: FS.label,
+      color: colors.textFaint,
+      letterSpacing: 4,
+      textTransform: 'uppercase',
+      marginTop: 2,
+    },
+    headerMeta: { alignItems: 'flex-end', gap: 4 },
+    versionBadge: {
+      fontSize: FS.label,
+      color: colors.inkRed,
+      backgroundColor: colors.inkRedGlow,
+      borderWidth: 1,
+      borderColor: colors.inkRedDim,
+      borderRadius: radius.pill,
+      paddingHorizontal: space.sm,
+      paddingVertical: 2,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      fontFamily: MONO,
+    },
+    headerDate: {
+      fontSize: FS.label,
+      color: colors.textFaint,
+      fontFamily: MONO,
+      letterSpacing: 0.5,
+    },
 
-  // Nav
-  navScroll:    { },
-  nav:          { flexDirection: 'row', paddingHorizontal: space.xl },
-  navItem:      { paddingHorizontal: space.lg, paddingVertical: space.md, position: 'relative' },
-  navItemActive: { borderBottomWidth: 2, borderBottomColor: T.accent },
-  navText:      { fontSize: FS.body, color: T.textMuted, fontWeight: FW.medium },
-  navTextActive:{ color: T.textPrimary },
+    // Nav
+    navScroll:    { },
+    nav:          { flexDirection: 'row', paddingHorizontal: space.xl },
+    navItem:      { paddingHorizontal: space.lg, paddingVertical: space.md, position: 'relative' },
+    navItemActive: { borderBottomWidth: 2, borderBottomColor: colors.inkRed },
+    navText:      { fontSize: FS.body, color: colors.textFaint, fontWeight: FW.medium },
+    navTextActive:{ color: colors.textPrimary },
 
-  // Scroll body
-  scroll:   { flex: 1 },
-  content:  { padding: space.xxl, paddingBottom: space.giant },
+    // Scroll body
+    scroll:   { flex: 1 },
+    content:  { padding: space.xxl, paddingBottom: space.giant },
 
-  // Inline code
-  codeInline: {
-    fontFamily: MONO,
-    fontSize: FS.label,
-    color: T.accent,
-    backgroundColor: T.accentDim,
-    paddingHorizontal: 4,
-    borderRadius: 4,
-  },
+    // Inline code
+    codeInline: {
+      fontFamily: MONO,
+      fontSize: FS.label,
+      color: colors.inkRed,
+      backgroundColor: colors.inkRedGlow,
+      paddingHorizontal: 4,
+      borderRadius: 4,
+    },
 
-  // Spacing section
-  spacingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: space.sm,
-    gap: space.lg,
-  },
-  spacingMeta: { width: 130 },
-  spacingBarWrap: { flex: 1 },
-  spacingBar: {
-    height: 6,
-    backgroundColor: T.accent,
-    borderRadius: 3,
-    opacity: 0.7,
-  },
+    // Spacing section
+    spacingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: space.sm,
+      gap: space.lg,
+    },
+    spacingMeta: { width: 130 },
+    spacingBarWrap: { flex: 1 },
+    spacingBar: {
+      height: 6,
+      backgroundColor: colors.inkRed,
+      borderRadius: 3,
+      opacity: 0.7,
+    },
 
-  // Radius section
-  radiusGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: space.lg,
-  },
-  radiusItem: { alignItems: 'center', gap: space.xs },
-  radiusBox: {
-    width: 56,
-    height: 56,
-    backgroundColor: T.surface2,
-    borderWidth: 1,
-    borderColor: T.border,
-  },
+    // Radius section
+    radiusGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: space.lg,
+    },
+    radiusItem: { alignItems: 'center', gap: space.xs },
+    radiusBox: {
+      width: 56,
+      height: 56,
+      backgroundColor: colors.bgCard2,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  // Token labels (shared)
-  tokenName:  { fontSize: FS.label, color: T.textSecondary, fontFamily: MONO },
-  tokenValue: { fontSize: FS.label,   color: T.textMuted },
+    // Token labels (shared)
+    tokenName:  { fontSize: FS.label, color: colors.textSecondary, fontFamily: MONO },
+    tokenValue: { fontSize: FS.label, color: colors.textFaint },
 
-  // Button demo
-  buttonRow: { flexDirection: 'row', gap: space.sm },
-  buttonFlex: { flex: 1 },
-  demoLabel: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: space.sm,
-  },
+    // Button demo
+    buttonRow: { flexDirection: 'row', gap: space.sm },
+    buttonFlex: { flex: 1 },
+    demoLabel: {
+      fontSize: FS.label,
+      color: colors.textFaint,
+      letterSpacing: 2,
+      textTransform: 'uppercase',
+      marginBottom: space.sm,
+    },
 
-  // Card / Chip / ProgressBar helpers
-  gap12: { gap: space.md },
+    // Card / Chip / ProgressBar helpers
+    gap12: { gap: space.md },
 
-  // Section demo placeholder
-  sectionPlaceholder: {
-    backgroundColor: T.surface2,
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: radius.lg,
-    padding: space.lg,
-    alignItems: 'center',
-  },
-  sectionPlaceholderText: { fontSize: FS.body, color: T.textMuted },
+    // Section demo placeholder
+    sectionPlaceholder: {
+      backgroundColor: colors.bgCard2,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      padding: space.lg,
+      alignItems: 'center',
+    },
+    sectionPlaceholderText: { fontSize: FS.body, color: colors.textFaint },
 
-  // StatCard grid
-  statGrid: { flexDirection: 'row', gap: space.sm },
-  statFlex: { flex: 1 },
+    // StatCard grid
+    statGrid: { flexDirection: 'row', gap: space.sm },
+    statFlex: { flex: 1 },
 
-  // Avatar row
-  avatarRow:  { flexDirection: 'row', gap: space.xxl, alignItems: 'flex-start' },
-  avatarItem: { alignItems: 'center', gap: space.sm },
-  avatarLabel:{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
+    // Avatar row
+    avatarRow:  { flexDirection: 'row', gap: space.xxl, alignItems: 'flex-start' },
+    avatarItem: { alignItems: 'center', gap: space.sm },
+    avatarLabel:{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO },
 
-  // Sheet content demo
-  sheetContent: { paddingVertical: space.sm, gap: space.md },
-  sheetContentText: { fontSize: FS.body, color: T.textSecondary },
+    // Sheet content demo
+    sheetContent: { paddingVertical: space.sm, gap: space.md },
+    sheetContentText: { fontSize: FS.body, color: colors.textSecondary },
 
-  // Monospace row
-  monoRow:    { flexDirection: 'row', gap: space.lg, alignItems: 'flex-start' },
-  monoDemo:   {
-    flex: 1,
-    backgroundColor: T.surface,
-    borderRadius: radius.lg,
-    padding: space.lg,
-    alignItems: 'center',
-    gap: space.xs,
-  },
-  monoSample: {
-    fontFamily: MONO,
-    fontSize: FS.pinyin,
-    color: T.accent,
-    letterSpacing: 3,
-  },
-  monoCaption:{ fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
-  monoDesc:   { flex: 1.4 },
-  propName:   { fontSize: FS.label, color: T.textMuted, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 },
-  propValue:  { fontSize: FS.body, color: T.textSecondary, lineHeight: LH.body },
+    // Monospace row
+    monoRow:    { flexDirection: 'row', gap: space.lg, alignItems: 'flex-start' },
+    monoDemo:   {
+      flex: 1,
+      backgroundColor: colors.bgCard,
+      borderRadius: radius.lg,
+      padding: space.lg,
+      alignItems: 'center',
+      gap: space.xs,
+    },
+    monoSample: {
+      fontFamily: MONO,
+      fontSize: FS.pinyin,
+      color: colors.inkRedText,
+      letterSpacing: 3,
+    },
+    monoCaption:{ fontSize: FS.label, color: colors.textFaint, fontFamily: MONO },
+    monoDesc:   { flex: 1.4 },
+    propName:   { fontSize: FS.label, color: colors.textFaint, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 },
+    propValue:  { fontSize: FS.body, color: colors.textSecondary, lineHeight: LH.body },
 
-  // Line heights section
-  lhNote: {
-    fontSize: FS.body,
-    color: T.textSecondary,
-    lineHeight: LH.body,
-    marginBottom: space.lg,
-  },
-  lhRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: space.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    gap: space.lg,
-  },
-  lhToken:   { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO, width: 80 },
-  lhValue:   { fontSize: FS.label, color: T.accent,      fontFamily: MONO, width: 44 },
-  lhFormula: { fontSize: FS.label, color: T.textMuted,   fontFamily: MONO },
-  lhSectionTitle: {
-    fontSize: FS.body,
-    color: T.textPrimary,
-    fontWeight: FW.semibold,
-    marginTop: space.xxl,
-    marginBottom: space.sm,
-  },
-  lhDemoCard: {
-    backgroundColor: T.surface,
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: radius.card,
-    overflow: 'hidden',
-    marginTop: space.sm,
-    marginBottom: space.sm,
-  },
-  lhDemoLabel: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    fontFamily: MONO,
-    letterSpacing: 1,
-    paddingHorizontal: space.lg,
-    paddingTop: space.md,
-    paddingBottom: space.xs,
-  },
-  lhDemoCentered: {
-    alignItems: 'center',
-    paddingVertical: space.xl,
-    paddingHorizontal: space.lg,
-  },
-  lhDemoAnnotation: {
-    backgroundColor: T.surface2,
-    borderTopWidth: 1,
-    borderTopColor: T.border,
-    paddingHorizontal: space.lg,
-    paddingVertical: space.sm,
-  },
-  lhDemoAnnotationText: {
-    fontSize: FS.label,
-    color: T.accent,
-    fontFamily: MONO,
-    letterSpacing: 0.5,
-  },
+    // Line heights section
+    lhNote: {
+      fontSize: FS.body,
+      color: colors.textSecondary,
+      lineHeight: LH.body,
+      marginBottom: space.lg,
+    },
+    lhRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: space.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      gap: space.lg,
+    },
+    lhToken:   { fontSize: FS.label, color: colors.textPrimary, fontFamily: MONO, width: 100 },
+    lhValue:   { fontSize: FS.label, color: colors.inkRed,      fontFamily: MONO, width: 44 },
+    lhFormula: { fontSize: FS.label, color: colors.textFaint,   fontFamily: MONO },
+    lhSectionTitle: {
+      fontSize: FS.body,
+      color: colors.textPrimary,
+      fontWeight: FW.semibold,
+      marginTop: space.xxl,
+      marginBottom: space.sm,
+    },
+    lhDemoCard: {
+      backgroundColor: colors.bgCard,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.card,
+      overflow: 'hidden',
+      marginTop: space.sm,
+      marginBottom: space.sm,
+    },
+    lhDemoLabel: {
+      fontSize: FS.label,
+      color: colors.textFaint,
+      fontFamily: MONO,
+      letterSpacing: 1,
+      paddingHorizontal: space.lg,
+      paddingTop: space.md,
+      paddingBottom: space.xs,
+    },
+    lhDemoCentered: {
+      alignItems: 'center',
+      paddingVertical: space.xl,
+      paddingHorizontal: space.lg,
+    },
+    lhDemoAnnotation: {
+      backgroundColor: colors.bgCard2,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingHorizontal: space.lg,
+      paddingVertical: space.sm,
+    },
+    lhDemoAnnotationText: {
+      fontSize: FS.label,
+      color: colors.inkRed,
+      fontFamily: MONO,
+      letterSpacing: 0.5,
+    },
 
-  // Footer
-  footer: { marginTop: space.huge, alignItems: 'center' },
-  footerText: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO, letterSpacing: 1 },
+    // Footer
+    footer: { marginTop: space.huge, alignItems: 'center' },
+    footerText: { fontSize: FS.label, color: colors.textFaint, fontFamily: MONO, letterSpacing: 1 },
 
-  // No-italic callout
-  noItalicNote: {
-    backgroundColor: T.surface,
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: 12,
-    padding: space.lg,
-  },
-  noItalicText: {
-    fontSize: FS.body,
-    color: T.textSecondary,
-    lineHeight: LH.body,
-  },
-});
+    // Italic / note callout
+    noItalicNote: {
+      backgroundColor: colors.bgCard,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      padding: space.lg,
+    },
+    noItalicText: {
+      fontSize: FS.body,
+      color: colors.textSecondary,
+      lineHeight: LH.body,
+    },
+  });
+}
 
-// doc-level typography styles
-const ds = StyleSheet.create({
-  docHeading: {
-    fontSize: FS.title,
-    color: T.textPrimary,
-    fontWeight: FW.semibold,
-    marginBottom: space.sm,
-  },
-  docSubheading: {
-    fontSize: FS.body,
-    color: T.textSecondary,
-    lineHeight: 22,
-    marginBottom: space.xxl,
-  },
+function makeDocStyles(_colors: ColorTheme) {
+  return StyleSheet.create({});
+}
 
-  // Color swatches
-  colorGroup: { marginBottom: space.xxl },
-  colorGroupLabel: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    letterSpacing: 2.5,
-    textTransform: 'uppercase',
-    marginBottom: space.md,
-  },
-  colorGroupGrid: { gap: space.sm },
-  swatch: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.lg,
-    backgroundColor: T.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: T.border,
-    padding: space.md,
-  },
-  swatchBox: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-  },
-  swatchMeta:  { flex: 1, gap: 2 },
-  swatchToken: { fontSize: FS.body, color: T.textPrimary, fontFamily: MONO },
-  swatchHex:   { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
-  swatchUsage: { fontSize: FS.label, color: T.textSecondary, marginTop: 2 },
+function makeComponentStyles(_colors: ColorTheme) {
+  return StyleSheet.create({});
+}
 
-  // Type specimens
-  specimen: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    paddingVertical: space.md,
-    gap: space.lg,
-    minHeight: 64,
-  },
-  specimenSample: { width: 160, overflow: 'hidden' },
-  specimenMeta:   { flex: 1, gap: 2 },
-  specimenToken:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO },
-  specimenPx:     { fontSize: FS.label, color: T.accent,      fontFamily: MONO },
-  specimenUsage:  { fontSize: FS.label, color: T.textMuted },
-});
+function makeRuleStyles(_colors: ColorTheme) {
+  return StyleSheet.create({});
+}
 
-// component-section styles
-const cs = StyleSheet.create({
-  wrap: {
-    backgroundColor: T.surface,
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: radius.card,
-    padding: space.xxl,
-    marginBottom: space.xxl,
-  },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: space.sm },
-  name:   { fontSize: FS.subheading, color: T.textPrimary, fontWeight: FW.semibold },
-  file:   { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
-  desc:   { fontSize: FS.body, color: T.textSecondary, lineHeight: 20, marginBottom: space.xxl },
+function makeExampleStyles(colors: ColorTheme) {
+  return StyleSheet.create({
+    // Home
+    homeHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      paddingHorizontal: space.lg,
+      paddingTop: space.md,
+    },
+    homeGreet: {
+      paddingHorizontal: space.lg,
+      paddingTop: space.xxl,
+      paddingBottom: space.xl,
+    },
+    homeCards: {
+      paddingHorizontal: space.md,
+      gap: space.md,
+    },
 
-  demo: {
-    backgroundColor: T.surface2,
-    borderRadius: radius.lg,
-    padding: space.lg,
-    marginBottom: space.xxl,
-    borderWidth: 1,
-    borderColor: T.border,
-  },
+    // Session
+    sessionTopbar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.md,
+      paddingHorizontal: space.lg,
+      paddingTop: space.sm,
+      paddingBottom: space.xs,
+    },
+    sessionScoreStrip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: space.md,
+      paddingBottom: space.sm,
+    },
+    sessionCardArea: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: space.xl,
+      paddingBottom: 60,
+    },
+    sessionHskBadge: {
+      position: 'absolute',
+      top: 8,
+      right: space.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 100,
+    },
+    sessionFabs: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: space.xxl,
+      paddingBottom: space.lg,
+    },
+    fab: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+    },
 
-  tableHeading: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    letterSpacing: 2.5,
-    textTransform: 'uppercase',
-    marginBottom: space.sm,
-  },
-  table:       { borderWidth: 1, borderColor: T.border, borderRadius: radius.lg, overflow: 'hidden', marginBottom: space.lg },
-  row:         { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: T.border },
-  tableHeader: { backgroundColor: T.surface2 },
-  cell:        { paddingHorizontal: space.md, paddingVertical: space.sm },
-  cellProp:    { flex: 1.2 },
-  cellType:    { flex: 2 },
-  cellDesc:    { flex: 2 },
-  th:          { fontSize: FS.label, color: T.textMuted, letterSpacing: 1.5, textTransform: 'uppercase' },
-  propName:    { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO },
-  propType:    { fontSize: FS.label, color: T.accent, fontFamily: MONO },
-  propDesc:    { fontSize: FS.label, color: T.textSecondary },
+    // Session complete
+    completeCentered: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: space.lg,
+    },
 
-  usedRow: {
-    flexDirection: 'row',
-    gap: space.md,
-    paddingVertical: space.xs,
-    alignItems: 'flex-start',
-  },
-  usedScreen:  { fontSize: FS.label, color: T.textPrimary, fontFamily: MONO, width: 130 },
-  usedContext: { flex: 1, fontSize: FS.label, color: T.textSecondary },
-});
+    // Setup / Profile / Settings header
+    setupHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: space.lg,
+      paddingTop: space.md,
+      paddingBottom: space.sm,
+    },
 
-// rules-tab styles
-const rules = StyleSheet.create({
-  weightRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    paddingVertical: space.md,
-    gap: space.lg,
-    minHeight: 64,
-  },
-  weightSample: {
-    width: 140,
-    justifyContent: 'center',
-  },
-  colorSample: {
-    width: 140,
-    justifyContent: 'center',
-  },
-  weightMeta: { flex: 1, gap: 4 },
-
-  tokenRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-  tokenBadge: {
-    fontFamily: MONO,
-    fontSize: FS.label,
-    color: T.accent,
-    backgroundColor: T.accentDim,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  valueBadge: {
-    fontFamily: MONO,
-    fontSize: FS.label,
-    color: T.textMuted,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-  },
-  ruleText: { fontSize: FS.body, color: T.textSecondary, lineHeight: LH.body },
-  whereText: { fontSize: FS.label, color: T.textMuted, fontFamily: MONO },
-
-  roleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-    paddingVertical: space.md,
-    gap: space.lg,
-    minHeight: 64,
-  },
-  roleSample: {
-    width: 140,
-    justifyContent: 'center',
-  },
-  roleName: { fontSize: FS.body, color: T.textPrimary, fontWeight: FW.medium, marginBottom: 2 },
-});
-
-// examples-tab styles
-const ex = StyleSheet.create({
-  // Screen example wrapper
-  exampleWrap: {
-    marginBottom: space.huge,
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: radius.card,
-    overflow: 'hidden',
-  },
-  exampleHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: T.surface,
-    paddingHorizontal: space.lg,
-    paddingVertical: space.md,
-    borderBottomWidth: 1,
-    borderBottomColor: T.border,
-  },
-  exampleTitle: {
-    fontSize: FS.ui,
-    color: T.textPrimary,
-    fontWeight: FW.semibold,
-  },
-  exampleFile: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    fontFamily: MONO,
-  },
-  exampleBody: {
-    flexDirection: 'row',
-  },
-
-  // Phone frame
-  phone: {
-    width: 260,
-    minHeight: 480,
-    backgroundColor: T.bg,
-    borderRightWidth: 1,
-    borderRightColor: T.border,
-    overflow: 'hidden',
-  },
-  phoneNotch: {
-    width: 80,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: T.surface2,
-    alignSelf: 'center',
-    marginTop: space.sm,
-    marginBottom: space.sm,
-  },
-  phoneContent: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  phoneHomeBar: {
-    width: 56,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: T.surface2,
-    alignSelf: 'center',
-    marginTop: space.sm,
-    marginBottom: space.sm,
-  },
-
-  // Annotation sidebar
-  annotationList: {
-    flex: 1,
-    backgroundColor: T.surface,
-    paddingHorizontal: space.md,
-    paddingVertical: space.md,
-  },
-  annotationHeading: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    letterSpacing: 2,
-    marginBottom: space.md,
-    fontFamily: MONO,
-  },
-  annotationRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: space.sm,
-    marginBottom: space.md,
-  },
-  annotationDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: T.accent,
-    marginTop: 5,
-  },
-  annotationMeta: {
-    flex: 1,
-  },
-  annotationToken: {
-    fontSize: FS.label,
-    color: T.accent,
-    fontFamily: MONO,
-    backgroundColor: T.accentDim,
-    paddingHorizontal: 4,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  annotationValue: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    fontFamily: MONO,
-  },
-  annotationNote: {
-    fontSize: FS.label,
-    color: T.textSecondary,
-    marginTop: 2,
-    lineHeight: LH.label,
-  },
-  annotationWhy: {
-    fontSize: FS.label,
-    color: T.textMuted,
-    marginTop: 3,
-    lineHeight: LH.label,
-    fontStyle: 'italic',
-  },
-  annotationSectionGap: {
-    marginTop: space.lg,
-  },
-
-  // ── Screen-specific placeholder styles ──────────────────────────────────
-
-  // Home
-  homeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: space.lg,
-    paddingTop: space.md,
-  },
-  homeGreet: {
-    paddingHorizontal: space.lg,
-    paddingTop: space.xxl,
-    paddingBottom: space.xl,
-  },
-  homeCards: {
-    paddingHorizontal: space.md,
-    gap: space.md,
-  },
-
-  // Session
-  sessionTopbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.md,
-    paddingHorizontal: space.lg,
-    paddingTop: space.sm,
-    paddingBottom: space.xs,
-  },
-  sessionScoreStrip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: space.md,
-    paddingBottom: space.sm,
-  },
-  sessionCardArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: space.xl,
-    paddingBottom: 60,
-  },
-  sessionHskBadge: {
-    position: 'absolute',
-    top: 8,
-    right: space.lg,
-    borderWidth: 1,
-    borderColor: T.border,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 100,
-  },
-  sessionFabs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: space.xxl,
-    paddingBottom: space.lg,
-  },
-  fab: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-
-  // Session complete
-  completeCentered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: space.lg,
-  },
-
-  // Setup / Profile / Settings header
-  setupHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: space.lg,
-    paddingTop: space.md,
-    paddingBottom: space.sm,
-  },
-
-  // Deck selector
-  deckSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: T.surface,
-    borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: 14,
-    paddingHorizontal: space.lg,
-    paddingVertical: 12,
-  },
-});
+    // Deck selector
+    deckSelector: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.bgCard,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 0,
+      paddingHorizontal: space.lg,
+      paddingVertical: 12,
+    },
+  });
+}

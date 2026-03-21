@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS, FW, LS } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { FS, FW, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
@@ -13,6 +15,8 @@ import { ResponsiveShell } from '@/components/ResponsiveShell';
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [hasSession,   setHasSession]   = useState(false);
   const [displayName,  setDisplayName]  = useState<string | null>(null);
 
@@ -104,19 +108,19 @@ export default function HomeScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: T.bg },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  root: { flex: 1, backgroundColor: t.bg },
 
   header: {
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'flex-start', paddingHorizontal: space.xxxl, paddingTop: space.xxl, paddingBottom: space.sm,
   },
-  logoHanzi:   { fontSize: FS.subheading, color: T.accent, fontWeight: FW.semibold },
-  logoLabel:   { fontSize: FS.label, color: T.textMuted, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' },
+  logoHanzi:   { fontSize: FS.subheading, color: t.inkRed, fontWeight: FW.semibold },
+  logoLabel:   { fontSize: FS.label, color: t.textFaint, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' },
 
   greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },
-  greetTitle: { fontSize: FS.title, color: T.textPrimary, fontWeight: FW.semibold, marginBottom: 6, letterSpacing: LS.tight * FS.title },
-  greetSub:   { fontSize: FS.body, color: T.textMuted },
+  greetTitle: { fontSize: FS.title, color: t.textPrimary, fontWeight: FW.semibold, marginBottom: 6, letterSpacing: LS.tight * FS.title },
+  greetSub:   { fontSize: FS.body, color: t.textSecondary },
 
   actions: { paddingHorizontal: space.xl, gap: space.md },
 });

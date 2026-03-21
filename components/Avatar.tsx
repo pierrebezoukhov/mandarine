@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import {
   View, Text, Image, TouchableOpacity, StyleSheet,
   StyleProp, ViewStyle,
 } from 'react-native';
-import { T } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface AvatarProps {
   /** Public URL of the user's photo. Falls back to initials when absent. */
@@ -23,6 +25,8 @@ export function Avatar({
   onPress,
   style,
 }: AvatarProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const borderRadius = size / 2;
   const fontSize     = Math.round(size * 0.35);
 
@@ -50,19 +54,19 @@ export function Avatar({
   return <View style={style}>{inner}</View>;
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   image: {
-    backgroundColor: T.surface2,
+    backgroundColor: t.bgCard2,
   },
   fallback: {
-    backgroundColor: T.surface2,
+    backgroundColor: t.bgCard2,
     borderWidth: 1,
-    borderColor: T.border,
+    borderColor: t.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   initials: {
-    color:      T.textSecondary,
+    color:      t.textSecondary,
     fontWeight: '500',
   },
 });

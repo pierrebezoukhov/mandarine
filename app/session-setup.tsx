@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView,
   TextInput, FlatList, SafeAreaView, ActivityIndicator, Platform,
@@ -7,7 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
-import { T, FS, FW } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { MONO, FS, FW } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Section } from '@/components/Section';
 import { Chip } from '@/components/Chip';
@@ -57,6 +59,8 @@ const DEFAULT_CONFIG: SessionConfig = {
 // ── Main screen ───────────────────────────────────────────────────────────────
 export default function SessionSetupScreen() {
   const { user }                     = useAuth();
+  const { colors }                   = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [config, setConfig]          = useState<SessionConfig>(DEFAULT_CONFIG);
   const [decks, setDecks]            = useState<Deck[]>([]);
   const [loadingDecks, setLoading]   = useState(true);
@@ -164,7 +168,7 @@ export default function SessionSetupScreen() {
               activeOpacity={0.8}
             >
               {loadingDecks ? (
-                <ActivityIndicator color={T.textMuted} size="small" />
+                <ActivityIndicator color={colors.textSecondary} size="small" />
               ) : config.deck ? (
                 <View style={{ flex: 1 }}>
                   <Text style={s.deckName}>{config.deck.name}</Text>
@@ -232,7 +236,7 @@ export default function SessionSetupScreen() {
           <TextInput
             style={s.searchInput}
             placeholder="Search decks…"
-            placeholderTextColor={T.textMuted}
+            placeholderTextColor={colors.textFaint}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCorrect={false}
@@ -241,7 +245,7 @@ export default function SessionSetupScreen() {
         </View>
 
         {loadingDecks ? (
-          <ActivityIndicator color={T.accent} style={{ margin: 40 }} />
+          <ActivityIndicator color={colors.inkRed} style={{ margin: 40 }} />
         ) : (
           <FlatList
             data={filteredDecks}
@@ -277,8 +281,8 @@ export default function SessionSetupScreen() {
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
-const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: T.bg },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  root:   { flex: 1, backgroundColor: t.bg },
   scroll: { paddingHorizontal: space.xl, paddingTop: space.sm, paddingBottom: 32 },
 
   header: {
@@ -286,23 +290,23 @@ const s = StyleSheet.create({
     paddingHorizontal: space.xl, paddingTop: space.lg, paddingBottom: space.md,
   },
   backBtn:     { width: 60 },
-  backText:    { fontSize: FS.body, color: T.textMuted },
-  headerTitle: { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.semibold },
+  backText:    { fontSize: FS.body, color: t.textSecondary },
+  headerTitle: { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
 
   // Deck selector
   deckSelector: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: T.surface, borderWidth: 1, borderColor: T.border,
-    borderRadius: 14, paddingHorizontal: space.lg, paddingVertical: 14,
+    backgroundColor: t.bgCard, borderWidth: 1, borderColor: t.border,
+    paddingHorizontal: 12, paddingVertical: 10,
   },
-  deckName:        { fontSize: FS.ui, color: T.textPrimary, fontWeight: FW.medium },
-  deckDesc:        { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
-  deckPlaceholder: { flex: 1, fontSize: FS.ui, color: T.textMuted },
-  deckCaret:       { fontSize: FS.body, color: T.textMuted, marginLeft: space.md },
+  deckName:        { fontFamily: MONO, fontSize: 15, color: t.textPrimary, fontWeight: FW.light },
+  deckDesc:        { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, marginTop: 2 },
+  deckPlaceholder: { flex: 1, fontFamily: MONO, fontSize: 15, color: t.textSecondary, fontWeight: FW.light },
+  deckCaret:       { fontSize: 14, color: t.inkRedDim, marginLeft: space.md },
 
   // Difficulty chips container
   chips:    { gap: space.sm },
-  diffHint: { fontSize: FS.label, color: T.textMuted, marginTop: space.sm },
+  diffHint: { fontSize: FS.label, color: t.textFaint, marginTop: space.sm },
 
   // Footer
   footer: {
@@ -310,24 +314,24 @@ const s = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? space.xxl : space.xl,
     paddingTop: space.md,
     borderTopWidth: 1,
-    borderTopColor: T.border,
+    borderTopColor: t.border,
   },
 
   // Deck picker search
   searchWrap: {
-    backgroundColor: T.surface2, borderWidth: 1, borderColor: T.border,
-    borderRadius: 10, paddingHorizontal: space.md, marginBottom: space.sm,
+    backgroundColor: t.bgCard2, borderWidth: 1, borderColor: t.border,
+    paddingHorizontal: space.md, marginBottom: space.sm,
   },
-  searchInput: { color: T.textPrimary, fontSize: FS.ui, paddingVertical: 10 },
+  searchInput: { fontFamily: MONO, color: t.textPrimary, fontSize: 15, fontWeight: FW.light, paddingVertical: 8 },
 
   // Deck list rows
   row: {
     flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: T.border,
+    paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: t.border,
   },
   rowActive:     {},
-  rowName:       { fontSize: FS.ui, color: T.textSecondary, fontWeight: FW.medium },
-  rowNameActive: { color: T.textPrimary },
-  rowDesc:       { fontSize: FS.label, color: T.textMuted, marginTop: 2 },
-  checkmark:     { fontSize: FS.ui, color: T.accent, marginLeft: space.md },
+  rowName:       { fontSize: FS.ui, color: t.textSecondary, fontWeight: FW.medium },
+  rowNameActive: { color: t.textPrimary },
+  rowDesc:       { fontSize: FS.label, color: t.textSecondary, marginTop: 2 },
+  checkmark:     { fontSize: FS.ui, color: t.inkRed, marginLeft: space.md },
 });

@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { T, MONO, FS, LS } from '@/theme/tokens';
+import { MONO, FS, LS } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface StatCardProps {
   /** Short uppercase label below the value. */
@@ -10,6 +13,9 @@ interface StatCardProps {
 }
 
 export function StatCard({ label, value, style }: StatCardProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={[s.card, style]}>
       <Text style={s.value}>{value}</Text>
@@ -18,11 +24,11 @@ export function StatCard({ label, value, style }: StatCardProps) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   card: {
-    backgroundColor: T.surface,
+    backgroundColor: t.bgCard,
     borderWidth:     1,
-    borderColor:     T.border,
+    borderColor:     t.border,
     borderRadius:    16,
     paddingVertical:   16,
     paddingHorizontal: 12,
@@ -33,13 +39,13 @@ const s = StyleSheet.create({
   value: {
     fontFamily:    MONO,
     fontSize:      FS.title,
-    color:         T.textPrimary,
+    color:         t.textPrimary,
     marginBottom:  4,
     letterSpacing: LS.tight * FS.title,
   },
   label: {
     fontSize:      FS.label,
-    color:         T.textMuted,
+    color:         t.textFaint,
     textTransform: 'uppercase',
     letterSpacing: LS.loose * FS.label,
   },
