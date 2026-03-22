@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 import { MONO, FS, FW } from '@/theme/tokens';
+import { GearIcon } from '@/components/GearIcon';
 import { space } from '@/theme/spacing';
 import { Avatar } from '@/components/Avatar';
 import { StatCard } from '@/components/StatCard';
@@ -135,7 +136,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <Text style={s.title}>Profile</Text>
           <TouchableOpacity onPress={() => router.push('/settings')} style={s.headerBtn}>
-            <Text style={s.settingsIcon}>⚙️</Text>
+            <GearIcon size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
 
@@ -258,13 +259,12 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     paddingBottom: space.sm,
   },
   headerBtn:   { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
-  backText:    { fontSize: FS.body, color: t.textSecondary },
-  title:       { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
-  settingsIcon: { fontSize: FS.subheading, textAlign: 'right' },
+  backText:    { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary },
+  title:       { fontFamily: MONO, fontSize: FS.definition, color: t.textPrimary, fontWeight: FW.medium },
 
   scroll: { paddingHorizontal: space.xl, paddingBottom: space.giant },
 
-  avatarWrap:      { alignItems: 'center', paddingVertical: space.xxxl },
+  avatarWrap:      { alignItems: 'center', paddingVertical: space.xxl },
   avatarContainer: { position: 'relative' },
   editBadge: {
     position:        'absolute',
@@ -279,7 +279,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     alignItems:      'center',
     justifyContent:  'center',
   },
-  editIcon: { fontSize: 11, color: t.textSecondary, lineHeight: 14 },
+  editIcon: { fontFamily: MONO, fontSize: 11, color: t.textSecondary, lineHeight: 14 },
 
   grid:    { flexDirection: 'row', gap: 10 },
   gridGap: { marginTop: 10 },
@@ -300,6 +300,6 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 
   sessionRow: { paddingVertical: space.md },
   sessionDivider: { borderBottomWidth: 1, borderBottomColor: t.border },
-  sessionDeck: { fontSize: FS.body, color: t.textPrimary, marginBottom: space.xs },
+  sessionDeck: { fontFamily: MONO, fontSize: FS.body, color: t.textPrimary, marginBottom: space.xs },
   sessionMeta: { fontSize: FS.label, color: t.textSecondary, fontFamily: MONO },
 });

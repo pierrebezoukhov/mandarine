@@ -5,7 +5,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
-import { FS, FW, LS } from '@/theme/tokens';
+import { FS, FW, LS, MONO } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
@@ -113,14 +113,14 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 
   header: {
     flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'flex-start', paddingHorizontal: space.xxxl, paddingTop: space.xxl, paddingBottom: space.sm,
+    alignItems: 'flex-start', paddingHorizontal: space.xxl, paddingTop: space.xxl, paddingBottom: space.sm,
   },
-  logoHanzi:   { fontSize: FS.subheading, color: t.inkRed, fontWeight: FW.semibold },
-  logoLabel:   { fontSize: FS.label, color: t.textFaint, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' },
+  logoHanzi:   { fontSize: FS.pinyin, color: t.inkRed, fontWeight: FW.medium },
+  logoLabel:   { fontFamily: MONO, fontSize: FS.label, color: t.textFaint, marginTop: 2, letterSpacing: 4, textTransform: 'uppercase' },
 
-  greet:      { paddingHorizontal: space.xxxl, paddingTop: space.giant, paddingBottom: 40 },
-  greetTitle: { fontSize: FS.title, color: t.textPrimary, fontWeight: FW.semibold, marginBottom: 6, letterSpacing: LS.tight * FS.title },
-  greetSub:   { fontSize: FS.body, color: t.textSecondary },
+  greet:      { paddingHorizontal: space.xxl, paddingTop: space.giant, paddingBottom: 40 },
+  greetTitle: { fontFamily: MONO, fontSize: FS.formTitle, color: t.textPrimary, fontWeight: FW.medium, marginBottom: 6, letterSpacing: LS.tighter * FS.formTitle },
+  greetSub:   { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary },
 
   actions: { paddingHorizontal: space.xl, gap: space.md },
 });

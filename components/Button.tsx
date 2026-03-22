@@ -1,22 +1,20 @@
-import { useMemo } from 'react';
+import { useState, useMemo, ReactNode } from 'react';
 import {
-  TouchableOpacity, Text, ActivityIndicator, StyleSheet,
-  ViewStyle, StyleProp,
+  TouchableOpacity, View, Text, ActivityIndicator, StyleSheet,
+  ViewStyle, StyleProp, Platform,
 } from 'react-native';
-import { FS, FW } from '@/theme/tokens';
+import { MONO, FS, FW, LS } from '@/theme/tokens';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
-type ButtonShape   = 'pill' | 'rounded';
-
 interface ButtonProps {
   label: string;
   onPress: () => void;
   /** primary = accent fill | secondary = outlined | ghost = text only */
   variant?: ButtonVariant;
-  /** pill = borderRadius 100 (default) | rounded = borderRadius 12 */
-  shape?: ButtonShape;
+  /** Optional icon element rendered to the left of the label */
+  icon?: ReactNode;
   disabled?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -26,77 +24,126 @@ export function Button({
   label,
   onPress,
   variant = 'primary',
-  shape   = 'pill',
+  icon,
   disabled,
   loading,
   style,
 }: ButtonProps) {
-  const { colors } = useTheme();
-  const s = useMemo(() => makeStyles(colors), [colors]);
+  const { colors, isDark } = useTheme();
+  const s = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
   const isDisabled = disabled || loading;
+  const [hovered, setHovered] = useState(false);
+
+  const webHoverProps = Platform.OS === 'web' && !isDisabled ? {
+    onMouseEnter: () => setHovered(true),
+    onMouseLeave: () => setHovered(false),
+  } as any : {};
 
   return (
     <TouchableOpacity
       style={[
         s.base,
-        shape === 'pill'    ? s.shapePill    : s.shapeRounded,
         variant === 'primary'   && s.variantPrimary,
         variant === 'secondary' && s.variantSecondary,
         variant === 'ghost'     && s.variantGhost,
+        hovered && variant === 'primary'   && s.hoverPrimary,
+        hovered && variant === 'secondary' && s.hoverSecondary,
+        hovered && variant === 'ghost'     && s.hoverGhost,
         isDisabled && s.disabled,
         style,
       ]}
       onPress={onPress}
       disabled={isDisabled}
       activeOpacity={0.82}
+      {...webHoverProps}
     >
       {loading
         ? <ActivityIndicator color={variant === 'primary' ? '#fff' : colors.textSecondary} />
-        : <Text style={[
-            s.label,
-            variant === 'primary'   && s.labelPrimary,
-            variant === 'secondary' && s.labelSecondary,
-            variant === 'ghost'     && s.labelGhost,
-          ]}>
-            {label}
-          </Text>
+        : <View style={s.inner}>
+            {icon}
+            <Text style={[
+              s.label,
+              variant === 'primary'   && s.labelPrimary,
+              variant === 'secondary' && s.labelSecondary,
+              variant === 'ghost'     && s.labelGhost,
+            ]}>
+              {label}
+            </Text>
+          </View>
       }
     </TouchableOpacity>
   );
 }
 
-const makeStyles = (t: ColorTheme) => StyleSheet.create({
+const makeStyles = (t: ColorTheme, isDark: boolean) => StyleSheet.create({
   base: {
-    paddingVertical: 15,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
+    ...(Platform.OS === 'web' ? {
+      transition: 'background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, filter 150ms ease',
+      cursor: 'pointer',
+    } as any : {}),
   },
 
-  // Shapes
-  shapePill:    { borderRadius: 100 },
-  shapeRounded: { borderRadius: 12 },
+  inner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
 
-  // Variants
+  // Variants — default
   variantPrimary: {
     backgroundColor: t.inkRed,
   },
   variantSecondary: {
+    height: 52,
     borderWidth: 1,
     borderColor: t.border,
-    backgroundColor: t.bgCard,
   },
   variantGhost: {
     // no background, no border
   },
 
+  // Variants — hover (web only)
+  hoverPrimary: Platform.OS === 'web' ? {
+    filter: 'brightness(1.12)',
+    boxShadow: `0 0 16px ${t.inkRedGlow}`,
+  } as any : {},
+  hoverSecondary: Platform.OS === 'web' ? {
+    borderColor: t.inkRed,
+    backgroundColor: isDark ? 'rgba(200,56,42,0.06)' : 'rgba(184,48,30,0.03)',
+    boxShadow: `0 0 12px ${t.inkRedGlow}`,
+  } as any : {},
+  hoverGhost: Platform.OS === 'web' ? {
+    backgroundColor: isDark ? 'rgba(200,56,42,0.06)' : 'rgba(184,48,30,0.03)',
+  } as any : {},
+
   disabled: { opacity: 0.18 },
 
-  // Labels
+  // Labels — primary: 12px, 500, uppercase, 0.12em
+  //          secondary/ghost: 13px, 400, normal case, 0.04em
   label: {
-    fontSize: FS.ui,
-    fontWeight: FW.medium,
+    fontFamily: MONO,
   },
-  labelPrimary:   { color: '#fff' },
-  labelSecondary: { color: t.textSecondary },
-  labelGhost:     { color: t.textSecondary },
+  labelPrimary: {
+    color: '#fff',
+    fontSize: FS.ctaLabel,
+    fontWeight: FW.medium,
+    textTransform: 'uppercase',
+    letterSpacing: LS.cta * FS.ctaLabel,
+  },
+  labelSecondary: {
+    color: t.textPrimary,
+    fontSize: FS.body,
+    fontWeight: FW.regular,
+    letterSpacing: LS.wide * FS.body,
+  },
+  labelGhost: {
+    color: t.textSecondary,
+    fontSize: FS.body,
+    fontWeight: FW.regular,
+    letterSpacing: LS.wide * FS.body,
+  },
 });

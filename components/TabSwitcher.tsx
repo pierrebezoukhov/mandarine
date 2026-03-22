@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { FS, FW } from '@/theme/tokens';
+import { FS, FW, MONO } from '@/theme/tokens';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
@@ -54,7 +54,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  tabText:       { fontSize: FS.body, fontWeight: FW.medium, color: t.textSecondary },
+  tabText:       { fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: t.textSecondary },
   tabTextActive: { color: t.textPrimary },
   underline: {
     position: 'absolute',

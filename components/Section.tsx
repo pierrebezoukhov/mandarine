@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { ReactNode } from 'react';
-import { FS, LS } from '@/theme/tokens';
+import { FS, LS, MONO } from '@/theme/tokens';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
@@ -26,8 +26,9 @@ export function Section({ label, children, style }: SectionProps) {
 const makeStyles = (t: ColorTheme) => StyleSheet.create({
   wrap:  { marginBottom: 28 },
   label: {
+    fontFamily: MONO,
     fontSize: FS.label,
-    letterSpacing: LS.loose * FS.label,
+    letterSpacing: LS.widest * FS.label,
     color: t.textFaint,
     marginBottom: 10,
     textTransform: 'uppercase',

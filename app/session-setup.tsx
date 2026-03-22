@@ -290,8 +290,8 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     paddingHorizontal: space.xl, paddingTop: space.lg, paddingBottom: space.md,
   },
   backBtn:     { width: 60 },
-  backText:    { fontSize: FS.body, color: t.textSecondary },
-  headerTitle: { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
+  backText:    { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary },
+  headerTitle: { fontFamily: MONO, fontSize: FS.definition, color: t.textPrimary, fontWeight: FW.medium },
 
   // Deck selector
   deckSelector: {
@@ -299,14 +299,14 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     backgroundColor: t.bgCard, borderWidth: 1, borderColor: t.border,
     paddingHorizontal: 12, paddingVertical: 10,
   },
-  deckName:        { fontFamily: MONO, fontSize: 15, color: t.textPrimary, fontWeight: FW.light },
+  deckName:        { fontFamily: MONO, fontSize: FS.definition, color: t.textPrimary, fontWeight: FW.light },
   deckDesc:        { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, marginTop: 2 },
-  deckPlaceholder: { flex: 1, fontFamily: MONO, fontSize: 15, color: t.textSecondary, fontWeight: FW.light },
-  deckCaret:       { fontSize: 14, color: t.inkRedDim, marginLeft: space.md },
+  deckPlaceholder: { flex: 1, fontFamily: MONO, fontSize: FS.definition, color: t.textSecondary, fontWeight: FW.light },
+  deckCaret:       { fontFamily: MONO, fontSize: 14, color: t.inkRedDim, marginLeft: space.md },
 
   // Difficulty chips container
   chips:    { gap: space.sm },
-  diffHint: { fontSize: FS.label, color: t.textFaint, marginTop: space.sm },
+  diffHint: { fontFamily: MONO, fontSize: FS.label, color: t.textFaint, marginTop: space.sm },
 
   // Footer
   footer: {
@@ -322,7 +322,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     backgroundColor: t.bgCard2, borderWidth: 1, borderColor: t.border,
     paddingHorizontal: space.md, marginBottom: space.sm,
   },
-  searchInput: { fontFamily: MONO, color: t.textPrimary, fontSize: 15, fontWeight: FW.light, paddingVertical: 8 },
+  searchInput: { fontFamily: MONO, color: t.textPrimary, fontSize: FS.definition, fontWeight: FW.light, paddingVertical: 8 },
 
   // Deck list rows
   row: {
@@ -330,8 +330,8 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: t.border,
   },
   rowActive:     {},
-  rowName:       { fontSize: FS.ui, color: t.textSecondary, fontWeight: FW.medium },
+  rowName:       { fontFamily: MONO, fontSize: FS.definition, color: t.textSecondary, fontWeight: FW.medium },
   rowNameActive: { color: t.textPrimary },
-  rowDesc:       { fontSize: FS.label, color: t.textSecondary, marginTop: 2 },
-  checkmark:     { fontSize: FS.ui, color: t.inkRed, marginLeft: space.md },
+  rowDesc:       { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, marginTop: 2 },
+  checkmark:     { fontFamily: MONO, fontSize: FS.definition, color: t.inkRed, marginLeft: space.md },
 });

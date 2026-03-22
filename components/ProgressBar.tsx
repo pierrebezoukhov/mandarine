@@ -42,17 +42,15 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     flex: 1,
     height: 2,
     backgroundColor: t.border,
-    borderRadius: 1,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
     backgroundColor: t.inkRed,
-    borderRadius: 1,
   },
   counter: {
     fontFamily: MONO,
-    fontSize: FS.label,
+    fontSize: FS.progress,
     color: t.textSecondary,
   },
   counterTotal: {

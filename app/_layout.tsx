@@ -5,8 +5,8 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { NoiseOverlay } from '@/components/NoiseOverlay';
-import { Scanlines } from '@/components/Scanlines';
+// import { NoiseOverlay } from '@/components/NoiseOverlay';
+// import { Scanlines } from '@/components/Scanlines';
 import {
   IBMPlexMono_400Regular,
 } from '@expo-google-fonts/ibm-plex-mono/400Regular';
@@ -74,8 +74,6 @@ export default function RootLayout() {
     <ThemeProvider>
       <AuthProvider>
         <RouteGuard />
-        <Scanlines />
-        <NoiseOverlay />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="auth" options={{ animation: 'fade' }} />
           <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />

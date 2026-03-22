@@ -152,19 +152,19 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     paddingBottom: space.sm,
   },
   backBtn:  { paddingVertical: 6, paddingHorizontal: 2, minWidth: 60 },
-  backText: { fontSize: FS.body, color: t.textSecondary },
-  title:    { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
+  backText: { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary },
+  title:    { fontFamily: MONO, fontSize: FS.definition, color: t.textPrimary, fontWeight: FW.medium },
 
   scroll: { paddingHorizontal: space.xl, paddingTop: space.xl, paddingBottom: space.giant },
 
   fieldLabel: {
     fontFamily: MONO,
-    fontSize: 10,
-    letterSpacing: LS.widest * 10,
+    fontSize: FS.label,
+    letterSpacing: LS.widest * FS.label,
     color: t.textFaint,
     textTransform: 'uppercase',
     marginBottom: space.sm,
   },
 
-  email: { fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: t.textSecondary },
+  email: { fontFamily: MONO, fontSize: FS.definition, fontWeight: FW.light, color: t.textSecondary },
 });

@@ -2,7 +2,7 @@ import { ReactNode, useMemo } from 'react';
 import {
   Modal, View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { FS, FW } from '@/theme/tokens';
+import { FS, FW, MONO } from '@/theme/tokens';
 import { useTheme } from '@/context/ThemeContext';
 import { useResponsive } from '@/hooks/useResponsive';
 import { ColorTheme } from '@/theme/colors';
@@ -89,6 +89,6 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
   },
-  title: { fontSize: FS.ui, color: t.textPrimary, fontWeight: FW.semibold },
-  done:  { fontSize: FS.body, color: t.inkRed, fontWeight: FW.medium },
+  title: { fontFamily: MONO, fontSize: FS.definition, color: t.textPrimary, fontWeight: FW.medium },
+  done:  { fontFamily: MONO, fontSize: FS.body, color: t.inkRed, fontWeight: FW.medium },
 });

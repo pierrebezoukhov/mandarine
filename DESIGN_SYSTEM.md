@@ -177,90 +177,119 @@ These aliases will be removed once all call-sites use the new names.
 
 **File:** `theme/tokens.ts`
 
-### Fonts
+### Fonts — two only
 
 | Constant | Native | Web | Role |
 |---|---|---|---|
-| `SERIF` | `NotoSerifSC-Light` | `"Noto Serif SC", "STSong", serif` | Hanzi hero character, example sentences |
-| `MONO` | `IBMPlexMono-Regular` | `"IBM Plex Mono", monospace` | All UI text, labels, inputs, counters, pinyin |
-| `MONO_MEDIUM` | `IBMPlexMono-Medium` | `"IBM Plex Mono", monospace` | Score strip values, interactive mono labels |
+| `MONO` | `IBMPlexMono-Regular` | `"IBM Plex Mono", monospace` | **All UI text** — every label, input, button, counter, pinyin, description |
+| `SERIF` | `NotoSerifSC-Light` | `"Noto Serif SC", "STSong", serif` | **Chinese characters only** — hero hanzi, example sentences |
 
-**Key rule:** All UI text uses `MONO` (IBM Plex Mono). Chinese characters use `SERIF` (Noto Serif SC). This creates contrast between "machine" and "tradition."
+Every `<Text>` element must have `fontFamily: MONO` unless it displays Chinese characters (then `SERIF`). No system font fallback — the terminal aesthetic depends on monospace everywhere.
 
-### Display scale (Perfect Fourth 1.333)
+### Text treatments — complete reference
 
-| Token | Value | Role |
+Each treatment defines a specific text role with its full styling recipe. Sizes are role-based (not derived from a mathematical scale).
+
+#### Display treatments
+
+| Treatment | Token | Size | Weight | LS | LH | Style | Font | Color | Where used |
+|---|---|---|---|---|---|---|---|---|---|
+| **Hero Hanzi** | `FS.hanzi` | 108px | 300 | `LS.tighter` (-0.02em) | `LH.single` (1.0) | — | `SERIF` | `textHanzi` | Flashcard main character |
+| **Form Title** | `FS.formTitle` | 24px | 500 | `LS.wider` (0.08em) | `LH.tight` (1.2) | uppercase | `MONO` | `textPrimary` | Auth headings ("WELCOME BACK"), session complete title |
+
+#### Content treatments
+
+| Treatment | Token | Size | Weight | LS | LH | Style | Font | Color | Where used |
+|---|---|---|---|---|---|---|---|---|---|
+| **Pinyin** | `FS.pinyin` | 18px | 400 | `LS.wider` (0.08em) | `LH.single` (1.0) | italic | `MONO` | `inkRedText` | Main card pinyin romanization |
+| **Definition** | `FS.definition` | 15px | 300 | `LS.wide` (0.04em) | `LH.normal` (1.5) | — | `MONO` | `textSecondary` | Card meaning/translation, header titles, deck names |
+| **Input** | `FS.input` | 14px | 400 | `LS.wide` (0.04em) | — | — | `MONO` | `textPrimary` | Form text inputs, search fields |
+| **Body** | `FS.body` | 13px | 400 | `LS.wide` (0.04em) | `LH.normal` (1.5) | — | `MONO` | `textSecondary` | Subtitles, descriptions, secondary button labels, back links |
+| **Score Number** | `FS.body` | 13px | 500 | `LS.wider` (0.08em) | `LH.single` (1.0) | tnum | `MONO` | semantic color | Score strip numbers (wrong/right counts) |
+| **CTA Label** | `FS.ctaLabel` | 12px | 500 | `LS.cta` (0.12em) | `LH.single` (1.0) | uppercase | `MONO` | `#fff` | Primary button text ("START SESSION") |
+| **Progress** | `FS.progress` | 12px | 400 | `LS.progress` (0.05em) | `LH.single` (1.0) | tnum | `MONO` | `textSecondary` | Progress counter ("3 / 24"), example translations |
+| **Example Pinyin** | `FS.exPinyin` | 11px | 400 | `LS.example` (0.06em) | `LH.normal` (1.5) | italic | `MONO` | `inkRedText` | Example sentence pinyin |
+| **Label** | `FS.label` | 10px | 400 | `LS.widest` (0.14em) | `LH.single` (1.0) | uppercase | `MONO` | `textFaint` | Form labels, section headers, divider text, POS tags |
+| **Micro** | `FS.micro` | 9px | 400 | `LS.extreme` (0.22em) | `LH.single` (1.0) | uppercase | `MONO` | `textFaint` | Tap hints ("TAP TO REVEAL"), rating button labels, HSK badges |
+
+#### Chinese text treatments (SERIF font)
+
+| Treatment | Size | Weight | LS | LH | Color | Where used |
+|---|---|---|---|---|---|---|
+| **Hero Hanzi** | 108px | 300 | -0.02em | 1.0 | `textHanzi` | Flashcard main character |
+| **Hanzi Display** | 48px | 300 | — | 1.0 | `textHanzi` | Smaller character display |
+| **Example Hanzi** | 15px | 400 | `LS.example` (0.06em) | `LH.normal` (1.5) | `textPrimary` | Example sentence Chinese text |
+
+### Font sizes — token reference
+
+#### Display (FSDisplay)
+
+| Token | Value | Usage |
 |---|---|---|
-| `FSDisplay.hanzi` | 108px | Flashcard hero character (manual override) |
-| `FSDisplay.seal` | 50px | Session completion seal |
-| `FSDisplay.score` | 42px | Large numeric display |
-| `FSDisplay.title` | 42px | Screen titles / H1 |
-| `FSDisplay.heading` | 32px | Deck names / H2 |
-| `FSDisplay.subheading` | 21px | Sub-headings, card headings |
+| `FS.hanzi` | 108px | Flashcard hero character (Noto Serif SC) |
+| `FS.formTitle` | 24px | Form/screen headings (MONO, uppercase, weight 500) |
 
-### Body scale (Major Third 1.250)
+#### Content (FSContent)
 
-| Token | Value | Role |
+| Token | Value | Usage |
 |---|---|---|
-| `FSBody.pinyin` | 20px | Pinyin romanization |
-| `FSBody.ui` | 16px | Navigation controls (base) |
-| `FSBody.body` | 16px | Body text, translations (base) |
-| `FSBody.label` | 13px | Captions, section labels |
-| `FSBody.progress` | 12px | Progress counter, example translation |
-| `FSBody.scoreNumber` | 13px | Score display numbers (weight 500) |
-| `FSBody.micro` | 9px | Tap hints, button labels — minimum legible size |
-| `FSBody.buttonLabel` | 9px | Action button labels (Wrong, Right, Again) |
+| `FS.pinyin` | 18px | Pinyin romanization |
+| `FS.definition` | 15px | Card meaning, header titles, deck names |
+| `FS.input` | 14px | Form input text |
+| `FS.body` | 13px | Body secondary, descriptions, subtitles |
+| `FS.ctaLabel` | 12px | Primary CTA button labels (uppercase) |
+| `FS.progress` | 12px | Progress counter, example translation |
+| `FS.exPinyin` | 11px | Example sentence pinyin (italic) |
+| `FS.label` | 10px | Form labels, dividers, section headers (uppercase) |
+| `FS.micro` | 9px | Tap hints, rating button labels (uppercase) |
+
+### Font weights — three only
+
+No bold (700). Bold thickens Chinese character strokes, reducing legibility.
+
+| Token | Weight | Usage |
+|---|---|---|
+| `FW.light` | 300 | Serif Hanzi display, definition text, form inputs |
+| `FW.regular` | 400 | Pinyin, labels, body text, secondary buttons (default) |
+| `FW.medium` | 500 | Primary CTA labels, score numbers, form titles, interactive controls |
 
 ### Letter spacing
 
 | Token | Value | Usage |
 |---|---|---|
-| `LS.tighter` | `-0.05` | Score / seal / hanzi — large display |
-| `LS.tight` | `-0.025` | Title / heading hierarchy |
-| `LS.normal` | `0` | Body / UI text — default |
-| `LS.loose` | `0.025` | Section labels |
-| `LS.wide` | `0.04` | Definition text, body secondary, input text |
-| `LS.wider` | `0.08` | Pinyin, score labels, sidebar brand |
-| `LS.widest` | `0.14` | Button labels, form labels, sidebar nav |
-| `LS.ultrawide` | `0.18` | Uppercase card labels (POS · HSK level) |
-| `LS.extreme` | `0.22` | Micro text ("Tap to reveal") |
+| `LS.tighter` | -0.02 | Hanzi display |
+| `LS.normal` | 0 | Default — no tracking |
+| `LS.subtle` | 0.01 | Subtitles |
+| `LS.wide` | 0.04 | Definition text, body, oauth buttons, translations |
+| `LS.progress` | 0.05 | Progress counters |
+| `LS.example` | 0.06 | Example hanzi, example pinyin, brand pinyin |
+| `LS.wider` | 0.08 | Pinyin, score labels, form title |
+| `LS.cta` | 0.12 | CTA button labels, section state labels |
+| `LS.widest` | 0.14 | Form labels, rating button labels |
+| `LS.divider` | 0.16 | Divider text, hint triggers |
+| `LS.ultrawide` | 0.18 | Uppercase card labels (POS · HSK level) |
+| `LS.extreme` | 0.22 | Micro text ("Tap to reveal") |
 
-### Font weights
+### Line heights — three ratios
 
-Four weights — no bold (700). Bold thickens Chinese character strokes.
+Applied as `lineHeight: fontSize * LH.ratio`.
 
-| Token | Weight | Role |
+| Token | Value | Usage |
 |---|---|---|
-| `FW.light` | 300 | Serif Hanzi display, form inputs, definitions |
-| `FW.regular` | 400 | Pinyin, labels, captions (default — omit from style) |
-| `FW.medium` | 500 | Interactive controls, primary CTA labels, score numbers |
-| `FW.semibold` | 600 | Screen headings, titles |
-
-### Line heights
-
-| Token | Font size | Line height | Ratio |
-|---|---|---|---|
-| `LH.micro` | 9px | 12px | 1.33 |
-| `LH.progress` | 12px | 12px | 1.00 |
-| `LH.scoreNumber` | 13px | 16px | 1.23 |
-| `LH.label` | 13px | 20px | 1.54 |
-| `LH.body` / `LH.ui` | 16px | 24px | 1.50 |
-| `LH.pinyin` | 20px | 28px | 1.40 |
-| `LH.subheading` | 21px | 28px | 1.33 |
-| `LH.heading` | 32px | 40px | 1.25 |
-| `LH.title` / `LH.score` | 42px | 48px | 1.14 |
-| `LH.seal` | 50px | 56px | 1.12 |
-| `LH.hanzi` | 108px | 120px | 1.11 |
+| `LH.single` | 1.0 | Single-line: buttons, counters, scores, pinyin, labels |
+| `LH.tight` | 1.2 | Form titles, compact headings |
+| `LH.normal` | 1.5 | Multi-line body, definitions, example sentences |
 
 ### Typography rules
 
-1. All UI text uses monospace (IBM Plex Mono) — this creates the terminal/ASCII aesthetic
-2. Chinese characters use Noto Serif SC serif — contrast between "machine" and "tradition"
-3. Pinyin is always italic with `inkRedText` color
-4. Uppercase labels use wide letter-spacing (`LS.widest` to `LS.extreme`)
-5. Body text uses light-to-normal weights (300–400) for an elegant, non-heavy feel
+1. All UI text uses `MONO` (IBM Plex Mono) — no system font fallback
+2. Chinese characters use `SERIF` (Noto Serif SC) — contrast between "machine" and "tradition"
+3. Pinyin is always **italic** with `inkRedText` color
+4. Uppercase labels use wide letter-spacing (0.12em–0.22em)
+5. Body text uses light-to-regular weights (300–400) for an elegant feel
 6. Numbers use `fontFeatureSettings: 'tnum'` for tabular alignment
-7. No text ever goes below 9px (`FSBody.micro`)
+7. No text ever goes below 9px (`FS.micro`)
+8. Primary buttons: 12px / 500 / uppercase / 0.12em. Secondary buttons: 13px / 400 / normal case / 0.04em
 
 ---
 
@@ -349,25 +378,57 @@ Fallback circle uses `bgCard2` background, `border` stroke, `textSecondary` init
 
 **File:** `components/Button.tsx`
 
-Primary call-to-action element.
+Square call-to-action element. All variants use `MONO` font, square corners (no border-radius).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `string` | — | Button text |
 | `onPress` | `() => void` | — | Press handler |
 | `variant` | `'primary' \| 'secondary' \| 'ghost'` | `'primary'` | Visual style |
-| `shape` | `'pill' \| 'rounded'` | `'pill'` | Border radius |
+| `icon` | `ReactNode` | — | Optional icon rendered to the left of the label |
 | `disabled` | `boolean` | `false` | Dims to 18% opacity |
 | `loading` | `boolean` | `false` | Shows ActivityIndicator |
 | `style` | `ViewStyle` | — | Override container |
 
-#### Variants
+#### Variants — container
 
-| Variant | Background | Border | Text |
-|---|---|---|---|
-| `primary` | `inkRed` | none | `#fff` |
-| `secondary` | `bgCard` | `border` | `textSecondary` |
-| `ghost` | none | none | `textSecondary` |
+| Variant | Background | Border |
+|---|---|---|
+| `primary` | `inkRed` | none |
+| `secondary` | `bgCard` | 1px `border` |
+| `ghost` | none | none |
+
+#### Variants — typography
+
+Primary and secondary/ghost use completely different text treatments:
+
+| Property | Primary (CTA) | Secondary / Ghost |
+|---|---|---|
+| fontSize | 12px (`FS.ctaLabel`) | 13px (`FS.body`) |
+| fontWeight | 500 (`FW.medium`) | 400 (`FW.regular`) |
+| letterSpacing | 0.12em (`LS.cta`) | 0.04em (`LS.wide`) |
+| textTransform | `uppercase` | normal |
+| color | `#fff` | `textPrimary` / `textSecondary` |
+
+Primary buttons command attention through uppercase + wide tracking. Secondary/ghost buttons read as regular text actions — no shouting.
+
+#### Icon variant
+
+Pass any `ReactNode` as the `icon` prop to render it to the left of the label with a 12px gap. The icon + label are laid out in a `flexDirection: 'row'` container.
+
+```tsx
+import { GoogleIcon } from '@/components/GoogleIcon';
+
+// OAuth button with Google logo
+<Button
+  label="Continue with Google"
+  variant="secondary"
+  icon={<GoogleIcon />}
+  onPress={googleSignIn}
+/>
+```
+
+**`GoogleIcon`** (`components/GoogleIcon.tsx`) renders the official Google "G" SVG (18×18) on web via inline `<div>` + `dangerouslySetInnerHTML`. On native, it renders a colored circle fallback. Accepts an optional `size` prop (default 18).
 
 ---
 
@@ -402,13 +463,13 @@ Labelled text input with focus management, error states, and ink-glow focus ring
 
 **File:** `components/Card.tsx`
 
-Action row with icon box, title, subtitle, and arrow. Used on home screen.
+Action row with icon box, title, subtitle, and arrow. Square corners, `MONO` font. Used on home screen for primary navigation.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `icon` | `string` | — | Single character in 48×48 box |
-| `title` | `string` | — | Primary label |
-| `subtitle` | `string` | — | Secondary description |
+| `title` | `string` | — | Primary label (15px, weight 500) |
+| `subtitle` | `string` | — | Secondary description (10px) |
 | `onPress` | `() => void` | — | Press handler |
 | `variant` | `'primary' \| 'secondary'` | `'secondary'` | Visual weight |
 | `disabled` | `boolean` | `false` | 45% opacity, hides arrow |
@@ -416,10 +477,21 @@ Action row with icon box, title, subtitle, and arrow. Used on home screen.
 
 #### Variants
 
-| Variant | Icon bg | Border | Icon text |
+| Variant | Background | Border | Icon bg |
 |---|---|---|---|
-| `primary` | `inkRedGlow` + `inkRedDim` border | `inkRedDim` | `textPrimary` |
-| `secondary` | `bgCard2` | `border` | `textSecondary` |
+| `primary` | `inkRedGlow` | `inkRedDim` | `inkRedGlow` + `inkRedDim` border |
+| `secondary` | `bgCard` | `border` | `bgCard2` + `border` border |
+
+#### States
+
+| State | Visual | Notes |
+|---|---|---|
+| Default | Variant background + border | — |
+| Hover (web) | `inkRed` border + `box-shadow: 0 0 12px inkRedGlow` | Both variants get the same hover |
+| Active | `activeOpacity: 0.8` | Native touch feedback |
+| Disabled | 45% opacity, arrow hidden | Higher than Button's 18% because Card has more content (title + subtitle) that needs to remain legible |
+
+Transition: `border-color 150ms, background-color 150ms, box-shadow 150ms` (web only).
 
 ---
 

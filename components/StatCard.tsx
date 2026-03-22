@@ -29,7 +29,6 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     backgroundColor: t.bgCard,
     borderWidth:     1,
     borderColor:     t.border,
-    borderRadius:    16,
     paddingVertical:   16,
     paddingHorizontal: 12,
     alignItems:      'center',
@@ -38,15 +37,15 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   },
   value: {
     fontFamily:    MONO,
-    fontSize:      FS.title,
+    fontSize:      FS.formTitle,
     color:         t.textPrimary,
     marginBottom:  4,
-    letterSpacing: LS.tight * FS.title,
+    letterSpacing: LS.tighter * FS.formTitle,
   },
   label: {
     fontSize:      FS.label,
     color:         t.textFaint,
     textTransform: 'uppercase',
-    letterSpacing: LS.loose * FS.label,
+    letterSpacing: LS.widest * FS.label,
   },
 });

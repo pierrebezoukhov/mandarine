@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
+import { MONO } from '@/theme/tokens';
 
 interface AvatarProps {
   /** Public URL of the user's photo. Falls back to initials when absent. */
@@ -66,6 +67,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     justifyContent: 'center',
   },
   initials: {
+    fontFamily: MONO,
     color:      t.textSecondary,
     fontWeight: '500',
   },

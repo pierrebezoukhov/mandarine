@@ -7,10 +7,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 import { router } from 'expo-router';
-import { FS, FW, LH } from '@/theme/tokens';
+import { FS, FW, LH, LS, MONO } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
+import { GoogleIcon } from '@/components/GoogleIcon';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 
 
@@ -72,7 +73,7 @@ function LoginForm({ onSwitch, onForgot }: { onSwitch: () => void; onForgot: () 
         <View style={s.dividerLine} />
       </View>
 
-      <Button label="Continue with Google" onPress={google} variant="secondary" />
+      <Button label="Continue with Google" onPress={google} variant="secondary" icon={<GoogleIcon />} />
 
       <Text style={s.footer}>
         No account?{' '}
@@ -134,7 +135,7 @@ function SignupForm({ onSwitch, onSuccess }: { onSwitch: () => void; onSuccess: 
         <View style={s.dividerLine} />
       </View>
 
-      <Button label="Continue with Google" onPress={google} variant="secondary" />
+      <Button label="Continue with Google" onPress={google} variant="secondary" icon={<GoogleIcon />} />
 
       <Text style={s.footer}>
         Already have an account?{' '}
@@ -166,7 +167,7 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   if (sent) return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: colors.green, fontSize: FS.subheading }}>✓</Text>
+        <Text style={{ fontFamily: MONO, color: colors.green, fontSize: FS.pinyin }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Check your inbox</Text>
       <Text style={s.successSub}>
@@ -200,7 +201,7 @@ function ConfirmScreen({ email, onBack }: { email: string; onBack: () => void })
   return (
     <View style={s.successWrap}>
       <View style={s.successIcon}>
-        <Text style={{ color: colors.green, fontSize: FS.subheading }}>✓</Text>
+        <Text style={{ fontFamily: MONO, color: colors.green, fontSize: FS.pinyin }}>✓</Text>
       </View>
       <Text style={s.successTitle}>Confirm your email</Text>
       <Text style={s.successSub}>
@@ -259,32 +260,32 @@ export default function AuthScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const makeStyles = (t: ColorTheme) => StyleSheet.create({
   root:   { flex: 1, backgroundColor: t.bg },
-  scroll: { flexGrow: 1, paddingHorizontal: space.xxxl, paddingBottom: space.giant },
+  scroll: { flexGrow: 1, paddingHorizontal: space.xxl, paddingBottom: space.giant },
 
   logo:      { paddingTop: 72, marginBottom: space.giant },
-  logoHanzi: { fontSize: FS.score, color: t.inkRed, fontWeight: FW.semibold, marginBottom: space.xs },
-  logoLabel: { fontSize: FS.label, color: t.textFaint, letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 },
+  logoHanzi: { fontSize: FS.formTitle, color: t.inkRed, fontWeight: FW.medium, marginBottom: space.xs },
+  logoLabel: { fontFamily: MONO, fontSize: FS.label, color: t.textFaint, letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 },
 
-  heading: { fontSize: FS.title, color: t.textPrimary, fontWeight: FW.semibold, marginBottom: space.xs },
-  sub:     { fontSize: FS.body, color: t.textSecondary, marginBottom: space.xxxl, lineHeight: LH.body },
+  heading: { fontFamily: MONO, fontSize: FS.formTitle, color: t.textPrimary, fontWeight: FW.medium, marginBottom: space.xs, textTransform: 'uppercase', letterSpacing: LS.wider * FS.formTitle },
+  sub:     { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary, marginBottom: space.xxl, lineHeight: FS.body * LH.normal },
 
   ctaTop: { marginTop: space.sm },
 
   forgotBtn:  { alignSelf: 'flex-end', marginTop: -6, marginBottom: space.sm },
-  forgotText: { fontSize: FS.label, color: t.textSecondary },
+  forgotText: { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary },
 
   divider:     { flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.xl },
   dividerLine: { flex: 1, height: 1, backgroundColor: t.border },
-  dividerText: { fontSize: FS.label, color: t.textFaint },
+  dividerText: { fontFamily: MONO, fontSize: FS.label, color: t.textFaint },
 
-  footer:     { marginTop: space.xxxl, textAlign: 'center', fontSize: FS.body, color: t.textSecondary },
-  footerLink: { color: t.inkRedText, textDecorationLine: 'underline' },
+  footer:     { fontFamily: MONO, marginTop: space.xxl, textAlign: 'center', fontSize: FS.body, color: t.textSecondary },
+  footerLink: { fontFamily: MONO, color: t.inkRedText, textDecorationLine: 'underline' },
 
   backBtn:  { marginBottom: space.xxl },
-  backText: { color: t.textSecondary, fontSize: FS.label },
+  backText: { fontFamily: MONO, color: t.textSecondary, fontSize: FS.label },
 
   successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
   successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: t.green === '#3a7a44' ? 'rgba(58,122,68,0.12)' : 'rgba(45,110,56,0.08)', borderWidth: 1, borderColor: t.green, alignItems: 'center', justifyContent: 'center' },
-  successTitle: { fontSize: FS.subheading, color: t.textPrimary },
-  successSub:   { fontSize: FS.body, color: t.textSecondary, textAlign: 'center', lineHeight: LH.body, maxWidth: 260 },
+  successTitle: { fontFamily: MONO, fontSize: FS.pinyin, color: t.textPrimary },
+  successSub:   { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary, textAlign: 'center', lineHeight: FS.body * LH.normal, maxWidth: 260 },
 });

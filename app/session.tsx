@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 import { MONO, MONO_MEDIUM, SERIF, FS, FW, LH, LS } from '@/theme/tokens';
-import { space, radius } from '@/theme/spacing';
+import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
@@ -138,7 +138,7 @@ export default function SessionScreen() {
   const { height: windowHeight } = useWindowDimensions();
   const compact = windowHeight < 700;
   const hanziSize = compact ? 84 : FS.hanzi;
-  const hanziLH = compact ? 96 : LH.hanzi;
+  const hanziLH = compact ? 96 : FS.hanzi * LH.single;
   const cardMaxHeight = windowHeight - 252;
 
   const { user }        = useAuth();
@@ -346,9 +346,9 @@ export default function SessionScreen() {
   if (error) {
     return (
       <SafeAreaView style={[s.root, s.centered, { paddingHorizontal: 32 }]}>
-        <Text style={{ color: colors.inkRedText, fontSize: FS.ui, textAlign: 'center' }}>{error}</Text>
+        <Text style={{ fontFamily: MONO, color: colors.inkRedText, fontSize: FS.body, textAlign: 'center' }}>{error}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 24 }}>
-          <Text style={{ color: colors.textSecondary }}>← Go back</Text>
+          <Text style={{ fontFamily: MONO, color: colors.textSecondary }}>← Go back</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -585,7 +585,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: space.md,
     paddingHorizontal: space.xl, paddingTop: space.md, paddingBottom: space.sm,
   },
-  iconBtn:         { padding: space.sm, borderRadius: 8 },
+  iconBtn:         { padding: space.sm },
   iconBtnDisabled: { opacity: 0.2 },
   iconBtnText:     { fontSize: 18, fontFamily: MONO, letterSpacing: LS.tighter * 18, color: t.textSecondary },
 
@@ -597,7 +597,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   scoreForgot: { color: t.inkRedDim },
   scoreGot:    { color: t.green },
   scorePending:{ color: t.textFaint },
-  scoreSep:    { color: t.textFaint, fontSize: 10 },
+  scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: 10 },
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
@@ -629,7 +629,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     position: 'absolute', top: 10, right: 14,
   },
   hskBadgeText: {
-    fontFamily: MONO, fontSize: 9, color: t.textFaint,
+    fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
     letterSpacing: 1.5, opacity: 0.6,
   },
 
@@ -639,7 +639,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     fontSize: FS.hanzi,
     fontWeight: FW.light,
     color: t.textHanzi,
-    lineHeight: LH.hanzi,
+    lineHeight: FS.hanzi * LH.single,
     letterSpacing: LS.tighter * FS.hanzi,
     textAlign: 'center',
     maxWidth: '100%',
@@ -655,14 +655,14 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     marginBottom: space.lg,
   },
   pinyinText: {
-    fontFamily: MONO, fontSize: 18, letterSpacing: LS.wider * 18,
+    fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: LS.wider * FS.pinyin,
     color: t.inkRedText, fontStyle: 'italic', opacity: 0.9,
     textShadowColor: t.inkRedGlow,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 12,
   },
   pinyinAudio: {
-    fontSize: 12, color: t.textFaint, opacity: 0.6,
+    fontFamily: MONO, fontSize: 12, color: t.textFaint, opacity: 0.6,
   },
 
   // Divider
@@ -674,13 +674,13 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   // Meaning block (POS + definition)
   meaningBlock: { width: '100%', alignItems: 'flex-start', marginBottom: space.lg },
   posTag: {
-    fontFamily: MONO, fontSize: 10,
+    fontFamily: MONO, fontSize: FS.label,
     color: t.textFaint, letterSpacing: 2, textTransform: 'uppercase',
     marginBottom: space.xs,
   },
   meaningText: {
-    fontFamily: MONO, fontSize: 15, fontWeight: FW.light, color: t.textSecondary,
-    lineHeight: 22, letterSpacing: 0.5,
+    fontFamily: MONO, fontSize: FS.definition, fontWeight: FW.light, color: t.textSecondary,
+    lineHeight: FS.definition * LH.normal, letterSpacing: 0.5,
   },
 
   // Hint block (collapsible example)
@@ -696,11 +696,11 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     paddingHorizontal: space.md, paddingVertical: space.sm,
   },
   hintLabel: {
-    flex: 1, fontFamily: MONO, fontSize: 10,
-    letterSpacing: LS.widest * 10, color: t.textFaint, textTransform: 'uppercase',
+    flex: 1, fontFamily: MONO, fontSize: FS.label,
+    letterSpacing: LS.widest * FS.label, color: t.textFaint, textTransform: 'uppercase',
   },
   hintIcon: {
-    fontFamily: MONO, fontSize: 10, color: t.textFaint,
+    fontFamily: MONO, fontSize: FS.label, color: t.textFaint,
   },
   hintIconOpen: {
     transform: [{ rotate: '180deg' }],
@@ -713,16 +713,16 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   },
   hintHanzi: {
     fontFamily: SERIF, fontSize: FS.pinyin, color: t.textPrimary,
-    lineHeight: LH.pinyin, letterSpacing: 1, marginBottom: space.sm,
+    lineHeight: FS.pinyin * LH.single, letterSpacing: 1, marginBottom: space.sm,
   },
   hintPinyin: {
-    fontFamily: MONO, fontSize: 11, color: t.inkRedText,
-    fontStyle: 'italic', letterSpacing: LS.wider * 11, lineHeight: 17,
+    fontFamily: MONO, fontSize: FS.exPinyin, color: t.inkRedText,
+    fontStyle: 'italic', letterSpacing: LS.wider * FS.exPinyin, lineHeight: FS.exPinyin * LH.normal,
     marginBottom: space.xs,
   },
   hintTranslation: {
-    fontFamily: MONO, fontSize: 10, color: t.textSecondary,
-    letterSpacing: 0.5, lineHeight: 16,
+    fontFamily: MONO, fontSize: FS.label, color: t.textSecondary,
+    letterSpacing: 0.5, lineHeight: FS.label * LH.normal,
   },
 
   // Blur wrapper for translation
@@ -732,14 +732,14 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     alignItems: 'flex-start', justifyContent: 'center',
   },
   blurLabelText: {
-    fontFamily: MONO, fontSize: 9, letterSpacing: 3,
+    fontFamily: MONO, fontSize: FS.micro, letterSpacing: 3,
     color: t.textFaint, textTransform: 'uppercase',
   },
 
   // Tap hint (inside card surface)
   tapHint: {
     marginTop: space.md,
-    fontFamily: MONO, fontSize: 9, color: t.textFaint,
+    fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
     letterSpacing: LS.extreme * 9, textTransform: 'uppercase',
   },
 
@@ -750,7 +750,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     gap: space.lg,
   },
   rateBtn: {
-    width: 64, height: 64, borderRadius: radius.square,
+    width: 64, height: 64,
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 1,
     position: 'relative',
@@ -767,7 +767,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
       : 'rgba(45,110,56,0.08)',     // light
     borderColor: t.green,
   },
-  rateBtnIcon: { fontSize: 20 },
+  rateBtnIcon: { fontFamily: MONO, fontSize: 20 },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
@@ -776,18 +776,18 @@ const makeCompleteStyles = (t: ColorTheme) => StyleSheet.create({
     flex: 1, backgroundColor: t.bg,
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36,
   },
-  seal:      { fontSize: FS.seal, color: t.inkRed, opacity: 0.3, marginBottom: space.xxxl },
-  title:     { fontSize: FS.title, color: t.textPrimary, fontWeight: FW.semibold, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tight * FS.title },
-  sub:       { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, letterSpacing: 1, marginBottom: 40 },
+  seal:      { fontFamily: MONO, fontSize: FS.formTitle, color: t.inkRed, opacity: 0.3, marginBottom: space.xxl },
+  title:     { fontFamily: MONO, fontSize: FS.formTitle, color: t.textPrimary, fontWeight: FW.medium, marginBottom: space.sm, textAlign: 'center', letterSpacing: LS.tighter * FS.formTitle },
+  sub:       { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary, letterSpacing: 1, marginBottom: 40 },
 
   stats:     { flexDirection: 'row', alignItems: 'center', gap: space.xxl, marginBottom: 32 },
   stat:      { alignItems: 'center' },
-  statVal:   { fontSize: FS.score, lineHeight: LH.score, marginBottom: 6, letterSpacing: LS.tighter * FS.score },
+  statVal:   { fontFamily: MONO, fontSize: FS.formTitle, lineHeight: FS.formTitle * LH.single, marginBottom: 6, letterSpacing: LS.tighter * FS.formTitle },
   statLabel: { fontFamily: MONO, fontSize: FS.label, color: t.textSecondary, letterSpacing: 1.5 },
-  statSep:   { color: t.textSecondary, fontSize: FS.subheading },
+  statSep:   { fontFamily: MONO, color: t.textSecondary, fontSize: FS.definition },
 
   pctBadge: {
-    borderWidth: 1, borderColor: t.border, borderRadius: 100,
+    borderWidth: 1, borderColor: t.border,
     paddingHorizontal: space.xl, paddingVertical: space.sm, marginBottom: space.giant,
   },
   pctText: { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary, letterSpacing: 1 },
