@@ -75,7 +75,7 @@ const light = {
 
   textPrimary:     '#2a241a',
   textSecondary:   '#6b6050',
-  textFaint:       '#b0a898',
+  textFaint:       '#887a68',
   textHanzi:       '#1a1610',
 
   green:           '#2d6e38',
@@ -109,7 +109,7 @@ const dark = {
 
   textPrimary:     '#e8e0d0',
   textSecondary:   '#8a8070',
-  textFaint:       '#4a4438',
+  textFaint:       '#6b6055',
   textHanzi:       '#f0e8d8',
 
   green:           '#3a7a44',

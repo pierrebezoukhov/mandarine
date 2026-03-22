@@ -125,7 +125,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 |---|---|---|---|
 | `textPrimary` | `#2a241a` | `#e8e0d0` | Headings, active labels, card titles |
 | `textSecondary` | `#6b6050` | `#8a8070` | Body text, secondary labels, subtitles |
-| `textFaint` | `#b0a898` | `#4a4438` | Labels, placeholders, tap hints, ornaments |
+| `textFaint` | `#887a68` | `#6b6055` | Labels, placeholders, tap hints, ornaments |
 | `textHanzi` | `#1a1610` | `#f0e8d8` | Large Hanzi character on flashcards |
 
 ### Semantic Colors
