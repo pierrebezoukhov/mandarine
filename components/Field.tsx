@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { View, Text, TextInput, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
 import { MONO, FS, FW, LS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
@@ -56,7 +57,7 @@ export function Field({
 }
 
 const makeStyles = (t: ColorTheme) => StyleSheet.create({
-  wrap:  { marginBottom: 14 },
+  wrap:  { marginBottom: space.md },
   label: {
     fontFamily: MONO,
     fontSize: FS.label,

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { MONO, FS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
@@ -36,7 +37,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: space.md,
   },
   track: {
     flex: 1,

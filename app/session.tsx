@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
-  Animated, ActivityIndicator, Platform, ScrollView, useWindowDimensions,
+  Animated, ActivityIndicator, Platform, useWindowDimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -234,16 +234,15 @@ export default function SessionScreen() {
 
   const handleTap = useCallback(() => {
     setReveal(r => {
-      const next = Math.min(r + 1, 2);
+      if (r >= 2) return r;  // already fully revealed — do nothing
+      const next = r + 1;
       if (next === 1) {
-        // Stagger: animate pinyin in
         pinyinAnim.setValue(0);
         Animated.spring(pinyinAnim, {
           toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
         }).start();
       }
       if (next === 2) {
-        // Stagger: animate meaning, then hint block
         meaningAnim.setValue(0);
         hintAnim.setValue(0);
         Animated.stagger(80, [
@@ -425,12 +424,8 @@ export default function SessionScreen() {
               <Text style={s.hskBadgeText}>HSK {card.hsk_level}</Text>
             </View>
 
-            {/* Scrollable card content — safety net for short viewports */}
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              contentContainerStyle={{ alignItems: 'center', width: '100%' }}
-            >
+            {/* Card content */}
+            <View style={{ alignItems: 'center', width: '100%' }}>
             {/* Hanzi — serif, light weight, ink bleed */}
             <Text
               style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH, marginBottom: space.md }]}
@@ -497,7 +492,7 @@ export default function SessionScreen() {
             <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }]} pointerEvents="none">
               {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
             </Text>
-            </ScrollView>
+            </View>
 
             {/* Feedback flash — outline + glow */}
             <Animated.View
@@ -712,7 +707,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     height: 1, backgroundColor: t.borderDim, marginBottom: space.sm,
   },
   hintHanzi: {
-    fontFamily: SERIF, fontSize: FS.pinyin, color: t.textPrimary,
+    fontFamily: SERIF, fontSize: FS.pinyin, fontWeight: FW.light, color: t.textPrimary,
     lineHeight: FS.pinyin * LH.single, letterSpacing: 1, marginBottom: space.sm,
   },
   hintPinyin: {
@@ -762,9 +757,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     borderColor: t.inkRedDim,
   },
   rateBtnGot: {
-    backgroundColor: t.green === '#3a7a44'
-      ? 'rgba(58,122,68,0.12)'     // dark
-      : 'rgba(45,110,56,0.08)',     // light
+    backgroundColor: t.greenDim,
     borderColor: t.green,
   },
   rateBtnIcon: { fontFamily: MONO, fontSize: 20 },

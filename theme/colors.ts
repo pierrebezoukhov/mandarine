@@ -26,8 +26,12 @@ export interface ColorTheme {
   // Semantic Colors
   green:          string;
   greenBright:    string;
+  greenDim:       string;
   redBtn:         string;
   redBtnBright:   string;
+
+  // Overlay
+  overlay:        string;
 
   // Card Shadows
   cardShadow:     string;
@@ -76,8 +80,11 @@ const light = {
 
   green:           '#2d6e38',
   greenBright:     '#3a8a42',
+  greenDim:        'rgba(45,110,56,0.08)',
   redBtn:          '#c45a4e',
   redBtnBright:    '#b8301e',
+
+  overlay:         'rgba(0,0,0,0.6)',
 
   cardShadow:      'rgba(120,100,60,0.08)',
   cardInsetShadow: 'rgba(120,100,60,0.06)',
@@ -107,8 +114,11 @@ const dark = {
 
   green:           '#3a7a44',
   greenBright:     '#4fa858',
+  greenDim:        'rgba(58,122,68,0.12)',
   redBtn:          '#7a1e14',
   redBtnBright:    '#c8382a',
+
+  overlay:         'rgba(0,0,0,0.6)',
 
   cardShadow:      'rgba(0,0,0,0.3)',
   cardInsetShadow: 'rgba(0,0,0,0.4)',

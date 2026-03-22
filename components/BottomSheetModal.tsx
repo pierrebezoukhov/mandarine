@@ -57,7 +57,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   overlayDesktop: { justifyContent: 'center', alignItems: 'center' },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: t.overlay,
   },
 
   sheet: {

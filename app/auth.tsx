@@ -285,7 +285,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   backText: { fontFamily: MONO, color: t.textSecondary, fontSize: FS.label },
 
   successWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: space.giant, gap: space.lg },
-  successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: t.green === '#3a7a44' ? 'rgba(58,122,68,0.12)' : 'rgba(45,110,56,0.08)', borderWidth: 1, borderColor: t.green, alignItems: 'center', justifyContent: 'center' },
+  successIcon:  { width: 56, height: 56, borderRadius: 28, backgroundColor: t.greenDim, borderWidth: 1, borderColor: t.green, alignItems: 'center', justifyContent: 'center' },
   successTitle: { fontFamily: MONO, fontSize: FS.pinyin, color: t.textPrimary },
   successSub:   { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary, textAlign: 'center', lineHeight: FS.body * LH.normal, maxWidth: 260 },
 });

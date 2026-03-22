@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
 import { MONO, FS, FW, LS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
@@ -104,7 +105,7 @@ export function SegmentedControl({
 }
 
 const makeStyles = (t: ColorTheme) => StyleSheet.create({
-  row: { flexDirection: 'row', gap: 8 },
+  row: { flexDirection: 'row', gap: space.sm },
 
   segment: {
     flex: 1,

@@ -19,6 +19,7 @@ export default function HomeScreen() {
   const s = useMemo(() => makeStyles(colors), [colors]);
   const [hasSession,   setHasSession]   = useState(false);
   const [displayName,  setDisplayName]  = useState<string | null>(null);
+  const [nameLoaded,   setNameLoaded]   = useState(false);
 
   // Fetch profile once; seed display_name from OAuth metadata if not set yet
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function HomeScreen() {
           updateProfile(user.id, { display_name: fallback });
         }
       }
+      setNameLoaded(true);
     });
   }, [user?.id]);
 
@@ -79,11 +81,13 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Greeting */}
-        <View style={s.greet}>
-          <Text style={s.greetTitle}>Hello, {name}.</Text>
-          <Text style={s.greetSub}>What would you like to do?</Text>
-        </View>
+        {/* Greeting — hidden until profile name is loaded to prevent flash */}
+        {nameLoaded && (
+          <View style={s.greet}>
+            <Text style={s.greetTitle}>Hello, {name}.</Text>
+            <Text style={s.greetSub}>What would you like to do?</Text>
+          </View>
+        )}
 
         {/* Actions */}
         <View style={s.actions}>

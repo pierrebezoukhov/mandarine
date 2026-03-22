@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
 import { FS, FW, LH, MONO } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 
@@ -73,9 +74,9 @@ const makeStyles = (t: ColorTheme, isDark: boolean) => StyleSheet.create({
   base: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: space.lg,
     borderWidth: 1,
-    padding: 20,
+    padding: space.xl,
     ...(Platform.OS === 'web' ? {
       transition: 'border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease',
       cursor: 'pointer',

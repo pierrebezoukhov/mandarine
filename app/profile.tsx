@@ -281,8 +281,8 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   },
   editIcon: { fontFamily: MONO, fontSize: 11, color: t.textSecondary, lineHeight: 14 },
 
-  grid:    { flexDirection: 'row', gap: 10 },
-  gridGap: { marginTop: 10 },
+  grid:    { flexDirection: 'row', gap: space.sm },
+  gridGap: { marginTop: space.sm },
   cell:    { flex: 1 },
 
   hskRow: {
