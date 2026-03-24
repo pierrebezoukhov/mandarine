@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 // import { NoiseOverlay } from '@/components/NoiseOverlay';
 // import { Scanlines } from '@/components/Scanlines';
+import { DialRoot } from 'dialkit';
+import 'dialkit/styles.css';
 import {
   IBMPlexMono_400Regular,
 } from '@expo-google-fonts/ibm-plex-mono/400Regular';
@@ -84,6 +86,7 @@ export default function RootLayout() {
           <Stack.Screen name="design-system" options={{ animation: 'fade' }} />
         </Stack>
       </AuthProvider>
+      {Platform.OS === 'web' && <DialRoot />}
     </ThemeProvider>
   );
 }

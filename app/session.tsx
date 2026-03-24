@@ -21,6 +21,7 @@ import {
   RESUME_SESSION_KEY, SESSION_CONFIG_KEY,
   type Card, type Results, type ResumeState,
 } from '@/lib/progress';
+import { useDialKit } from 'dialkit';
 
 
 // ── Session Complete ───────────────────────────────────────────────────────────
@@ -70,54 +71,65 @@ function SessionComplete({ got, forgot, total, onRestart }: {
 }
 
 // ── Corner ornament ────────────────────────────────────────────────────────────
-function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
+function CornerOrnament({ position, size = 10, opacity = 0.5, offset = 10, offsetH = 14 }: {
+  position: 'tl' | 'tr' | 'bl' | 'br';
+  size?: number; opacity?: number; offset?: number; offsetH?: number;
+}) {
   const { colors } = useTheme();
   const posStyle = {
-    tl: { top: 10, left: 14 },
-    tr: { top: 10, right: 14 },
-    bl: { bottom: 10, left: 14 },
-    br: { bottom: 10, right: 14 },
+    tl: { top: offset, left: offsetH },
+    tr: { top: offset, right: offsetH },
+    bl: { bottom: offset, left: offsetH },
+    br: { bottom: offset, right: offsetH },
   }[position];
 
   return (
     <Text style={[{
       position: 'absolute',
       fontFamily: MONO,
-      fontSize: 10,
+      fontSize: size,
       color: colors.inkRedDim,
-      opacity: 0.5,
+      opacity: opacity,
     }, posStyle]}>+</Text>
   );
 }
 
-// ── Blur wrapper for example pinyin + translation ────────────────────────────
-function BlurredExample({ pinyin, meaning, revealed, onReveal }: {
-  pinyin?: string; meaning?: string; revealed: boolean; onReveal: () => void;
+// ── Typewriter text — characters appear one by one ───────────────────────────
+function TypewriterText({ text, active, delay = 30, startDelay = 0, style }: {
+  text: string; active: boolean; delay?: number; startDelay?: number; style?: any;
 }) {
-  const { colors } = useTheme();
-  const s = useMemo(() => makeStyles(colors), [colors]);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const hasPlayed = useRef(false);
+
+  useEffect(() => {
+    if (active && !hasPlayed.current) {
+      hasPlayed.current = true;
+      const startTyping = () => {
+        let i = 0;
+        const interval = setInterval(() => {
+          i++;
+          setVisibleCount(i);
+          if (i >= text.length) clearInterval(interval);
+        }, delay);
+      };
+      if (startDelay > 0) {
+        setTimeout(startTyping, startDelay);
+      } else {
+        startTyping();
+      }
+    }
+  }, [active]);
+
+  useEffect(() => {
+    hasPlayed.current = false;
+    setVisibleCount(0);
+  }, [text]);
+
   return (
-    <TouchableOpacity onPress={onReveal} activeOpacity={0.8}>
-      <View style={s.blurWrapper}>
-        <View
-          style={[
-            !revealed && Platform.OS === 'web' && ({
-              filter: 'blur(5px)',
-              userSelect: 'none',
-            } as any),
-            !revealed && Platform.OS !== 'web' && { opacity: 0.15 },
-          ]}
-        >
-          {pinyin && <Text style={s.hintPinyin}>{pinyin}</Text>}
-          {meaning && <Text style={s.hintTranslation}>{meaning}</Text>}
-        </View>
-        {!revealed && (
-          <View style={s.blurLabel}>
-            <Text style={s.blurLabelText}>TAP TO REVEAL</Text>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
+    <Text style={style}>
+      {text.slice(0, visibleCount)}
+      {visibleCount < text.length && <Text style={{ opacity: 0 }}>{text.slice(visibleCount)}</Text>}
+    </Text>
   );
 }
 
@@ -131,7 +143,6 @@ export default function SessionScreen() {
   const [reveal, setReveal]   = useState(0);
   const [results, setResults] = useState<Results>({});
   const [done, setDone]       = useState(false);
-  const [hintOpen, setHintOpen] = useState(false);
   const [translationRevealed, setTranslationRevealed] = useState(false);
   const [hoveredBtn, setHoveredBtn] = useState<'forgot' | 'got' | null>(null);
 
@@ -144,6 +155,107 @@ export default function SessionScreen() {
   const { user }        = useAuth();
   const { colors, isDark } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
+
+  const dk = useDialKit('Flashcard', {
+    // Card container
+    cardMaxWidth:     [340, 240, 480],
+    cardPaddingH:     [24, 8, 48],
+    cardPaddingTop:   [28, 8, 56],
+    cardPaddingBot:   [16, 8, 48],
+    cardBorderWidth:  [1.5, 0.5, 4],
+    shadowRadius:     [32, 0, 64],
+    shadowOffsetY:    [8, 0, 24],
+
+    // Hanzi hero
+    hanziSize:        [108, 48, 180],
+    hanziMarginBot:   [20, 4, 48],
+    hanziGlowRadius:  [40, 0, 80],
+
+    // Pinyin
+    pinyinSize:       [18, 10, 28],
+    pinyinGap:        [6, 0, 20],
+    pinyinMarginBot:  [16, 4, 32],
+    pinyinOpacity:    [0.9, 0.3, 1],
+    pinyinGlowRadius: [12, 0, 30],
+
+    // Divider
+    dividerHeight:    [1, 0.5, 4],
+    dividerMarginBot: [16, 4, 32],
+
+    // POS tag
+    posSize:          [10, 8, 16],
+    posLetterSpacing: [2, 0.5, 5],
+    posMarginBot:     [4, 0, 12],
+
+    // Meaning
+    meaningSize:      [15, 10, 22],
+    meaningLineHeight:[1.5, 1.0, 2.0],
+    meaningLetterSp:  [0.5, 0, 2],
+    meaningMarginBot: [16, 4, 32],
+
+    // Hint block
+    hintBorderWidth:  [1, 0.5, 3],
+    hintPaddingH:     [12, 4, 24],
+    hintPaddingV:     [8, 4, 20],
+    hintDividerH:     [1, 0.5, 3],
+    exHanziSize:      [18, 12, 28],
+    exPinyinSize:     [11, 8, 18],
+    exTranslSize:     [10, 8, 16],
+
+    // Tap hint
+    tapHintSize:      [9, 7, 14],
+    tapHintMarginTop: [12, 0, 24],
+
+    // Corner ornaments
+    ornamentSize:     [10, 6, 18],
+    ornamentOpacity:  [0.5, 0.1, 1],
+    ornamentOffset:   [10, 4, 24],
+    ornamentOffsetH:  [14, 4, 24],
+
+    // HSK badge
+    badgeSize:        [9, 7, 14],
+    badgeLetterSp:    [1.5, 0.5, 4],
+    badgeOpacity:     [0.6, 0.1, 1],
+    badgeTop:         [10, 4, 24],
+    badgeRight:       [14, 4, 24],
+
+    // Score strip
+    scoreSize:        [10, 8, 16],
+    scoreSepSize:     [10, 6, 16],
+    scoreGap:         [12, 4, 24],
+    scorePaddingBot:  [10, 4, 24],
+
+    // Rating buttons
+    rateBtnSize:      [64, 40, 96],
+    rateBtnIconSize:  [20, 12, 32],
+    rateBtnGap:       [16, 4, 32],
+    rateBtnPaddingH:  [40, 16, 80],
+    rateBtnPaddingBot:[24, 8, 48],
+
+    // Animations
+    entranceDamping:  [18, 5, 40],
+    entranceStiffness:[200, 50, 500],
+    entranceTranslY:  [20, 0, 60],
+    entranceScale:    [0.96, 0.8, 1.0],
+    revealDamping:    [18, 5, 40],
+    revealStiffness:  [200, 50, 500],
+    revealTranslY:    [10, 0, 30],
+    staggerDelay:     [80, 0, 200],
+    flashDuration:    [600, 200, 1200],
+    exitDelay:        [150, 0, 500],
+    exitDuration:     [250, 100, 600],
+
+    // Colors
+    hanziColor:       colors.textHanzi,
+    pinyinColor:      colors.inkRedText,
+    meaningColor:     colors.textSecondary,
+    posColor:         colors.textFaint,
+    bgCardColor:      colors.bgCard,
+    cardBorderColor:  colors.border,
+    hintBgColor:      colors.bgCard2,
+    hintBorderColor:  colors.borderDim,
+  });
+
   const startedAt       = useRef<string>(new Date().toISOString());
   const sessionConfig   = useRef<SessionConfig | null>(null);
 
@@ -227,8 +339,8 @@ export default function SessionScreen() {
     Animated.spring(cardAnim, {
       toValue: 1,
       useNativeDriver: true,
-      damping: 18,
-      stiffness: 200,
+      damping: dk.entranceDamping,
+      stiffness: dk.entranceStiffness,
     }).start();
   }, [idx, cards.length]);
 
@@ -239,21 +351,21 @@ export default function SessionScreen() {
       if (next === 1) {
         pinyinAnim.setValue(0);
         Animated.spring(pinyinAnim, {
-          toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
+          toValue: 1, useNativeDriver: true, damping: dk.revealDamping, stiffness: dk.revealStiffness,
         }).start();
       }
       if (next === 2) {
+
         meaningAnim.setValue(0);
         hintAnim.setValue(0);
-        Animated.stagger(80, [
+        Animated.stagger(dk.staggerDelay, [
           Animated.spring(meaningAnim, {
-            toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
+            toValue: 1, useNativeDriver: true, damping: dk.revealDamping, stiffness: dk.revealStiffness,
           }),
           Animated.spring(hintAnim, {
-            toValue: 1, useNativeDriver: true, damping: 18, stiffness: 200,
+            toValue: 1, useNativeDriver: true, damping: dk.revealDamping, stiffness: dk.revealStiffness,
           }),
         ]).start();
-        setHintOpen(true);
       }
       return next;
     });
@@ -271,7 +383,7 @@ export default function SessionScreen() {
     flashColor.current = result;
     flashAnim.setValue(1);
     Animated.timing(flashAnim, {
-      toValue: 0, duration: 600, useNativeDriver: true,
+      toValue: 0, duration: dk.flashDuration, useNativeDriver: true,
     }).start();
 
     if (!isLast) {
@@ -299,7 +411,7 @@ export default function SessionScreen() {
 
     setTimeout(() => {
       Animated.timing(cardAnim, {
-        toValue: 0, duration: 250, useNativeDriver: true,
+        toValue: 0, duration: dk.exitDuration, useNativeDriver: true,
       }).start(() => {
         if (isLast) { setDone(true); }
         else {
@@ -309,18 +421,16 @@ export default function SessionScreen() {
           hintAnim.setValue(0);
           setIdx(nextIdx);
           setReveal(0);
-          setHintOpen(false);
           setTranslationRevealed(false);
         }
       });
-    }, 150);
+    }, dk.exitDelay);
   }, [cards, idx, results, user?.id]);
 
   const goBack = useCallback(() => {
     if (idx === 0) return;
     setIdx(i => i - 1);
     setReveal(0);
-    setHintOpen(false);
     setTranslationRevealed(false);
   }, [idx]);
 
@@ -331,7 +441,7 @@ export default function SessionScreen() {
     setCards(c => [...c].sort(() => Math.random() - 0.5));
     pinyinAnim.setValue(0); meaningAnim.setValue(0); hintAnim.setValue(0);
     setIdx(0); setReveal(0); setResults({}); setDone(false);
-    setHintOpen(false); setTranslationRevealed(false);
+    setTranslationRevealed(false);
   }, [user?.id]);
 
   // ── Loading / error states ────────────────────────────────────────────────
@@ -367,8 +477,8 @@ export default function SessionScreen() {
   }
 
   const card      = cards[idx];
-  const cardScale = cardAnim.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] });
-  const cardTranslateY = cardAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] });
+  const cardScale = cardAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.entranceScale, 1] });
+  const cardTranslateY = cardAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.entranceTranslY, 0] });
 
   return (
     <SafeAreaView style={s.root}>
@@ -395,12 +505,12 @@ export default function SessionScreen() {
       </View>
 
       {/* Score strip: wrong · remaining · right */}
-      <View style={s.scoreStrip}>
-        <Text style={[s.scoreItem, s.scoreForgot]}>× {forgotCount}</Text>
-        <Text style={s.scoreSep}>·</Text>
-        <Text style={[s.scoreItem, s.scorePending]}>{remaining}</Text>
-        <Text style={s.scoreSep}>·</Text>
-        <Text style={[s.scoreItem, s.scoreGot]}>✓ {gotCount}</Text>
+      <View style={[s.scoreStrip, { gap: dk.scoreGap, paddingBottom: dk.scorePaddingBot }]}>
+        <Text style={[s.scoreItem, s.scoreForgot, { fontSize: dk.scoreSize }]}>× {forgotCount}</Text>
+        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>·</Text>
+        <Text style={[s.scoreItem, s.scorePending, { fontSize: dk.scoreSize }]}>{remaining}</Text>
+        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>·</Text>
+        <Text style={[s.scoreItem, s.scoreGot, { fontSize: dk.scoreSize }]}>✓ {gotCount}</Text>
       </View>
 
       {/* Card */}
@@ -412,84 +522,118 @@ export default function SessionScreen() {
           onPress={handleTap} activeOpacity={1}
         >
           {/* Card container */}
-          <View style={[s.cardContainer, { maxHeight: cardMaxHeight }]}>
+          <View style={[s.cardContainer, {
+            maxHeight: cardMaxHeight,
+            maxWidth: dk.cardMaxWidth,
+            paddingHorizontal: dk.cardPaddingH,
+            paddingTop: dk.cardPaddingTop,
+            paddingBottom: dk.cardPaddingBot,
+            borderWidth: dk.cardBorderWidth,
+            backgroundColor: dk.bgCardColor,
+            borderColor: dk.cardBorderColor,
+            ...(Platform.OS === 'web' ? {
+              boxShadow: `0 ${dk.shadowOffsetY}px ${dk.shadowRadius}px ${colors.cardShadow}`,
+            } as any : {
+              shadowColor: colors.cardShadow,
+              shadowOffset: { width: 0, height: dk.shadowOffsetY },
+              shadowOpacity: 1,
+              shadowRadius: dk.shadowRadius,
+            }),
+          }]}>
             <Scanlines color={colors.scanline} gap={4} />
 
             {/* Corner ornaments */}
-            <CornerOrnament position="tl" />
-            <CornerOrnament position="br" />
+            <CornerOrnament position="tl" size={dk.ornamentSize} opacity={dk.ornamentOpacity} offset={dk.ornamentOffset} offsetH={dk.ornamentOffsetH} />
+            <CornerOrnament position="br" size={dk.ornamentSize} opacity={dk.ornamentOpacity} offset={dk.ornamentOffset} offsetH={dk.ornamentOffsetH} />
 
             {/* HSK badge */}
-            <View style={s.hskBadge}>
-              <Text style={s.hskBadgeText}>HSK {card.hsk_level}</Text>
+            <View style={[s.hskBadge, { top: dk.badgeTop, right: dk.badgeRight }]}>
+              <Text style={[s.hskBadgeText, { fontSize: dk.badgeSize, letterSpacing: dk.badgeLetterSp, opacity: dk.badgeOpacity }]}>HSK {card.hsk_level}</Text>
             </View>
 
             {/* Card content */}
-            <View style={{ alignItems: 'center', width: '100%' }}>
+            <View style={{ width: '100%' }}>
             {/* Hanzi — serif, light weight, ink bleed */}
             <Text
-              style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH, marginBottom: space.md }]}
+              style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH, marginBottom: space.md }, {
+                fontSize: compact ? hanziSize : dk.hanziSize,
+                lineHeight: compact ? hanziLH : dk.hanziSize * LH.single,
+                color: dk.hanziColor,
+                marginBottom: compact ? space.md : dk.hanziMarginBot,
+                textShadowRadius: dk.hanziGlowRadius,
+              }]}
               adjustsFontSizeToFit numberOfLines={1}
             >{card.hanzi}</Text>
 
             {/* Stage 1: Pinyin + audio icon — spring-animated reveal */}
-            <Animated.View style={[s.pinyinRow, {
+            <Animated.View style={[s.pinyinRow, { gap: dk.pinyinGap, marginBottom: dk.pinyinMarginBot }, {
               opacity: reveal >= 1 ? pinyinAnim : 0,
               transform: [{ translateY: reveal >= 1
-                ? pinyinAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
-                : 10 }],
+                ? pinyinAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
+                : dk.revealTranslY }],
             }]}>
-              <Text style={s.pinyinText}>{card.pinyin}</Text>
+              <Text style={[s.pinyinText, { fontSize: dk.pinyinSize, opacity: dk.pinyinOpacity, color: dk.pinyinColor, textShadowRadius: dk.pinyinGlowRadius }]}>{card.pinyin}</Text>
               <Text style={s.pinyinAudio}>♪</Text>
             </Animated.View>
 
             {/* Stage 2: POS + definition — staggered reveal */}
-            <Animated.View style={[s.meaningBlock, {
-              opacity: reveal >= 2 ? meaningAnim : 0,
-              transform: [{ translateY: reveal >= 2
-                ? meaningAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
-                : 10 }],
-            }]}>
-              <View style={s.divider} />
-              {card.part_of_speech && <Text style={s.posTag}>{card.part_of_speech}</Text>}
-              <Text style={s.meaningText}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
-            </Animated.View>
-
-            {/* Stage 3: Example sentence (collapsible hint block) — staggered */}
-            {card._example && (
-              <Animated.View style={[s.hintBlock, {
-                opacity: reveal >= 2 ? hintAnim : 0,
+            <View style={s.meaningBlock}>
+              <Animated.View style={[{ width: '100%', marginBottom: dk.meaningMarginBot }, {
+                opacity: reveal >= 2 ? meaningAnim : 0,
                 transform: [{ translateY: reveal >= 2
-                  ? hintAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] })
-                  : 10 }],
-                pointerEvents: reveal < 2 ? 'none' as const : 'auto' as const,
+                  ? meaningAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
+                  : dk.revealTranslY }],
               }]}>
-                <TouchableOpacity
-                  style={s.hintTrigger}
-                  onPress={(e) => { e.stopPropagation(); setHintOpen(o => !o); }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={s.hintLabel}>EXAMPLE</Text>
-                  <Text style={[s.hintIcon, hintOpen && s.hintIconOpen]}>▾</Text>
-                </TouchableOpacity>
-
-                <View style={[s.hintContent, !hintOpen && { opacity: 0 }]}>
-                    <View style={s.hintDivider} />
-                    {/* Example hanzi sentence */}
-                    <Text style={s.hintHanzi}>{card._example.hanzi}</Text>
-                    {/* Pinyin + translation — blurred until tapped */}
-                    <BlurredExample
-                      pinyin={card._example.pinyin}
-                      meaning={card._example.meaning}
-                      revealed={translationRevealed}
-                      onReveal={() => setTranslationRevealed(true)}
-                    />
-                  </View>
+                <View style={[s.divider, { height: dk.dividerHeight, marginBottom: dk.dividerMarginBot }]} />
+                {card.part_of_speech && <Text style={[s.posTag, { fontSize: dk.posSize, letterSpacing: dk.posLetterSpacing, marginBottom: dk.posMarginBot, color: dk.posColor }]}>{card.part_of_speech}</Text>}
+                <Text style={[s.meaningText, { fontSize: dk.meaningSize, lineHeight: dk.meaningSize * dk.meaningLineHeight, letterSpacing: dk.meaningLetterSp, color: dk.meaningColor }]}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
               </Animated.View>
+            </View>
+
+            {/* Example sentence — inline, no separate surface */}
+            {card._example && (
+              <View style={s.exampleBlock}>
+                <Animated.View style={{
+                  width: '100%',
+                  opacity: reveal >= 2 ? hintAnim : 0,
+                  transform: [{ translateY: reveal >= 2
+                    ? hintAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
+                    : dk.revealTranslY }],
+                  pointerEvents: reveal < 2 ? 'none' as const : 'auto' as const,
+                }}>
+                  {/* Example hanzi — prominent */}
+                  <Text style={[s.exHanzi, { fontSize: dk.exHanziSize, lineHeight: dk.exHanziSize * LH.single }]}>{card._example.hanzi}</Text>
+
+                  {/* Pinyin — always rendered, opacity-controlled */}
+                  {card._example.pinyin && (
+                    <Text style={[s.exPinyin, !translationRevealed && { opacity: 0 }]}>{card._example.pinyin}</Text>
+                  )}
+
+                  {/* Translation — typewriter reveal, starts after pinyin */}
+                  {card._example.meaning && (
+                    <TypewriterText
+                      text={card._example.meaning}
+                      active={translationRevealed}
+                      delay={30}
+                      startDelay={400}
+                      style={s.exTranslation}
+                    />
+                  )}
+
+                  {/* Tap hint — opacity-controlled to prevent layout shift */}
+                  <TouchableOpacity
+                    onPress={(e) => { e.stopPropagation(); if (!translationRevealed) setTranslationRevealed(true); }}
+                    activeOpacity={0.7}
+                    style={[s.translateHint, translationRevealed && { opacity: 0, pointerEvents: 'none' as const }]}
+                  >
+                    <Text style={s.translateHintText}>▸ tap to translate</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
             )}
 
             {/* Tap hint — inside card surface */}
-            <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }]} pointerEvents="none">
+            <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }, { fontSize: dk.tapHintSize, marginTop: dk.tapHintMarginTop }]} pointerEvents="none">
               {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
             </Text>
             </View>
@@ -519,7 +663,7 @@ export default function SessionScreen() {
       </Animated.View>
 
       {/* Rating buttons */}
-      <View style={s.buttonRow}>
+      <View style={[s.buttonRow, { paddingHorizontal: dk.rateBtnPaddingH, paddingBottom: dk.rateBtnPaddingBot, gap: dk.rateBtnGap }]}>
         <TouchableOpacity
           style={[
             s.rateBtn, s.rateBtnForgot,
@@ -528,6 +672,7 @@ export default function SessionScreen() {
               borderColor: colors.inkRed,
               ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.inkRedGlow}` } as any : {}),
             },
+            { width: dk.rateBtnSize, height: dk.rateBtnSize },
           ]}
           onPress={() => rate('forgot')}
           activeOpacity={0.8}
@@ -539,7 +684,7 @@ export default function SessionScreen() {
           <Scanlines color={colors.scanline} gap={4} />
           <Text style={[s.rateBtnIcon, {
             color: hoveredBtn === 'forgot' ? colors.inkRed : colors.inkRedDim,
-            fontSize: 18,
+            fontSize: dk.rateBtnIconSize,
           }]}>×</Text>
         </TouchableOpacity>
 
@@ -551,6 +696,7 @@ export default function SessionScreen() {
               borderColor: colors.greenBright,
               ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px rgba(${isDark ? '58,122,68' : '45,110,56'},0.2)` } as any : {}),
             },
+            { width: dk.rateBtnSize, height: dk.rateBtnSize },
           ]}
           onPress={() => rate('got')}
           activeOpacity={0.8}
@@ -562,6 +708,7 @@ export default function SessionScreen() {
           <Scanlines color={colors.scanline} gap={4} />
           <Text style={[s.rateBtnIcon, {
             color: hoveredBtn === 'got' ? colors.greenBright : colors.green,
+            fontSize: dk.rateBtnIconSize,
           }]}>✓</Text>
         </TouchableOpacity>
       </View>
@@ -612,11 +759,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
-    // Outer shadow (cross-platform)
-    shadowColor: t.cardShadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 32,
+    // Shadow — controlled by dk overrides in the render
     elevation: 12,
   },
 
@@ -634,6 +777,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     fontSize: FS.hanzi,
     fontWeight: FW.light,
     color: t.textHanzi,
+    alignSelf: 'center',
     lineHeight: FS.hanzi * LH.single,
     letterSpacing: LS.tighter * FS.hanzi,
     textAlign: 'center',
@@ -646,7 +790,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 
   // Pinyin row (pinyin + audio icon)
   pinyinRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
+    flexDirection: 'row', alignItems: 'center', alignSelf: 'center', gap: 6,
     marginBottom: space.lg,
   },
   pinyinText: {
@@ -667,7 +811,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   },
 
   // Meaning block (POS + definition)
-  meaningBlock: { width: '100%', alignItems: 'flex-start', marginBottom: space.lg },
+  meaningBlock: { width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.lg },
   posTag: {
     fontFamily: MONO, fontSize: FS.label,
     color: t.textFaint, letterSpacing: 2, textTransform: 'uppercase',
@@ -678,62 +822,34 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     lineHeight: FS.definition * LH.normal, letterSpacing: 0.5,
   },
 
-  // Hint block (collapsible example)
-  hintBlock: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: t.borderDim,
-    backgroundColor: t.bgCard2,
-    overflow: 'hidden',
+  // Example sentence — inline on card surface
+  exampleBlock: {
+    width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.md,
   },
-  hintTrigger: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: space.md, paddingVertical: space.sm,
+  exHanzi: {
+    fontFamily: SERIF, fontSize: FS.formTitle, fontWeight: FW.light, color: t.textPrimary,
+    lineHeight: FS.formTitle * LH.single, letterSpacing: 1, marginBottom: space.sm,
   },
-  hintLabel: {
-    flex: 1, fontFamily: MONO, fontSize: FS.label,
-    letterSpacing: LS.widest * FS.label, color: t.textFaint, textTransform: 'uppercase',
-  },
-  hintIcon: {
-    fontFamily: MONO, fontSize: FS.label, color: t.textFaint,
-  },
-  hintIconOpen: {
-    transform: [{ rotate: '180deg' }],
-  },
-  hintContent: {
-    paddingHorizontal: space.md, paddingBottom: space.md,
-  },
-  hintDivider: {
-    height: 1, backgroundColor: t.borderDim, marginBottom: space.sm,
-  },
-  hintHanzi: {
-    fontFamily: SERIF, fontSize: FS.pinyin, fontWeight: FW.light, color: t.textPrimary,
-    lineHeight: FS.pinyin * LH.single, letterSpacing: 1, marginBottom: space.sm,
-  },
-  hintPinyin: {
+  exPinyin: {
     fontFamily: MONO, fontSize: FS.exPinyin, color: t.inkRedText,
-    fontStyle: 'italic', letterSpacing: LS.wider * FS.exPinyin, lineHeight: FS.exPinyin * LH.normal,
+    fontStyle: 'italic', letterSpacing: LS.example * FS.exPinyin, lineHeight: FS.exPinyin * LH.normal,
     marginBottom: space.xs,
   },
-  hintTranslation: {
-    fontFamily: MONO, fontSize: FS.label, color: t.textSecondary,
-    letterSpacing: 0.5, lineHeight: FS.label * LH.normal,
+  exTranslation: {
+    fontFamily: MONO, fontSize: FS.progress, color: t.textSecondary,
+    letterSpacing: LS.wide * FS.progress,
   },
-
-  // Blur wrapper for translation
-  blurWrapper: { position: 'relative' },
-  blurLabel: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'flex-start', justifyContent: 'center',
+  translateHint: {
+    marginTop: space.sm,
   },
-  blurLabelText: {
-    fontFamily: MONO, fontSize: FS.micro, letterSpacing: 3,
-    color: t.textFaint, textTransform: 'uppercase',
+  translateHintText: {
+    fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
+    letterSpacing: LS.widest * FS.micro, textTransform: 'uppercase',
   },
 
   // Tap hint (inside card surface)
   tapHint: {
-    marginTop: space.md,
+    marginTop: space.md, alignSelf: 'center',
     fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
     letterSpacing: LS.extreme * 9, textTransform: 'uppercase',
   },
