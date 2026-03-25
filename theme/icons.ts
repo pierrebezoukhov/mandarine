@@ -13,4 +13,12 @@ export const Icon = {
   repeat:    '\u21BA',   // ↺
   left:      '\u2190',   // ←
   right:     '\u2192',   // →
+
+  // Navigation tabs
+  study:     '\u5B66',   // 学
+  search:    '\u627E',   // 找
+  stories:   '\u8BFB',   // 读
+
+  // Search
+  prompt:    '>_',       // terminal prompt
 } as const;
