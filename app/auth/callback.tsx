@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { T } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 // ─── OAuth Callback ───────────────────────────────────────────────────────────
 // Web only: Supabase redirects here after Google sign-in with tokens in the
@@ -16,6 +17,9 @@ import { T } from '@/theme/tokens';
 // manually in signInWithGoogle() via supabase.auth.setSession().
 
 export default function AuthCallback() {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
+
   // Nothing to do — just render a spinner while onAuthStateChange fires.
   useEffect(() => {
     // Supabase JS processes the URL fragment automatically on mount.
@@ -24,15 +28,15 @@ export default function AuthCallback() {
 
   return (
     <View style={s.root}>
-      <ActivityIndicator size="large" color={T.textSecondary} />
+      <ActivityIndicator size="large" color={colors.textSecondary} />
     </View>
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: T.bg,
+    backgroundColor: t.bg,
     alignItems: 'center',
     justifyContent: 'center',
   },

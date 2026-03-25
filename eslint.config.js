@@ -22,7 +22,7 @@ module.exports = [
         {
           selector: "Property[key.name='fontSize'] > Literal",
           message:
-            "Raw font-size number. Use FS.* from '@/theme/tokens' (e.g. FS.body, FS.ui, FS.heading).",
+            "Raw font-size number. Use FS.* from '@/theme/tokens' (e.g. FS.body, FS.formTitle, FS.pinyin).",
         },
         // ── Spacing guard ──────────────────────────────────────────────────
         // Raw padding / margin / gap values ≥ 3 px must use space.* tokens.

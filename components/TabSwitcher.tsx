@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, FS, FW } from '@/theme/tokens';
+import { FS, FW, MONO } from '@/theme/tokens';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface TabOption {
   label: string;
@@ -14,6 +17,9 @@ interface TabSwitcherProps {
 }
 
 export function TabSwitcher({ tabs, value, onChange, style }: TabSwitcherProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={[s.row, style]}>
       {tabs.map(tab => {
@@ -36,11 +42,11 @@ export function TabSwitcher({ tabs, value, onChange, style }: TabSwitcherProps) 
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: T.border,
+    borderBottomColor: t.border,
   },
   tab: {
     flex: 1,
@@ -48,14 +54,14 @@ const s = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  tabText:       { fontSize: FS.body, fontWeight: FW.medium, color: T.textMuted },
-  tabTextActive: { color: T.textPrimary },
+  tabText:       { fontFamily: MONO, fontSize: FS.body, fontWeight: FW.medium, color: t.textSecondary },
+  tabTextActive: { color: t.textPrimary },
   underline: {
     position: 'absolute',
     bottom: -1,
     left: 0,
     right: 0,
     height: 1,
-    backgroundColor: T.textPrimary,
+    backgroundColor: t.inkRed,
   },
 });

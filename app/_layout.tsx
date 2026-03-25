@@ -4,6 +4,11 @@ import { Stack, router, useSegments } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+// import { NoiseOverlay } from '@/components/NoiseOverlay';
+// import { Scanlines } from '@/components/Scanlines';
+import { DialRoot } from 'dialkit';
+import 'dialkit/styles.css';
 import {
   IBMPlexMono_400Regular,
 } from '@expo-google-fonts/ibm-plex-mono/400Regular';
@@ -68,17 +73,20 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <AuthProvider>
-      <RouteGuard />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="auth" options={{ animation: 'fade' }} />
-        <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
-        <Stack.Screen name="session-setup" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="session"       options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="profile"       options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="settings"       options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="design-system" options={{ animation: 'fade' }} />
-      </Stack>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouteGuard />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="auth" options={{ animation: 'fade' }} />
+          <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+          <Stack.Screen name="session-setup" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="session"       options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="profile"       options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings"       options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="design-system" options={{ animation: 'fade' }} />
+        </Stack>
+      </AuthProvider>
+      {Platform.OS === 'web' && <DialRoot />}
+    </ThemeProvider>
   );
 }

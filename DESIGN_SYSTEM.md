@@ -1,16 +1,19 @@
-# Hanziflash Design System
+# Mandarine Design System
 
-A minimal, dark-themed component library for the Hanziflash React Native / Expo app.
-All tokens and components live in `theme/` and `components/` and are shared across every screen.
+A dual-theme component library for the Mandarine (Hanziflash) React Native / Expo app.
+Light mode: "Red Ink on Aged Parchment." Dark mode: "CRT Terminal."
+All tokens live in `theme/`, components in `components/`, shared across every screen.
 
 ---
 
 ## Table of contents
 
-1. [Colour tokens](#1-colour-tokens)
-2. [Typography](#2-typography)
-3. [Spacing & radius](#3-spacing--radius)
-4. [Components](#4-components)
+1. [Theme system](#1-theme-system)
+2. [Colour palettes](#2-colour-palettes)
+3. [Typography](#3-typography)
+4. [Iconography](#4-iconography)
+5. [Spacing & radius](#5-spacing--radius)
+6. [Components](#6-components)
    - [Avatar](#avatar)
    - [Button](#button)
    - [Field](#field)
@@ -22,189 +25,334 @@ All tokens and components live in `theme/` and `components/` and are shared acro
    - [BottomSheetModal](#bottomsheetmodal)
    - [ProgressBar](#progressbar)
    - [Section](#section)
-5. [Conventions](#5-conventions)
-6. [Session surfaces](#6-session-surfaces)
-7. [Visual effects — web vs native](#7-visual-effects--web-vs-native)
-8. [Technical decisions](#8-technical-decisions)
+   - [Scanlines](#scanlines)
+   - [NoiseOverlay](#noiseoverlay)
+7. [Conventions](#7-conventions)
+8. [Session surfaces](#8-session-surfaces)
+9. [Visual effects — web vs native](#9-visual-effects--web-vs-native)
+10. [Art direction](#10-art-direction)
+11. [Technical decisions](#11-technical-decisions)
 
 ---
 
-## 1. Colour tokens
+## 1. Theme system
 
-**File:** `theme/tokens.ts`
-**Import:** `import { T } from '@/theme/tokens'`
+### Architecture
 
-### Backgrounds
+The app supports **light**, **dark**, and **system** (follows OS preference) themes.
 
-| Token | Value | Usage |
-|---|---|---|
-| `T.bg` | `#131109` | Screen background |
-| `T.bgDeep` | `#0c0b09` | Session screen — darker than global bg |
-| `T.surface` | `#1e1b12` | Cards, inputs, sheets |
-| `T.surface2` | `#252118` | Progress tracks, search inputs, nested surfaces |
-| `T.surfaceCard` | `#111008` | Explicit card container in session |
+| File | Purpose |
+|---|---|
+| `theme/colors.ts` | Raw light + dark palettes, `ColorTheme` type, backward-compat aliases |
+| `context/ThemeContext.tsx` | `ThemeProvider` + `useTheme()` hook |
+| `theme/tokens.ts` | Typography (fonts, sizes, weights, line heights, letter spacing) — theme-independent |
+| `theme/icons.ts` | ASCII icon constants |
+| `theme/spacing.ts` | Spacing and border-radius scales — theme-independent |
 
-### Borders
+### Usage pattern
 
-| Token | Value | Usage |
-|---|---|---|
-| `T.border` | `rgba(255,248,220, 0.08)` | Default border on all elements |
-| `T.borderFocus` | `rgba(255,248,220, 0.22)` | Input focus ring, custom count input |
+All components and screens use the **themed factory pattern**:
 
-### Text
+```tsx
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
-| Token | Value | Usage |
-|---|---|---|
-| `T.textPrimary` | `#F0EBE0` | Headings, active labels, card titles |
-| `T.textSecondary` | `#A09880` | Body text, secondary labels |
-| `T.textMuted` | `#928A78` | Section labels, placeholders, inactive states — passes WCAG AA (4.5:1) on all surfaces |
-| `T.textHanzi` | `#f0e8d8` | The large Hanzi character on flashcards (warm parchment) |
-| `T.textFaint` | `#4a4438` | Ultra-low-emphasis: tap hints, corner ornaments |
+export function MyComponent() {
+  const { colors, isDark } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
+  return <View style={s.wrap}>...</View>;
+}
 
-### Accent
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  wrap: { backgroundColor: t.bg },
+});
+```
 
-| Token | Value | Usage |
-|---|---|---|
-| `T.accent` | `#C0392B` | Primary CTAs, active underlines, pinyin text |
-| `T.accentDim` | `rgba(192,57,43, 0.12)` | Active chip / segment background fill |
-| `T.accentBorder` | `rgba(192,57,43, 0.28)` | Active chip / segment border |
+**Do not** import `T` from `theme/tokens.ts` for colors — that is a deprecated backward-compat alias pointing to the dark palette only.
 
-### Semantic
+### Theme persistence
 
-| Token | Value | Usage |
-|---|---|---|
-| `T.error` | `#9a3030` | Error states, "forgot" FAB, error score |
-| `T.errorDim` | `rgba(154,48,48,0.12)` | Error background fills (forgot button, error rows) |
-| `T.errorMuted` | `rgba(154,48,48,0.55)` | Subdued error text (score counters, secondary indicators) |
-| `T.errorBright` | `#e04030` | Hover/active error state, pinyin text |
-| `T.success` | `#3a7a44` | Success states, "got it" button, success score |
-| `T.successBright` | `#4fa858` | Hover/active success state |
+- Stored in AsyncStorage under key `hanziflash_theme_mode`
+- Values: `'light' | 'dark' | 'system'`
+- Default: `'system'` (reads `useColorScheme()` from React Native)
+- User toggles theme in Settings → Appearance → Theme (SegmentedControl)
+
+### Provider setup
+
+`ThemeProvider` wraps the entire app in `app/_layout.tsx`, outside `AuthProvider`:
+
+```tsx
+<ThemeProvider>
+  <AuthProvider>
+    <RouteGuard />
+    <Scanlines />
+    <NoiseOverlay />
+    <Stack>...</Stack>
+  </AuthProvider>
+</ThemeProvider>
+```
 
 ---
 
-## 2. Typography
+## 2. Colour palettes
+
+**File:** `theme/colors.ts`
+**Access:** `const { colors } = useTheme()`
+
+### Paper Surface
+
+| Token | Light | Dark | Usage |
+|---|---|---|---|
+| `bg` | `#f5f0e6` | `#0c0b09` | Screen background |
+| `bgCard` | `#faf6ed` | `#111008` | Cards, inputs, sheets, form controls |
+| `bgCard2` | `#f0ebe0` | `#161410` | Nested surfaces, focused inputs, search fields |
+| `border` | `#d4c9b8` | `#2a2620` | Default border on all elements |
+| `borderDim` | `#e0d8cc` | `#1e1c18` | Subtle dividers, hint block borders |
+| `scanline` | `rgba(120,100,60,0.03)` | `rgba(255,240,200,0.018)` | Scanline / paper-grain overlay color |
+
+### Red Ink System
+
+| Token | Light | Dark | Usage |
+|---|---|---|---|
+| `inkRed` | `#b8301e` | `#c8382a` | Primary CTA fill, active underlines, focus borders |
+| `inkRedDim` | `#c45a4e` | `#7a1e14` | Active chip/segment border, corner ornaments |
+| `inkRedGlow` | `rgba(184,48,30,0.12)` | `rgba(200,56,42,0.18)` | Active chip/segment background, box-shadow glow |
+| `inkRedText` | `#a82818` | `#e04030` | Pinyin text, error messages, links |
+
+### Text Hierarchy
+
+| Token | Light | Dark | Usage |
+|---|---|---|---|
+| `textPrimary` | `#2a241a` | `#e8e0d0` | Headings, active labels, card titles |
+| `textSecondary` | `#6b6050` | `#8a8070` | Body text, secondary labels, subtitles |
+| `textFaint` | `#887a68` | `#6b6055` | Labels, placeholders, tap hints, ornaments |
+| `textHanzi` | `#1a1610` | `#f0e8d8` | Large Hanzi character on flashcards |
+
+### Semantic Colors
+
+| Token | Light | Dark | Usage |
+|---|---|---|---|
+| `green` | `#2d6e38` | `#3a7a44` | Success/correct states, "got it" button |
+| `greenBright` | `#3a8a42` | `#4fa858` | Hover/active success state |
+| `redBtn` | `#c45a4e` | `#7a1e14` | Error/wrong states, "forgot" button |
+| `redBtnBright` | `#b8301e` | `#c8382a` | Hover/active error state |
+
+### Card Shadows
+
+| Token | Light | Dark | Usage |
+|---|---|---|---|
+| `cardShadow` | `rgba(120,100,60,0.08)` | `rgba(0,0,0,0.3)` | Outer card shadow |
+| `cardInsetShadow` | `rgba(120,100,60,0.06)` | `rgba(0,0,0,0.4)` | Inset card shadow (web-only) |
+
+### Noise
+
+| Token | Light | Dark | Usage |
+|---|---|---|---|
+| `noiseOpacity` | `0.05` | `0.04` | SVG noise overlay opacity |
+
+Light mode uses `multiply` blend; dark mode uses `overlay` blend (set in `NoiseOverlay` component).
+
+### Backward-compat aliases
+
+During migration, old `T.*` names are mapped to new palette keys in `withAliases()`:
+
+| Old name | Maps to |
+|---|---|
+| `accent` | `inkRed` |
+| `accentDim` | `inkRedGlow` |
+| `accentBorder` | `inkRedDim` |
+| `surface` / `surfaceCard` | `bgCard` |
+| `surface2` | `bgCard2` |
+| `bgDeep` | `bg` |
+| `borderFocus` | `inkRed` |
+| `textMuted` | `textSecondary` |
+| `error` / `errorDim` / `errorMuted` / `errorBright` | `redBtn` / `inkRedGlow` / `inkRedDim` / `inkRedText` |
+| `success` / `successBright` | `green` / `greenBright` |
+
+These aliases will be removed once all call-sites use the new names.
+
+---
+
+## 3. Typography
 
 **File:** `theme/tokens.ts`
 
-### Dual-scale architecture
-
-The type system uses two independent mathematical scales plus one manual override:
-
-| Scale | Ratio | Name | Domain |
-|---|---|---|---|
-| Body / supporting | 1.250 | Major Third | Flashcard text roles, UI copy, captions |
-| Display / title | 1.333 | Perfect Fourth | Screen headings, deck names, navigation |
-
-**Why two scales?** A single scale cannot serve both the flashcard's pedagogical hierarchy (pinyin → translation → example sentence) and the app's navigational hierarchy (screen title → deck name → sub-heading) without one distorting the other.
-
-### Display scale (Perfect Fourth 1.333)
-
-| Token | Value | Role |
-|---|---|---|
-| `FSDisplay.hanzi` | 96px | Flashcard hero character in Noto Serif SC Light (manual override) |
-| `FSDisplay.seal` | 50px | Session completion seal |
-| `FSDisplay.score` | 42px | Large numeric display |
-| `FSDisplay.title` | 42px | Screen titles / H1 |
-| `FSDisplay.heading` | 32px | Deck names / H2 |
-| `FSDisplay.subheading` | 21px | Sub-headings, card headings |
-
-### Body scale (Major Third 1.250)
-
-| Token | Value | Role |
-|---|---|---|
-| `FSBody.pinyin` | 20px | Pinyin romanization |
-| `FSBody.ui` | 16px | Inputs, buttons, nav controls (base) |
-| `FSBody.body` | 16px | Body text, translations (base) |
-| `FSBody.label` | 13px | Example sentences, captions, section labels |
-
-### Why 1.250 for the body scale?
-
-Chinese characters read more dramatically than Latin text at equivalent sizes. 1.250 keeps enough contrast between pinyin (20px), translation (16px), and example sentence (13px) without dropping below the ~12px Chinese-character legibility floor on mobile.
-
-### Character sizing (96px)
-
-The hero character is a manual override — not derived from either scale. It is the product being learned, not a heading. 96px in Noto Serif SC Light ensures it is the unambiguous primary stimulus with elegant, thin strokes. The gap between 96px and the next-largest element (title at 42px) creates a deliberate rupture that signals "this is the thing."
-
-### Line heights
-
-| Token | Font size | Line height | Ratio |
-|---|---|---|---|
-| `LH.label` | 13px | 20px | 1.54 |
-| `LH.body` / `LH.ui` | 16px | 24px | 1.50 |
-| `LH.pinyin` | 20px | 28px | 1.40 |
-| `LH.subheading` | 21px | 28px | 1.33 |
-| `LH.heading` | 32px | 40px | 1.25 |
-| `LH.title` / `LH.score` | 42px | 48px | 1.14 |
-| `LH.seal` | 50px | 56px | 1.12 |
-| `LH.hanzi` | 96px | 108px | 1.12 |
-
-### Font weights
-
-Four weights — no bold (700). Bold thickens Chinese character strokes, reducing legibility.
-
-| Token | Weight | Role |
-|---|---|---|
-| `FW.light` | 300 | Serif Hanzi display only — thin strokes for elegance |
-| `FW.regular` | 400 | Prose, translations, pinyin, captions (default — omit from style) |
-| `FW.medium` | 500 | Interactive controls: buttons, chips, tabs, list labels |
-| `FW.semibold` | 600 | Screen headings, deck names, section titles |
-
-**Why no bold?** Size signals priority. Weight signals interactivity. Color signals role. Each weight encodes a semantic role. `FW.light` is used exclusively with the serif Hanzi font (Noto Serif SC) — the thinner strokes give the character an elegant, calligraphic feel at 96px.
-
-### Font families
+### Fonts — two only
 
 | Constant | Native | Web | Role |
 |---|---|---|---|
-| `SERIF` | `NotoSerifSC-Light` | `"Noto Serif SC", "STSong", serif` | Hanzi hero character, example sentences |
-| `MONO` | `IBMPlexMono-Regular` | `"IBM Plex Mono", monospace` | Counters, pinyin, POS tags, badges, labels |
-| `MONO_MEDIUM` | `IBMPlexMono-Medium` | `"IBM Plex Mono", monospace` | Score strip values, interactive mono labels |
+| `MONO` | `IBMPlexMono-Regular` | `"IBM Plex Mono", monospace` | **All UI text** — every label, input, button, counter, pinyin, description |
+| `SERIF` | `NotoSerifSC-Light` | `"Noto Serif SC", "STSong", serif` | **Chinese characters only** — hero hanzi, example sentences |
 
-**Fonts are loaded via `expo-font` in `app/_layout.tsx`.** The app holds the splash screen until all fonts are ready. On web, IBM Plex Mono and Noto Serif SC are loaded via Google Fonts CDN (declared in font constants with CSS fallbacks).
+Every `<Text>` element must have `fontFamily: MONO` unless it displays Chinese characters (then `SERIF`). No system font fallback — the terminal aesthetic depends on monospace everywhere.
 
-All other text uses the system default (San Francisco on iOS, Roboto on Android).
+### Text treatments — complete reference
 
-### Font subsetting (Noto Serif SC)
+Each treatment defines a specific text role with its full styling recipe. Sizes are role-based (not derived from a mathematical scale).
 
-The full Noto Serif SC Light is ~24MB. For production, it should be subsetted to only the characters in the `cards` table using `pyftsubset`. HSK 1-6 covers ~5000 unique characters; a subset should be ~800KB-1.2MB. If new cards are added with characters outside the subset, the font falls back to system serif. Re-run the subsetting script when seeding new cards.
+#### Display treatments
+
+| Treatment | Token | Size | Weight | LS | LH | Style | Font | Color | Where used |
+|---|---|---|---|---|---|---|---|---|---|
+| **Hero Hanzi** | `FS.hanzi` | 108px | 300 | `LS.tighter` (-0.02em) | `LH.single` (1.0) | — | `SERIF` | `textHanzi` | Flashcard main character |
+| **Form Title** | `FS.formTitle` | 24px | 500 | `LS.wider` (0.08em) | `LH.tight` (1.2) | uppercase | `MONO` | `textPrimary` | Auth headings ("WELCOME BACK"), session complete title |
+
+#### Content treatments
+
+| Treatment | Token | Size | Weight | LS | LH | Style | Font | Color | Where used |
+|---|---|---|---|---|---|---|---|---|---|
+| **Pinyin** | `FS.pinyin` | 18px | 400 | `LS.wider` (0.08em) | `LH.single` (1.0) | italic | `MONO` | `inkRedText` | Main card pinyin romanization |
+| **Definition** | `FS.definition` | 15px | 300 | `LS.wide` (0.04em) | `LH.normal` (1.5) | — | `MONO` | `textSecondary` | Card meaning/translation, header titles, deck names |
+| **Input** | `FS.input` | 14px | 400 | `LS.wide` (0.04em) | — | — | `MONO` | `textPrimary` | Form text inputs, search fields |
+| **Body** | `FS.body` | 13px | 400 | `LS.wide` (0.04em) | `LH.normal` (1.5) | — | `MONO` | `textSecondary` | Subtitles, descriptions, secondary button labels, back links |
+| **Score Number** | `FS.body` | 13px | 500 | `LS.wider` (0.08em) | `LH.single` (1.0) | tnum | `MONO` | semantic color | Score strip numbers (wrong/right counts) |
+| **CTA Label** | `FS.ctaLabel` | 12px | 500 | `LS.cta` (0.12em) | `LH.single` (1.0) | uppercase | `MONO` | `#fff` | Primary button text ("START SESSION") |
+| **Progress** | `FS.progress` | 12px | 400 | `LS.progress` (0.05em) | `LH.single` (1.0) | tnum | `MONO` | `textSecondary` | Progress counter ("3 / 24"), example translations |
+| **Example Pinyin** | `FS.exPinyin` | 11px | 400 | `LS.example` (0.06em) | `LH.normal` (1.5) | italic | `MONO` | `inkRedText` | Example sentence pinyin |
+| **Label** | `FS.label` | 10px | 400 | `LS.widest` (0.14em) | `LH.single` (1.0) | uppercase | `MONO` | `textFaint` | Form labels, section headers, divider text, POS tags |
+| **Micro** | `FS.micro` | 9px | 400 | `LS.extreme` (0.22em) | `LH.single` (1.0) | uppercase | `MONO` | `textFaint` | Tap hints ("TAP TO REVEAL"), rating button labels, HSK badges |
+
+#### Chinese text treatments (SERIF font)
+
+| Treatment | Size | Weight | LS | LH | Color | Where used |
+|---|---|---|---|---|---|---|
+| **Hero Hanzi** | 108px | 300 | -0.02em | 1.0 | `textHanzi` | Flashcard main character |
+| **Hanzi Display** | 48px | 300 | — | 1.0 | `textHanzi` | Smaller character display |
+| **Example Hanzi** | 15px | 400 | `LS.example` (0.06em) | `LH.normal` (1.5) | `textPrimary` | Example sentence Chinese text |
+
+### Font sizes — token reference
+
+#### Display (FSDisplay)
+
+| Token | Value | Usage |
+|---|---|---|
+| `FS.hanzi` | 108px | Flashcard hero character (Noto Serif SC) |
+| `FS.formTitle` | 24px | Form/screen headings (MONO, uppercase, weight 500) |
+
+#### Content (FSContent)
+
+| Token | Value | Usage |
+|---|---|---|
+| `FS.pinyin` | 18px | Pinyin romanization |
+| `FS.definition` | 15px | Card meaning, header titles, deck names |
+| `FS.input` | 14px | Form input text |
+| `FS.body` | 13px | Body secondary, descriptions, subtitles |
+| `FS.ctaLabel` | 12px | Primary CTA button labels (uppercase) |
+| `FS.progress` | 12px | Progress counter, example translation |
+| `FS.exPinyin` | 11px | Example sentence pinyin (italic) |
+| `FS.label` | 10px | Form labels, dividers, section headers (uppercase) |
+| `FS.micro` | 9px | Tap hints, rating button labels (uppercase) |
+
+### Font weights — three only
+
+No bold (700). Bold thickens Chinese character strokes, reducing legibility.
+
+| Token | Weight | Usage |
+|---|---|---|
+| `FW.light` | 300 | Serif Hanzi display, definition text, form inputs |
+| `FW.regular` | 400 | Pinyin, labels, body text, secondary buttons (default) |
+| `FW.medium` | 500 | Primary CTA labels, score numbers, form titles, interactive controls |
+
+### Letter spacing
+
+| Token | Value | Usage |
+|---|---|---|
+| `LS.tighter` | -0.02 | Hanzi display |
+| `LS.normal` | 0 | Default — no tracking |
+| `LS.subtle` | 0.01 | Subtitles |
+| `LS.wide` | 0.04 | Definition text, body, oauth buttons, translations |
+| `LS.progress` | 0.05 | Progress counters |
+| `LS.example` | 0.06 | Example hanzi, example pinyin, brand pinyin |
+| `LS.wider` | 0.08 | Pinyin, score labels, form title |
+| `LS.cta` | 0.12 | CTA button labels, section state labels |
+| `LS.widest` | 0.14 | Form labels, rating button labels |
+| `LS.divider` | 0.16 | Divider text, hint triggers |
+| `LS.ultrawide` | 0.18 | Uppercase card labels (POS · HSK level) |
+| `LS.extreme` | 0.22 | Micro text ("Tap to reveal") |
+
+### Line heights — three ratios
+
+Applied as `lineHeight: fontSize * LH.ratio`.
+
+| Token | Value | Usage |
+|---|---|---|
+| `LH.single` | 1.0 | Single-line: buttons, counters, scores, pinyin, labels |
+| `LH.tight` | 1.2 | Form titles, compact headings |
+| `LH.normal` | 1.5 | Multi-line body, definitions, example sentences |
+
+### Typography rules
+
+1. All UI text uses `MONO` (IBM Plex Mono) — no system font fallback
+2. Chinese characters use `SERIF` (Noto Serif SC) — contrast between "machine" and "tradition"
+3. Pinyin is always **italic** with `inkRedText` color
+4. Uppercase labels use wide letter-spacing (0.12em–0.22em)
+5. Body text uses light-to-regular weights (300–400) for an elegant feel
+6. Numbers use `fontFeatureSettings: 'tnum'` for tabular alignment
+7. No text ever goes below 9px (`FS.micro`)
+8. Primary buttons: 12px / 500 / uppercase / 0.12em. Secondary buttons: 13px / 400 / normal case / 0.04em
 
 ---
 
-## 3. Spacing & radius
+## 4. Iconography
+
+**File:** `theme/icons.ts`
+**Import:** `import { Icon } from '@/theme/icons'`
+
+Pure ASCII/text characters — no SVG icon sets. All icons are rendered in `MONO` font and inherit their color from semantic context.
+
+| Constant | Character | Usage |
+|---|---|---|
+| `Icon.close` | `×` | Close buttons |
+| `Icon.next` | `›` | Next / forward |
+| `Icon.ornament` | `+` | Corner ornaments on cards |
+| `Icon.dropdown` | `▾` | Dropdown indicators, hint chevrons |
+| `Icon.audio` | `♪` | Audio playback hint |
+| `Icon.separator` | `·` | Dot separators in score strips |
+| `Icon.correct` | `✓` | Correct/got-it indicator |
+| `Icon.repeat` | `↺` | Repeat/again action |
+| `Icon.left` | `←` | Left navigation |
+| `Icon.right` | `→` | Right navigation, card arrows |
+
+---
+
+## 5. Spacing & radius
 
 **File:** `theme/spacing.ts`
 **Import:** `import { space, radius } from '@/theme/spacing'`
 
-### Spacing scale
+### Spacing scale (4px base)
 
-| Name | Value (px) |
+| Name | Value |
 |---|---|
-| `space.xs` | 4 |
-| `space.sm` | 8 |
-| `space.md` | 12 |
-| `space.lg` | 16 |
-| `space.xl` | 20 |
-| `space.xxl` | 24 |
-| `space.xxxl` | 28 |
-| `space.huge` | 36 |
-| `space.giant` | 48 |
+| `space.xs` | 4px |
+| `space.sm` | 8px |
+| `space.md` | 12px |
+| `space.lg` | 16px |
+| `space.xl` | 20px |
+| `space.xxl` | 24px |
+| `space.xxxl` | 28px |
+| `space.huge` | 36px |
+| `space.giant` | 48px |
 
 ### Border-radius scale
 
-| Name | Value (px) | Intended use |
+| Name | Value | Use |
 |---|---|---|
-| `radius.square` | 4 | Session rating buttons — minimal rounding |
+| `radius.square` | 4 | Session rating buttons |
 | `radius.sm` | 8 | Icon buttons |
-| `radius.md` | 10 | Segmented controls, search inputs |
-| `radius.lg` / `radius.input` | 12 | Text inputs, chips |
-| `radius.card` | 16 | Action cards |
+| `radius.md` | 10 | Legacy — kept for compat |
+| `radius.lg` / `radius.input` | 12 | Legacy — kept for compat |
+| `radius.card` | 16 | Action cards (Card component) |
 | `radius.modal` | 20 | Bottom-sheet top corners |
 | `radius.pill` | 100 | Primary CTA buttons |
 
-> **Note:** Existing screens may still use raw numbers. Use `space` / `radius` in all new components and screens going forward.
+> **Note:** Form elements (Field, Chip, SegmentedControl) now use **square corners** (no border-radius) matching the terminal aesthetic. The rounded radii above are kept for Card and Button components which have their own shapes.
 
 ---
 
-## 4. Components
+## 6. Components
+
+All components use the themed factory pattern: `useTheme()` + `useMemo(() => makeStyles(colors), [colors])`.
 
 ---
 
@@ -214,43 +362,15 @@ The full Noto Serif SC Light is ~24MB. For production, it should be subsetted to
 
 Circular profile photo with an initials fallback. Optionally tappable.
 
-#### Props
-
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `uri` | `string \| null` | — | Public URL of the user's photo |
-| `initials` | `string` | `'?'` | 1–2 characters shown when no photo is available |
+| `uri` | `string \| null` | — | Photo URL |
+| `initials` | `string` | `'?'` | 1–2 character fallback |
 | `size` | `number` | `80` | Diameter in pixels |
-| `onPress` | `() => void` | — | When provided, wraps the avatar in a `TouchableOpacity` |
-| `style` | `ViewStyle` | — | Override the outer container |
+| `onPress` | `() => void` | — | Makes it tappable |
+| `style` | `ViewStyle` | — | Override outer container |
 
-#### Fallback behaviour
-
-When `uri` is absent or null, a dark circle (`T.surface2`) is rendered with the initials centered in `T.textSecondary`. The font size scales with `size` (`size × 0.35`).
-
-#### Usage
-
-```tsx
-import { Avatar } from '@/components/Avatar';
-
-// Header button (initials, small)
-<Avatar
-  initials="JD"
-  size={36}
-  onPress={() => router.push('/profile')}
-/>
-
-// Profile page (photo, large, tappable to change)
-<Avatar
-  uri={avatarUri}
-  initials={initials}
-  size={96}
-  onPress={pickAvatar}
-/>
-
-// Read-only display
-<Avatar uri={user.avatar_url} initials="AB" size={48} />
-```
+Fallback circle uses `bgCard2` background, `border` stroke, `textSecondary` initials.
 
 ---
 
@@ -258,58 +378,57 @@ import { Avatar } from '@/components/Avatar';
 
 **File:** `components/Button.tsx`
 
-The primary call-to-action element. Handles disabled and loading states internally.
-
-#### Props
+Square call-to-action element. All variants use `MONO` font, square corners (no border-radius).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `string` | — | Button text |
 | `onPress` | `() => void` | — | Press handler |
 | `variant` | `'primary' \| 'secondary' \| 'ghost'` | `'primary'` | Visual style |
-| `shape` | `'pill' \| 'rounded'` | `'pill'` | Border radius |
-| `disabled` | `boolean` | `false` | Disables interaction + dims opacity |
-| `loading` | `boolean` | `false` | Replaces label with `ActivityIndicator` |
-| `style` | `ViewStyle` | — | Override container style |
+| `icon` | `ReactNode` | — | Optional icon rendered to the left of the label |
+| `disabled` | `boolean` | `false` | Dims to 18% opacity |
+| `loading` | `boolean` | `false` | Shows ActivityIndicator |
+| `style` | `ViewStyle` | — | Override container |
 
-#### Variants
+#### Variants — container
 
-| Variant | Background | Border | Text colour |
-|---|---|---|---|
-| `primary` | `T.accent` | none | `#fff` |
-| `secondary` | `T.surface` | `T.border` | `T.textSecondary` |
-| `ghost` | none | none | `T.textMuted` |
+| Variant | Background | Border |
+|---|---|---|
+| `primary` | `inkRed` | none |
+| `secondary` | `bgCard` | 1px `border` |
+| `ghost` | none | none |
 
-#### Shapes
+#### Variants — typography
 
-| Shape | `borderRadius` |
-|---|---|
-| `pill` (default) | `100` |
-| `rounded` | `12` — use for OAuth / social login buttons |
+Primary and secondary/ghost use completely different text treatments:
 
-#### Usage
+| Property | Primary (CTA) | Secondary / Ghost |
+|---|---|---|
+| fontSize | 12px (`FS.ctaLabel`) | 13px (`FS.body`) |
+| fontWeight | 500 (`FW.medium`) | 400 (`FW.regular`) |
+| letterSpacing | 0.12em (`LS.cta`) | 0.04em (`LS.wide`) |
+| textTransform | `uppercase` | normal |
+| color | `#fff` | `textPrimary` / `textSecondary` |
+
+Primary buttons command attention through uppercase + wide tracking. Secondary/ghost buttons read as regular text actions — no shouting.
+
+#### Icon variant
+
+Pass any `ReactNode` as the `icon` prop to render it to the left of the label with a 12px gap. The icon + label are laid out in a `flexDirection: 'row'` container.
 
 ```tsx
-import { Button } from '@/components/Button';
+import { GoogleIcon } from '@/components/GoogleIcon';
 
-// Primary CTA
-<Button label="Start Session" onPress={startSession} />
-
-// Disabled primary
-<Button label="Start Session" onPress={startSession} disabled={!canStart} />
-
-// Loading state
-<Button label="Sign in" onPress={submit} loading={loading} />
-
-// Secondary outlined
-<Button label="Back to home" variant="secondary" onPress={goHome} />
-
-// OAuth / social (rounded shape)
-<Button label="Continue with Google" variant="secondary" shape="rounded" onPress={googleSignIn} />
-
-// Ghost text link
-<Button label="Cancel" variant="ghost" onPress={cancel} />
+// OAuth button with Google logo
+<Button
+  label="Continue with Google"
+  variant="secondary"
+  icon={<GoogleIcon />}
+  onPress={googleSignIn}
+/>
 ```
+
+**`GoogleIcon`** (`components/GoogleIcon.tsx`) renders the official Google "G" SVG (18×18) on web via inline `<div>` + `dangerouslySetInnerHTML`. On native, it renders a colored circle fallback. Accepts an optional `size` prop (default 18).
 
 ---
 
@@ -317,51 +436,26 @@ import { Button } from '@/components/Button';
 
 **File:** `components/Field.tsx`
 
-Labelled text input with internal focus management, error border, and inline error message.
-
-#### Props
+Labelled text input with focus management, error states, and ink-glow focus ring.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `label` | `string` | — | Uppercase label above input |
+| `label` | `string` | — | Uppercase label (10px, MONO, `LS.widest`) |
 | `value` | `string` | — | Controlled value |
 | `onChange` | `(v: string) => void` | — | Change handler |
-| `placeholder` | `string` | — | Placeholder text |
+| `placeholder` | `string` | — | Placeholder text (`textFaint`) |
 | `secureTextEntry` | `boolean` | `false` | Password masking |
-| `hasError` | `boolean` | `false` | Shows error border without message |
-| `errorText` | `string` | — | Shows error border + red message below |
-| `style` | `ViewStyle` | — | Override wrapper style |
+| `hasError` | `boolean` | `false` | Error border without message |
+| `errorText` | `string` | — | Error border + red message below |
+| `style` | `ViewStyle` | — | Override wrapper |
 
-#### States
+#### Visual spec
 
-| State | Border colour |
-|---|---|
-| Default | `T.border` |
-| Focused | `T.borderFocus` |
-| Error | `T.error` (dim, `rgba(154,48,48,0.4)`) |
-
-#### Usage
-
-```tsx
-import { Field } from '@/components/Field';
-
-<Field
-  label="EMAIL"
-  value={email}
-  onChange={setEmail}
-  placeholder="you@example.com"
-  hasError={!!error && !email}
-/>
-
-<Field
-  label="PASSWORD"
-  value={password}
-  onChange={setPassword}
-  placeholder="Min. 8 characters"
-  secureTextEntry
-  errorText={error || undefined}
-/>
-```
+- Square corners (no border-radius)
+- `MONO` font, 15px, weight 300, `letterSpacing: LS.wide`
+- Padding: 8px vertical, 12px horizontal
+- Focus: `inkRed` border + `inkRedGlow` box-shadow (web)
+- Error: `inkRed` border + `inkRedGlow` box-shadow (web), `inkRedText` message
 
 ---
 
@@ -369,49 +463,35 @@ import { Field } from '@/components/Field';
 
 **File:** `components/Card.tsx`
 
-Action row with a Chinese-character icon, title, subtitle, and directional arrow. Used on the home screen for primary navigation actions.
-
-#### Props
+Action row with icon box, title, subtitle, and arrow. Square corners, `MONO` font. Used on home screen for primary navigation.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `icon` | `string` | — | Single character displayed in a 48×48 box |
-| `title` | `string` | — | Primary label |
-| `subtitle` | `string` | — | Secondary description |
+| `icon` | `string` | — | Single character in 48×48 box |
+| `title` | `string` | — | Primary label (15px, weight 500) |
+| `subtitle` | `string` | — | Secondary description (10px) |
 | `onPress` | `() => void` | — | Press handler |
-| `variant` | `'primary' \| 'secondary'` | `'primary'` | Visual weight |
-| `disabled` | `boolean` | `false` | Hides arrow, dims to 45% opacity |
-| `style` | `ViewStyle` | — | Override container style |
+| `variant` | `'primary' \| 'secondary'` | `'secondary'` | Visual weight |
+| `disabled` | `boolean` | `false` | 45% opacity, hides arrow |
+| `style` | `ViewStyle` | — | Override container |
 
 #### Variants
 
-| Variant | Icon background | Border | Icon text |
+| Variant | Background | Border | Icon bg |
 |---|---|---|---|
-| `primary` | `T.accentDim` + `T.accentBorder` border | `T.accentBorder` | `T.textPrimary` |
-| `secondary` | `T.surface2` | `T.border` | `T.textMuted` |
+| `primary` | `inkRedGlow` | `inkRedDim` | `inkRedGlow` + `inkRedDim` border |
+| `secondary` | `bgCard` | `border` | `bgCard2` + `border` border |
 
-#### Usage
+#### States
 
-```tsx
-import { Card } from '@/components/Card';
+| State | Visual | Notes |
+|---|---|---|
+| Default | Variant background + border | — |
+| Hover (web) | `inkRed` border + `box-shadow: 0 0 12px inkRedGlow` | Both variants get the same hover |
+| Active | `activeOpacity: 0.8` | Native touch feedback |
+| Disabled | 45% opacity, arrow hidden | Higher than Button's 18% because Card has more content (title + subtitle) that needs to remain legible |
 
-<Card
-  icon="开"
-  title="New session"
-  subtitle="Start a fresh round of flashcards"
-  variant="primary"
-  onPress={startNew}
-/>
-
-<Card
-  icon="续"
-  title="Resume session"
-  subtitle={hasSession ? 'Continue where you left off' : 'No session in progress'}
-  variant="secondary"
-  onPress={resume}
-  disabled={!hasSession}
-/>
-```
+Transition: `border-color 150ms, background-color 150ms, box-shadow 150ms` (web only).
 
 ---
 
@@ -419,68 +499,22 @@ import { Card } from '@/components/Card';
 
 **File:** `components/Chip.tsx`
 
-Selectable toggle row with a dot indicator, label, and optional sublabel. Used for multi-select filter options (e.g. difficulty selection).
-
-#### Props
+Selectable toggle with dot indicator. Square corners, `MONO` font.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `string` | — | Primary label |
-| `sublabel` | `string` | — | Secondary descriptor below label |
+| `sublabel` | `string` | — | Secondary descriptor |
 | `active` | `boolean` | — | Selected state |
 | `onPress` | `() => void` | — | Toggle handler |
-| `style` | `ViewStyle` | — | Override container style |
+| `style` | `ViewStyle` | — | Override container |
 
 #### States
 
-| State | Background | Border | Dot colour | Label colour |
+| State | Background | Border | Dot | Label |
 |---|---|---|---|---|
-| Inactive | `T.surface` | `T.border` | `T.textMuted` | `T.textMuted` |
-| Active | `T.accentDim` | `T.accentBorder` | `T.accent` | `T.textPrimary` |
-
-#### Usage
-
-```tsx
-import { Chip } from '@/components/Chip';
-
-<Chip
-  label="New"
-  sublabel="Haven't seen yet"
-  active={difficulties.includes('new')}
-  onPress={() => toggleDifficulty('new')}
-/>
-```
-
----
-
-### StatCard
-
-**File:** `components/StatCard.tsx`
-
-A metric tile displaying a large numeric value and a short uppercase label below. Used in the profile page stat grid.
-
-#### Props
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `label` | `string` | — | Short uppercase label (e.g. `"Sessions"`, `"Moy. /ses."`) |
-| `value` | `string \| number` | — | The metric displayed prominently |
-| `style` | `ViewStyle` | — | Override the card container — use `flex: 1` for grid cells, or omit for full-width |
-
-#### Usage
-
-```tsx
-import { StatCard } from '@/components/StatCard';
-
-// In a 2-column grid (each cell takes equal width)
-<View style={{ flexDirection: 'row', gap: 10 }}>
-  <StatCard label="Sessions"    value={42}    style={{ flex: 1 }} />
-  <StatCard label="Cartes vues" value={380}   style={{ flex: 1 }} />
-</View>
-
-// Full-width (secondary metric)
-<StatCard label="Réussite globale" value="71%" />
-```
+| Inactive | `bgCard` | `border` | `textSecondary` | `textSecondary` |
+| Active | `inkRedGlow` | `inkRedDim` | `inkRed` | `textPrimary` |
 
 ---
 
@@ -488,47 +522,35 @@ import { StatCard } from '@/components/StatCard';
 
 **File:** `components/SegmentedControl.tsx`
 
-Horizontal row of preset option segments with an optional custom numeric input.
-
-#### Props
+Horizontal segments with optional custom numeric input. Square corners, `MONO` font.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `options` | `{ label: string; value: number \| string }[]` | — | Preset segments |
-| `value` | `number \| string` | — | Currently selected value |
-| `onChange` | `(v: number \| string) => void` | — | Called on preset or custom tab press |
-| `allowCustom` | `boolean` | `false` | Appends a "Custom" segment |
-| `customValue` | `number` | — | Controlled custom number (parent-owned) |
-| `onCustomChange` | `(v: number) => void` | — | Called when custom text input changes |
-| `style` | `ViewStyle` | — | Override wrapper style |
+| `options` | `{ label, value }[]` | — | Preset segments |
+| `value` | `number \| string` | — | Selected value |
+| `onChange` | `(v) => void` | — | Selection handler |
+| `allowCustom` | `boolean` | `false` | Adds "Custom" segment |
+| `customValue` | `number` | — | Custom number value |
+| `onCustomChange` | `(v: number) => void` | — | Custom input handler |
+| `style` | `ViewStyle` | — | Override wrapper |
 
-#### Behaviour
+Active segment: `inkRedGlow` background, `inkRedDim` border.
 
-- A segment is active when `value === option.value`.
-- When `allowCustom` is true and `value` is not in `options`, the **Custom** segment activates and a `TextInput` (`keyboardType="number-pad"`) slides in below the row.
-- `onChange` fires for both preset and custom selections. Use `onCustomChange` to handle the typed numeric value separately if needed.
+---
 
-#### Usage
+### StatCard
 
-```tsx
-import { SegmentedControl } from '@/components/SegmentedControl';
+**File:** `components/StatCard.tsx`
 
-<SegmentedControl
-  options={[
-    { label: '10', value: 10 },
-    { label: '20', value: 20 },
-    { label: '50', value: 50 },
-  ]}
-  value={isCustomCount ? '' : cardCount}
-  onChange={v => {
-    const n = v as number;
-    setCardCount(n, n !== 10 && n !== 20 && n !== 50);
-  }}
-  allowCustom
-  customValue={isCustomCount ? cardCount : undefined}
-  onCustomChange={n => setCardCount(n, true)}
-/>
-```
+Metric tile with large number and uppercase label.
+
+| Prop | Type | Default |
+|---|---|---|
+| `label` | `string` | — |
+| `value` | `string \| number` | — |
+| `style` | `ViewStyle` | — |
+
+Uses `bgCard` background, `border` stroke, `textFaint` label.
 
 ---
 
@@ -536,31 +558,14 @@ import { SegmentedControl } from '@/components/SegmentedControl';
 
 **File:** `components/TabSwitcher.tsx`
 
-Horizontal tab row with an animated underline indicator for the active tab. Used at the top of the auth screen to switch between Sign in and Create account.
+Horizontal tabs with `inkRed` underline indicator.
 
-#### Props
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `tabs` | `{ label: string; value: string }[]` | — | Tab definitions |
-| `value` | `string` | — | Currently active tab value |
-| `onChange` | `(v: string) => void` | — | Tab press handler |
-| `style` | `ViewStyle` | — | Override row style |
-
-#### Usage
-
-```tsx
-import { TabSwitcher } from '@/components/TabSwitcher';
-
-<TabSwitcher
-  tabs={[
-    { label: 'Sign in',        value: 'login'  },
-    { label: 'Create account', value: 'signup' },
-  ]}
-  value={screen}
-  onChange={v => setScreen(v as Screen)}
-/>
-```
+| Prop | Type | Default |
+|---|---|---|
+| `tabs` | `{ label, value }[]` | — |
+| `value` | `string` | — |
+| `onChange` | `(v: string) => void` | — |
+| `style` | `ViewStyle` | — |
 
 ---
 
@@ -568,31 +573,14 @@ import { TabSwitcher } from '@/components/TabSwitcher';
 
 **File:** `components/BottomSheetModal.tsx`
 
-Slide-up sheet built on React Native `Modal`. Provides the standard shell — backdrop, drag handle, title row with a "Done" button, and keyboard-avoiding behaviour. Pass your content as `children`.
-
-#### Props
+Slide-up sheet (mobile) / centered dialog (desktop). `bgCard` background, `border` handle.
 
 | Prop | Type | Description |
 |---|---|---|
-| `visible` | `boolean` | Controls modal visibility |
-| `onClose` | `() => void` | Called by backdrop tap or "Done" button |
-| `title` | `string` | Sheet header title |
-| `children` | `ReactNode` | Content rendered below the header |
-
-#### Usage
-
-```tsx
-import { BottomSheetModal } from '@/components/BottomSheetModal';
-
-<BottomSheetModal
-  visible={showPicker}
-  onClose={() => { setShowPicker(false); setQuery(''); }}
-  title="Select Deck"
->
-  <TextInput value={query} onChangeText={setQuery} placeholder="Search…" />
-  <FlatList data={items} renderItem={renderItem} />
-</BottomSheetModal>
-```
+| `visible` | `boolean` | Controls visibility |
+| `onClose` | `() => void` | Backdrop tap or "Done" |
+| `title` | `string` | Header title |
+| `children` | `ReactNode` | Content slot |
 
 ---
 
@@ -600,32 +588,15 @@ import { BottomSheetModal } from '@/components/BottomSheetModal';
 
 **File:** `components/ProgressBar.tsx`
 
-Thin fill track with a `{current} / {total}` counter to the right. Used in the session topbar.
-
-#### Props
+Thin 2px fill track with `{current} / {total}` counter.
 
 | Prop | Type | Description |
 |---|---|---|
-| `current` | `number` | Current position (1-based for display) |
+| `current` | `number` | Current position |
 | `total` | `number` | Total count |
-| `style` | `ViewStyle` | Override the row wrapper (e.g. `flex: 1`) |
+| `style` | `ViewStyle` | Override row wrapper |
 
-#### Visual
-
-```
-──────────────────────────    3 / 20
-  fill (T.accent, 70% opacity)        MONO counter:
-                                        current → T.textPrimary
-                                        / total → T.textMuted
-```
-
-#### Usage
-
-```tsx
-import { ProgressBar } from '@/components/ProgressBar';
-
-<ProgressBar current={idx + 1} total={cards.length} style={{ flex: 1 }} />
-```
+Track: `border` color. Fill: `inkRed`. Counter: `MONO`, `textSecondary` / `textFaint`.
 
 ---
 
@@ -633,144 +604,167 @@ import { ProgressBar } from '@/components/ProgressBar';
 
 **File:** `components/Section.tsx`
 
-Labelled section wrapper. Renders an uppercase label (`FSBody.label`, `T.textMuted`, `LS.loose` letter-spacing) above its children with a `28px` bottom margin.
-
-#### Props
-
-| Prop | Type | Description |
-|---|---|---|
-| `label` | `string` | Section heading (rendered uppercase, spaced) |
-| `children` | `ReactNode` | Section content |
-| `style` | `ViewStyle` | Override wrapper style |
-
-#### Usage
-
-```tsx
-import { Section } from '@/components/Section';
-
-<Section label="DIFFICULTY">
-  {/* chips, controls, etc. */}
-</Section>
-```
+Uppercase label above children. Label: `textFaint`, `LS.loose` tracking, 28px bottom margin.
 
 ---
 
-## 5. Conventions
+### Scanlines
+
+**File:** `components/Scanlines.tsx`
+
+Web-only scanline / paper-grain overlay using CSS `repeating-linear-gradient`. Returns null on native.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `color` | `string` | theme `scanline` | Override scanline color |
+| `gap` | `number` | `3` | Pixel gap between lines |
+
+Applied globally in `_layout.tsx` and per-element in session screen (card, buttons).
+
+---
+
+### NoiseOverlay
+
+**File:** `components/NoiseOverlay.tsx`
+
+Web-only SVG feTurbulence noise texture. Returns null on native.
+
+- Light mode: `multiply` blend at 5% opacity
+- Dark mode: `overlay` blend at 4% opacity
+
+Applied globally in `_layout.tsx`.
+
+---
+
+## 7. Conventions
 
 ### Imports
 
-Always import tokens and components using the `@/` alias:
-
 ```ts
-import { T, MONO, MONO_MEDIUM, SERIF, FSDisplay, FSBody, LH, FW } from '@/theme/tokens';
-import { space, radius }     from '@/theme/spacing';
-import { Button }            from '@/components/Button';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
+import { MONO, SERIF, FS, FW, LH, LS } from '@/theme/tokens';
+import { Icon } from '@/theme/icons';
+import { space, radius } from '@/theme/spacing';
+import { Button } from '@/components/Button';
 ```
-
-Never redeclare a local `T = { ... }` object in a screen file.
 
 ### Adding a new colour
 
-1. Add the token to `theme/tokens.ts` with a comment describing its intended use.
-2. Do not hardcode the hex in a component — always reference `T.*`.
+1. Add to both `light` and `dark` objects in `theme/colors.ts`.
+2. Add to the `ColorTheme` interface.
+3. Access via `colors.yourToken` from `useTheme()`.
 
 ### Adding a new component
 
 1. Create `components/YourComponent.tsx`.
-2. Import `T` (and `MONO` if needed) from `@/theme/tokens`.
-3. Use `StyleSheet.create` — no inline style objects for anything beyond one-off overrides.
-4. Export a named function (not default export) so tree-shaking works correctly.
-5. Document props here in this file.
-
-### Changing the accent colour
-
-Edit `T.accent` in `theme/tokens.ts` — the change propagates to every Button, Chip, ProgressBar, active Tab underline, pinyin text, and SessionComplete seal automatically.
+2. Use the themed factory pattern: `useTheme()` + `makeStyles(t: ColorTheme)`.
+3. Use `StyleSheet.create` — no inline style objects except one-off overrides.
+4. Export a named function (not default).
+5. Document here.
 
 ### What stays in screens (not extracted)
-
-Some patterns are intentionally **not** shared components because they are specific to a single screen's domain:
 
 | Pattern | Screen | Reason |
 |---|---|---|
 | Animated flashcard + spring | `session.tsx` | Flashcard-domain specific |
 | Card container + corner ornaments | `session.tsx` | Session-specific visual treatment |
-| Hanzi / pinyin / meaning / hint layout | `session.tsx` | Flashcard-domain specific |
 | Rating buttons (Wrong / Right) | `session.tsx` | Tied to card reveal logic |
-| Scanlines + feedback flash | `session.tsx` | Session-specific atmospheric effects |
-| SessionComplete stat display | `session.tsx` | One-off summary view |
 | LoginForm / SignupForm / ForgotForm | `auth.tsx` | Auth-specific composition |
-| Deck selector TouchableOpacity row | `session-setup.tsx` | One-off trigger for BottomSheetModal |
-| HSK level progress row             | `profile.tsx`       | Specific to profile breakdown layout |
-| Recent session row                 | `profile.tsx`       | One-off summary row, not reused elsewhere |
+| Deck selector row | `session-setup.tsx` | One-off trigger for BottomSheetModal |
 
 ---
 
-## 6. Session surfaces
+## 8. Session surfaces
 
-The session screen (`app/session.tsx`) has its own visual treatment — darker background, explicit card container, and atmospheric effects — to create a focused "study mode" feel.
+The session screen (`app/session.tsx`) has a focused "study mode" feel.
 
 ### Card container
 
-The flashcard sits inside a bordered `View` with:
-- Background: `T.surfaceCard` (`#111008`)
-- Border: `T.border` (1px)
-- Shadow: `shadowRadius: 32`, elevation 12
-- Corner ornaments: `+` characters in `T.textFaint` at top-left and bottom-right
-- Scanlines: web-only `repeating-linear-gradient` overlay
+- Background: `bgCard`
+- Border: `border` (1.5px)
+- Shadow: `cardShadow` token (warm brown in light, deep black in dark)
+- Corner ornaments: `+` in `inkRedDim` at top-left and bottom-right
+- Scanlines: web-only, theme-aware color
 
-### 4-stage progressive reveal
+### 4-stage progressive reveal with staggered animation
 
-Each tap reveals one layer:
+Each tap reveals one layer with spring animation (`damping: 18, stiffness: 200`) and `translateY: 10→0`:
 
-| Stage | Shows | Purpose |
+| Stage | Shows | Animation |
 |---|---|---|
-| 0 | Hanzi only | Test pure character recognition |
-| 1 | + Pinyin | Confirm pronunciation |
-| 2 | + POS + definition | Confirm meaning |
-| 3 | + Example sentence (collapsible) | Contextual usage with blurred translation |
-
-Double-tap is removed in favor of single-tap progression. The example sentence block is collapsible (tap "EXAMPLE" to expand) and contains a blurred translation that requires an additional tap to reveal.
-
-### Blur effect on translation
-
-- **Web:** CSS `filter: blur(5px)` on the text element
-- **Native:** Reduced opacity (0.15) as a fallback (BlurView can be added when expo-blur is installed)
-- Tap to reveal removes the blur and shows the translation in `T.textPrimary`
+| 0 | Hanzi only | Card entrance: `scale 0.96→1` + `translateY 20→0` |
+| 1 | + Pinyin | Spring `opacity + translateY` |
+| 2 | + POS + definition | Spring with 80ms stagger, then hint block |
+| 3 | + Example (collapsible) | Staggered 80ms after meaning |
 
 ### Rating buttons
 
-Two square-ish buttons (`borderRadius: 4`) with icon + text label:
-- **Wrong** (✕): red tint background, red border
-- **Right** (✓): green tint background, green border
+Two 64×64 square buttons with scanline overlays and per-theme states:
+
+| Button | Default bg | Hover bg (light) | Hover bg (dark) | Glow |
+|---|---|---|---|---|
+| Wrong (×) | `inkRedGlow` | `rgba(184,48,30,0.16)` | `rgba(122,30,20,0.25)` | `inkRedGlow` |
+| Right (✓) | green at 8–12% | `rgba(45,110,56,0.16)` | `rgba(58,122,68,0.25)` | green glow |
 
 ### Feedback flash
 
-On rating, an `Animated.View` overlay flashes red or green (0.25 opacity) over the card container, fading out over 500ms.
+On rating: border flash (2px, `greenBright` or `inkRedText`) + web-only `boxShadow` glow pulse (30px, 600ms fade-out).
 
 ---
 
-## 7. Visual effects — web vs native
+## 9. Visual effects — web vs native
 
 | Effect | Web | Native | Notes |
 |---|---|---|---|
-| CRT scanlines (body, card, buttons) | `repeating-linear-gradient` via `backgroundImage` | Skipped | No `background-image` in RN |
-| Noise texture | SVG `feTurbulence` overlay | Skipped | No SVG filters in RN |
-| Ink-bleed text shadow on Hanzi | `textShadow*` | `textShadow*` | Cross-platform |
-| Card outer shadow | `box-shadow` | `shadowColor`/`elevation` | Cross-platform |
-| Inset card shadow | `box-shadow: inset` | Skipped | RN has no inset shadows |
-| Feedback flash (glow on rate) | `Animated.View` overlay | `Animated.View` overlay | Cross-platform |
-| Translation blur | CSS `filter: blur(5px)` | Opacity fallback | `expo-blur` BlurView for native in future |
-| Button hover states | Web CSS `:hover` | N/A | Touch-only on mobile |
+| Scanlines / paper grain | `repeating-linear-gradient` | Skipped | `Scanlines` component |
+| Noise texture | SVG `feTurbulence` | Skipped | `NoiseOverlay` component |
+| Ink-bleed text shadow | `textShadow*` | `textShadow*` | Cross-platform |
+| Card shadow | `shadowColor` + `cardShadow` token | `shadowColor` / `elevation` | Cross-platform |
+| Ink glow (focus/hover) | CSS `box-shadow` | Skipped | Web-only enhancement |
+| Feedback flash glow | `boxShadow` pulse | Border-only | Graceful degradation |
+| Translation blur | CSS `filter: blur(5px)` | Opacity 0.15 fallback | |
+| Button hover states | `onMouseEnter`/`onMouseLeave` | N/A | Touch-only on mobile |
+| CSS transitions | `transition` property | N/A | Web-only smooth states |
 
 ---
 
-## 8. Technical decisions
+## 10. Art direction
 
-### IBM Plex Mono scope
-IBM Plex Mono is used only for session screen monospace roles (score strip, labels, counters, hints, badges, pinyin). The rest of the app uses system sans-serif. This avoids the 20-30% width increase that monospace causes in proportional text and keeps CJK content legible.
+### Philosophy
 
-### Reveal model: 4 stages vs binary
-The prototype used binary reveal (concealed → everything). We use 4-stage progressive reveal because each tap forces active recall at a different level (character → pronunciation → meaning → context). This is the pedagogical point of flashcards.
+A design language born from CRT terminal nostalgia meets traditional Chinese calligraphy ink. Monospace typography with serif Hanzi display, red ink accents with aged paper surfaces, ASCII iconography with careful motion.
 
-### Keeping 2 rating buttons
-The prototype added a third "Again" button. We keep 2 (Wrong / Right) because "again" can be achieved by tapping "Wrong" — the SRS algorithm schedules the card sooner. This keeps the data model simple (`Results` stays `Record<string, 'got' | 'forgot'>`).
+### Rules
+
+1. Paper grain overlay in light mode: warm brown stripes at near-zero opacity
+2. CRT scanlines in dark mode: cool faint lines
+3. Noise texture: SVG feTurbulence — `multiply` at 5% (light), `overlay` at 4% (dark)
+4. Ink glow effects: red accent elements get `box-shadow: 0 0 12px inkRedGlow`
+5. Card shadows: warm brown `rgba(120,100,60,0.08)` in light; deep black in dark
+6. No images, no illustrations — pure typographic and geometric composition
+7. No SVG icon sets — all icons are ASCII characters in monospace font
+
+---
+
+## 11. Technical decisions
+
+### IBM Plex Mono as universal UI font
+
+All UI text uses IBM Plex Mono — not just session labels. This creates the consistent terminal/ASCII aesthetic described in the design language. The serif font (Noto Serif SC) is reserved exclusively for Chinese character display.
+
+### Square corners on form elements
+
+Form inputs, chips, and segmented controls use zero border-radius (square corners) to reinforce the terminal aesthetic. Only Cards (16px), Buttons (pill/rounded), and Modals (20px) retain rounded corners.
+
+### Dual-theme via React Context
+
+The `ThemeProvider` + `useTheme()` pattern was chosen over other approaches (CSS variables, styled-components) because:
+- Works cross-platform (web + native) without platform-specific code
+- `useMemo` with `colors` dependency means styles recompute only on theme change
+- Matches existing patterns (`useAuth()`, `useResponsive()`)
+- `StyleSheet.create` validation is preserved via the factory pattern
+
+### Reveal model: 4 stages with staggered animation
+
+Progressive reveal forces active recall at different levels (character → pronunciation → meaning → context). Each stage uses spring animation with `translateY: 10→0` and 80ms stagger between elements for a polished feel.

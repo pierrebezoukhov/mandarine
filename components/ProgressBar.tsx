@@ -1,5 +1,9 @@
+import { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, MONO, FS } from '@/theme/tokens';
+import { MONO, FS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface ProgressBarProps {
   /** Current card index (1-based for display) */
@@ -9,6 +13,8 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ current, total, style }: ProgressBarProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const progress = total > 0 ? Math.min(current / total, 1) : 0;
 
   return (
@@ -27,31 +33,28 @@ export function ProgressBar({ current, total, style }: ProgressBarProps) {
   );
 }
 
-const s = StyleSheet.create({
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: space.md,
   },
   track: {
     flex: 1,
     height: 2,
-    backgroundColor: T.surface2,
-    borderRadius: 1,
+    backgroundColor: t.border,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    backgroundColor: T.accent,
-    borderRadius: 1,
-    opacity: 0.7,
+    backgroundColor: t.inkRed,
   },
   counter: {
     fontFamily: MONO,
-    fontSize: FS.label,
-    color: T.textSecondary,
+    fontSize: FS.progress,
+    color: t.textSecondary,
   },
   counterTotal: {
-    color: T.textMuted,
+    color: t.textFaint,
   },
 });

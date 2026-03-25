@@ -61,7 +61,7 @@ The `RouteGuard` in `app/_layout.tsx` drives all auth-based redirects. There is 
 | `SESSION_CONFIG_KEY` | `hanziflash_session_config` | `SessionConfig` (deck, cardCount, difficulties) |
 | `SESSION_KEY` | `hanziflash_active_session` | Legacy; preserved for back-compat |
 
-`hanziflash_last_deck` and `hanziflash_last_user_id` are stored directly (not exported as constants) in `session-setup.tsx` and `AuthContext.tsx`.
+`hanziflash_last_deck` and `hanziflash_last_user_id` are stored directly (not exported as constants) in `session-setup.tsx` and `AuthContext.tsx`. `hanziflash_theme_mode` stores the theme preference (`'light' | 'dark' | 'system'`) in `ThemeContext.tsx`.
 
 ### Database Tables (Supabase)
 
@@ -88,7 +88,17 @@ Provides `{ session, user, loading, signIn, signUp, signOut, resetPassword, sign
 
 ### Design System
 
-All visual tokens live in `theme/tokens.ts` (exported as `T`) and `theme/spacing.ts`. No hardcoded colors anywhere in components or screens — always reference `T.*`. Components are in `components/`: `Button`, `Card`, `Chip`, `Field`, `ProgressBar`, `Section`, `SegmentedControl`, `TabSwitcher`, `BottomSheetModal`. Documentation is in `DESIGN_SYSTEM.md`.
+Dual-theme (light/dark/system) with the "Red Ink on Aged Parchment" aesthetic.
+
+- **`theme/colors.ts`** — Light + dark color palettes, `ColorTheme` type
+- **`context/ThemeContext.tsx`** — `ThemeProvider` + `useTheme()` hook (persists to AsyncStorage)
+- **`theme/tokens.ts`** — Typography only (fonts, sizes, weights, spacing) — theme-independent. `T` export is **deprecated** (dark-only alias); use `useTheme()` for colors
+- **`theme/icons.ts`** — ASCII icon constants (`Icon.close`, `Icon.correct`, etc.)
+- **`theme/spacing.ts`** — Spacing + radius scales
+
+All components use the themed factory pattern: `useTheme()` + `useMemo(() => makeStyles(colors), [colors])`. No hardcoded colors — always reference `colors.*` from the hook.
+
+Components: `Avatar`, `Button`, `Card`, `Chip`, `Field`, `ProgressBar`, `Section`, `SegmentedControl`, `TabSwitcher`, `BottomSheetModal`, `Scanlines`, `NoiseOverlay`. Documentation is in `DESIGN_SYSTEM.md`.
 
 ### Responsive Layout
 

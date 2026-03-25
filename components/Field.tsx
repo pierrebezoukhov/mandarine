@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { T, FS } from '@/theme/tokens';
+import { useState, useMemo } from 'react';
+import { View, Text, TextInput, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
+import { MONO, FS, FW, LS } from '@/theme/tokens';
+import { space } from '@/theme/spacing';
+import { useTheme } from '@/context/ThemeContext';
+import { ColorTheme } from '@/theme/colors';
 
 interface FieldProps {
   label: string;
@@ -25,6 +28,8 @@ export function Field({
   errorText,
   style,
 }: FieldProps) {
+  const { colors } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
   const [focused, setFocused] = useState(false);
 
   return (
@@ -39,7 +44,7 @@ export function Field({
         value={value}
         onChangeText={onChange}
         placeholder={placeholder}
-        placeholderTextColor={T.textMuted}
+        placeholderTextColor={colors.textFaint}
         secureTextEntry={secureTextEntry}
         autoCapitalize="none"
         autoCorrect={false}
@@ -51,33 +56,43 @@ export function Field({
   );
 }
 
-const s = StyleSheet.create({
-  wrap:  { marginBottom: 14 },
+const makeStyles = (t: ColorTheme) => StyleSheet.create({
+  wrap:  { marginBottom: space.md },
   label: {
+    fontFamily: MONO,
     fontSize: FS.label,
-    color: T.textMuted,
+    letterSpacing: LS.widest * FS.label,
+    color: t.textFaint,
     marginBottom: 6,
     textTransform: 'uppercase',
   },
   input: {
-    backgroundColor: T.surface,
+    fontFamily: MONO,
+    height: 48,
+    backgroundColor: t.bgCard,
     borderWidth: 1,
-    borderColor: T.border,
-    borderRadius: 12,
-    padding: 14,
-    color: T.textPrimary,
-    fontSize: FS.ui,
+    borderColor: t.border,
+    paddingHorizontal: 16,
+    color: t.textPrimary,
+    fontSize: FS.input,
+    fontWeight: FW.regular,
+    letterSpacing: LS.wide * FS.input,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none', transition: 'border-color 150ms ease, box-shadow 150ms ease' } as any : {}),
   },
   inputFocused: {
-    borderColor: T.borderFocus,
-    backgroundColor: T.surface2,
+    borderColor: t.inkRed,
+    backgroundColor: t.bgCard2,
+    ...(Platform.OS === 'web' ? { boxShadow: `0 0 0 1px ${t.inkRedGlow}` } as any : {}),
   },
   inputError: {
-    borderColor: 'rgba(154,48,48,0.5)',
+    borderColor: t.inkRed,
+    ...(Platform.OS === 'web' ? { boxShadow: `0 0 0 1px ${t.inkRedGlow}` } as any : {}),
   },
   errorText: {
+    fontFamily: MONO,
     fontSize: FS.label,
-    color: T.error,
+    letterSpacing: LS.wide * FS.label,
+    color: t.inkRedText,
     marginTop: 4,
   },
 });

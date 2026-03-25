@@ -3,25 +3,21 @@
 // Existing screens may still use raw numbers; migrate incrementally.
 
 export const space = {
-  xs:    4,
-  sm:    8,
-  md:    12,
-  lg:    16,
-  xl:    20,
-  xxl:   24,
-  xxxl:  28,
-  huge:  36,
-  giant: 48,
+  xs:      4,
+  sm:      8,
+  md:     12,
+  lg:     16,
+  xl:     20,
+  xxl:    24,
+  xxxl:   32,
+  huge:   40,
+  giant:  48,
+  massive: 64,
 } as const;
 
 // ── Border-radius scale ───────────────────────────────────────────────────────
+// Everything uses square corners by default. Only the bottom-sheet modal
+// retains rounded corners for visual separation from the overlay.
 export const radius = {
-  square: 4,  // session rating buttons — minimal rounding
-  sm:    8,   // icon buttons
-  md:    10,  // segmented controls, search inputs
-  lg:    12,  // inputs, chips, card icons
-  input: 12,  // alias: text inputs
-  card:  16,  // action cards
   modal: 20,  // bottom-sheet corners
-  pill:  100, // primary CTA buttons
 } as const;
