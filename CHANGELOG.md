@@ -1,3 +1,18 @@
+# [1.5.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.4.1...v1.5.0) (2026-03-25)
+
+
+### Bug Fixes
+
+* greeting name flash, flashcard interaction bugs, hardcoded values ([05ad25e](https://github.com/pierrebezoukhov/mandarine/commit/05ad25ee6fa2cb398e71495fccb27288abdcfeff))
+* textFaint contrast for WCAG AA compliance ([f047619](https://github.com/pierrebezoukhov/mandarine/commit/f047619443f113030db763aebc4993f3a0ac93d1)), closes [#b0a898](https://github.com/pierrebezoukhov/mandarine/issues/b0a898) [#887a68](https://github.com/pierrebezoukhov/mandarine/issues/887a68) [#4a4438](https://github.com/pierrebezoukhov/mandarine/issues/4a4438) [#6b6055](https://github.com/pierrebezoukhov/mandarine/issues/6b6055)
+
+
+### Features
+
+* DialKit integration, typewriter example reveal, flashcard layout fixes ([a4d27ef](https://github.com/pierrebezoukhov/mandarine/commit/a4d27ef7cfd864df69f3a65628d9ffe6546def6f))
+* dual-theme design system — light/dark mode with "Red Ink on Aged Parchment" aesthetic ([cba0038](https://github.com/pierrebezoukhov/mandarine/commit/cba0038fb631ec1820772e58c4359e3ec8a8d1aa))
+* typography alignment, square corners, button states, icon components ([bcac211](https://github.com/pierrebezoukhov/mandarine/commit/bcac211bf73bce37d1ef2329ca0f777e97920a2f))
+
 ## [1.4.1](https://github.com/pierrebezoukhov/mandarine/compare/v1.4.0...v1.4.1) (2026-03-17)
 
 
