@@ -173,7 +173,17 @@ List left (~35% width), large preview right (~65% width).
 
 ### Settings entry point
 
-Add a "Hanzi Font" row to the Settings screen (in the Appearance section, below the theme toggle). Shows current font name. Taps pushes to `/font-picker`.
+**Screen**: `app/settings.tsx`
+**Section**: APPEARANCE (existing — already contains the theme mode toggle)
+**Position**: Below the theme mode SegmentedControl
+
+New row:
+- **Label**: "Hanzi Font" (MONO, `FS.body`, `textPrimary`)
+- **Value**: Current font name displayed on the right (e.g. "LXGW WenKai") in `textSecondary`
+- **Arrow**: → indicator to signal navigation
+- **Action**: `router.push('/font-picker')`
+
+Uses the same row pattern as other navigable settings items. The row is not a `Card` component (those are for the home screen action cards) — it's a simple `TouchableOpacity` row matching the existing settings screen layout.
 
 ---
 
