@@ -10,7 +10,7 @@ import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
-import { fetchProfile, updateProfile } from '@/lib/profile';
+import { fetchProfile, updateProfile, getInitials } from '@/lib/profile';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { useResponsive } from '@/hooks/useResponsive';
 
@@ -75,10 +75,7 @@ export default function HomeScreen() {
           </View>
           {!isDesktop && (
             <Avatar
-              initials={(
-                user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
-                user?.email?.[0] ?? '?'
-              ).toUpperCase()}
+              initials={getInitials(user)}
               size={36}
               onPress={() => router.push('/profile')}
             />

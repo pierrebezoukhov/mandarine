@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { ColorTheme } from '@/theme/colors';
 import { Icon } from '@/theme/icons';
 import { Avatar } from '@/components/Avatar';
+import { getInitials } from '@/lib/profile';
 import { useResponsive } from '@/hooks/useResponsive';
 
 /** Map route names to Chinese character icons */
@@ -31,10 +32,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { isMobile, isDesktop } = useResponsive();
   const s = useMemo(() => makeStyles(colors, isDesktop), [colors, isDesktop]);
 
-  const initials = (
-    user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
-    user?.email?.[0] ?? '?'
-  ).toUpperCase();
+  const initials = getInitials(user);
 
   const tabs = state.routes.map((route, index) => {
     const isFocused = state.index === index;

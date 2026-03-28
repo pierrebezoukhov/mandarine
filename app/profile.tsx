@@ -16,7 +16,7 @@ import { Section } from '@/components/Section';
 import { ProgressBar } from '@/components/ProgressBar';
 import {
   fetchProfile, fetchProgressStats, fetchRecentSessions,
-  uploadAvatar, updateProfile,
+  uploadAvatar, updateProfile, getInitials,
   type Profile, type ProgressStats, type SessionSummary,
 } from '@/lib/profile';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
@@ -106,14 +106,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const initials = (
-    user?.user_metadata?.full_name
-      ?.split(' ')
-      .map((n: string) => n[0])
-      .join('')
-      .slice(0, 2) ??
-    (user?.email?.[0] ?? '?')
-  ).toUpperCase();
+  const initials = getInitials(user);
 
   if (loading) {
     return (
