@@ -13,7 +13,6 @@ export type HanziFontDef = {
   family: { web: string; native: string };
   weight: string;
   preview: string;
-  style: string;
   description: string;
 };
 
@@ -29,7 +28,7 @@ export const HANZI_FONTS: HanziFontDef[] = [
     },
     weight: '400',
     preview: '永',
-    style: 'Kai · 楷体',
+
     description: 'Handcrafted, warm, natural strokes',
   },
   {
@@ -41,7 +40,7 @@ export const HANZI_FONTS: HanziFontDef[] = [
     },
     weight: '300',
     preview: '永',
-    style: 'Song · Serif',
+
     description: 'Elegant, traditional, refined',
   },
   {
@@ -53,7 +52,7 @@ export const HANZI_FONTS: HanziFontDef[] = [
     },
     weight: '400',
     preview: '永',
-    style: 'Sans · Gothic',
+
     description: 'Clean, minimal, easy to read',
   },
   {
@@ -65,7 +64,7 @@ export const HANZI_FONTS: HanziFontDef[] = [
     },
     weight: '400',
     preview: '永',
-    style: 'Calligraphy',
+
     description: 'Expressive, ink-on-paper, artistic',
   },
   {
@@ -77,7 +76,7 @@ export const HANZI_FONTS: HanziFontDef[] = [
     },
     weight: '400',
     preview: '永',
-    style: 'Geometric · Gothic',
+
     description: 'Precise, geometric, modern',
   },
 ];

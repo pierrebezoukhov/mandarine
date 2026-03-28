@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useResponsive } from '@/hooks/useResponsive';
 import { ColorTheme } from '@/theme/colors';
-import { MONO, SERIF, FS, FW, LS, LH } from '@/theme/tokens';
+import { MONO, FS, FW, LS, LH } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { Icon } from '@/theme/icons';
 import { Button } from '@/components/Button';

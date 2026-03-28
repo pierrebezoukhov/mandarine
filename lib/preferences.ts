@@ -6,7 +6,10 @@ export type UserPreferences = {
   hanzi_font?: HanziFontId;
 };
 
-const PREFS_STORAGE_KEY = 'hanziflash_preferences';
+// Individual AsyncStorage keys that ThemeContext reads directly
+const INDIVIDUAL_KEYS: Record<keyof UserPreferences, string> = {
+  hanzi_font: 'hanziflash_hanzi_font',
+};
 
 export async function fetchPreferences(userId: string): Promise<UserPreferences> {
   const { data, error } = await supabase
@@ -19,46 +22,56 @@ export async function fetchPreferences(userId: string): Promise<UserPreferences>
   return data.preferences as UserPreferences;
 }
 
-export async function savePreference(
+export async function savePreference<K extends keyof UserPreferences>(
   userId: string,
-  key: keyof UserPreferences,
-  value: any,
+  key: K,
+  value: UserPreferences[K],
 ): Promise<void> {
-  const current = await fetchPreferences(userId);
-  const updated = { ...current, [key]: value };
-
+  // Atomic partial update — avoids read-then-write race condition.
+  // Uses Supabase's JSONB concatenation (||) to merge the single key.
   supabase
-    .from('profiles')
-    .update({ preferences: updated })
-    .eq('user_id', userId)
+    .rpc('update_preference', {
+      p_user_id: userId,
+      p_key: key,
+      p_value: JSON.stringify(value),
+    })
     .then(({ error }) => {
-      if (error) console.warn('[preferences] savePreference:', error.message);
+      // Fallback: if RPC doesn't exist yet, do a regular update
+      if (error) {
+        supabase
+          .from('profiles')
+          .update({ preferences: { [key]: value } })
+          .eq('user_id', userId)
+          .then(({ error: e2 }) => {
+            if (e2) console.warn('[preferences] savePreference:', e2.message);
+          });
+      }
     });
 }
 
 export async function syncPreferencesToLocal(userId: string): Promise<UserPreferences> {
   const remote = await fetchPreferences(userId);
-  if (Object.keys(remote).length > 0) {
-    await AsyncStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(remote));
+
+  // Write each preference to its individual AsyncStorage key
+  // so ThemeContext (which reads hanziflash_hanzi_font directly) picks it up
+  const writes: Promise<void>[] = [];
+  for (const [key, value] of Object.entries(remote)) {
+    const storageKey = INDIVIDUAL_KEYS[key as keyof UserPreferences];
+    if (storageKey && value != null) {
+      writes.push(AsyncStorage.setItem(storageKey, String(value)));
+    }
   }
+  await Promise.all(writes);
+
   return remote;
 }
 
-export async function getLocalPreferences(): Promise<UserPreferences> {
-  const raw = await AsyncStorage.getItem(PREFS_STORAGE_KEY);
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-
-export async function setLocalPreference(
-  key: keyof UserPreferences,
-  value: any,
+export async function setLocalPreference<K extends keyof UserPreferences>(
+  key: K,
+  value: UserPreferences[K],
 ): Promise<void> {
-  const current = await getLocalPreferences();
-  const updated = { ...current, [key]: value };
-  await AsyncStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(updated));
+  const storageKey = INDIVIDUAL_KEYS[key];
+  if (storageKey && value != null) {
+    await AsyncStorage.setItem(storageKey, String(value));
+  }
 }

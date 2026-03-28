@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
-import { MONO, SERIF, FS, FW, LS, LH } from '@/theme/tokens';
+import { MONO, FS, FW, LS, LH } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';

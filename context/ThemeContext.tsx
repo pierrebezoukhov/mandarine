@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorTheme, lightTheme, darkTheme } from '@/theme/colors';
@@ -68,8 +68,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const colors = isDark ? darkTheme : lightTheme;
 
-  const { family: hanziFamily, weight: hanziWeight } = resolveHanziFontFamily(hanziFontId);
-  const fonts = { hanzi: hanziFamily, hanziWeight };
+  const fonts = useMemo(() => {
+    const { family, weight } = resolveHanziFontFamily(hanziFontId);
+    return { hanzi: family, hanziWeight: weight };
+  }, [hanziFontId]);
 
   // Don't render children until we've loaded the stored preference,
   // otherwise we'd flash the wrong theme on startup.

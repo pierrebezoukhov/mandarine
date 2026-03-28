@@ -12,7 +12,7 @@ import { Button } from '@/components/Button';
 import { FlashcardPreview } from '@/components/FlashcardPreview';
 import { FontOptionRow } from '@/components/FontOptionRow';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
-import { HANZI_FONTS, getHanziFont, resolveHanziFontFamily } from '@/theme/fonts';
+import { HANZI_FONTS, resolveHanziFontFamily } from '@/theme/fonts';
 import { savePreference } from '@/lib/preferences';
 
 export default function FontPickerScreen() {
@@ -21,7 +21,6 @@ export default function FontPickerScreen() {
   const { isDesktop } = useResponsive();
   const s = useMemo(() => makeStyles(colors, isDesktop), [colors, isDesktop]);
 
-  const selectedDef = getHanziFont(hanziFontId);
   const { family: selectedFamily, weight: selectedWeight } = resolveHanziFontFamily(hanziFontId);
 
   const handleSelect = (id: typeof hanziFontId) => {
@@ -90,7 +89,7 @@ export default function FontPickerScreen() {
             </View>
           ) : (
             <>
-              {preview}
+              <View style={s.mobilePreview}>{preview}</View>
               <View style={s.mobileList}>{fontList}</View>
             </>
           )}
@@ -135,12 +134,15 @@ const makeStyles = (t: ColorTheme, isDesktop: boolean) => StyleSheet.create({
     paddingHorizontal: space.xl,
   },
   desktopLeft: {
-    width: '35%' as any,
+    flex: 35,
   },
   desktopRight: {
-    flex: 1,
+    flex: 65,
   },
 
+  mobilePreview: {
+    paddingHorizontal: space.xl,
+  },
   mobileList: {
     paddingHorizontal: space.xl,
     paddingTop: space.xxl,
