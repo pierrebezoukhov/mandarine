@@ -35,6 +35,11 @@ function hasCJK(s: string): boolean {
   return /[\u4e00-\u9fff]/.test(s);
 }
 
+/** Escape PostgREST filter meta-characters to prevent filter injection */
+function escapeFilterValue(s: string): string {
+  return s.replace(/[.,()\\]/g, '');
+}
+
 // ── Search ────────────────────────────────────────────────────────────────────
 
 export async function searchCards(
@@ -46,21 +51,20 @@ export async function searchCards(
   const trimmed = query.trim();
   if (!trimmed) return [];
 
-  // Build search filter based on input type
-  const isCJK = hasCJK(trimmed);
-  let searchFilter: string;
+  const safe = escapeFilterValue(trimmed);
+  if (!safe) return [];
 
-  if (isCJK) {
-    searchFilter = `hanzi.ilike.%${trimmed}%`;
-  } else {
-    searchFilter = `pinyin.ilike.%${trimmed}%,meaning.ilike.%${trimmed}%`;
-  }
+  // Build query with sanitized input
+  const isCJK = hasCJK(safe);
 
-  // Build query
   let q = supabase
     .from('cards')
     .select('id, hanzi, pinyin, meaning, hsk_level, part_of_speech, ex_hanzi, ex_pinyin, ex_meaning')
-    .or(searchFilter)
+    .or(
+      isCJK
+        ? `hanzi.ilike.%${safe}%`
+        : `pinyin.ilike.%${safe}%,meaning.ilike.%${safe}%`
+    )
     .limit(limit);
 
   // HSK level filter

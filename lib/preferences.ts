@@ -27,26 +27,19 @@ export async function savePreference<K extends keyof UserPreferences>(
   key: K,
   value: UserPreferences[K],
 ): Promise<void> {
-  // Atomic partial update — avoids read-then-write race condition.
-  // Uses Supabase's JSONB concatenation (||) to merge the single key.
-  supabase
-    .rpc('update_preference', {
-      p_user_id: userId,
-      p_key: key,
-      p_value: JSON.stringify(value),
-    })
-    .then(({ error }) => {
-      // Fallback: if RPC doesn't exist yet, do a regular update
-      if (error) {
-        supabase
-          .from('profiles')
-          .update({ preferences: { [key]: value } })
-          .eq('user_id', userId)
-          .then(({ error: e2 }) => {
-            if (e2) console.warn('[preferences] savePreference:', e2.message);
-          });
-      }
-    });
+  // Fallback merge: read current prefs, merge the key, write back.
+  // Race window is narrow (single user, infrequent changes) and acceptable.
+  // Can be replaced with an atomic RPC (jsonb_set) when one is created.
+  fetchPreferences(userId).then(current => {
+    const merged = { ...current, [key]: value };
+    supabase
+      .from('profiles')
+      .update({ preferences: merged })
+      .eq('user_id', userId)
+      .then(({ error }) => {
+        if (error) console.warn('[preferences] savePreference:', error.message);
+      });
+  });
 }
 
 export async function syncPreferencesToLocal(userId: string): Promise<UserPreferences> {
