@@ -5,7 +5,6 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
@@ -18,25 +17,8 @@ import { BottomSheetModal } from '@/components/BottomSheetModal';
 import { Button } from '@/components/Button';
 import { deleteResumeSession, RESUME_SESSION_KEY, SESSION_CONFIG_KEY } from '@/lib/progress';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-export type Deck = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  hsk_level: number | null;
-  is_public: boolean;
-};
-
-export type DifficultyFilter = 'new' | 'review' | 'hard';
-
-export type SessionConfig = {
-  deck: Deck | null;
-  cardCount: number;
-  isCustomCount: boolean;
-  difficulties: DifficultyFilter[];
-};
+import type { Deck, DifficultyFilter, SessionConfig } from '@/lib/types';
+import { fetchAvailableDecks } from '@/lib/decks';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CARD_PRESETS = [10, 20, 50] as const;
@@ -70,30 +52,24 @@ export default function SessionSetupScreen() {
   // Load decks + restore last used deck
   useEffect(() => {
     async function init() {
-      const [{ data: allDecks }, { data: cardLevels }, lastDeckRaw] = await Promise.all([
-        supabase.from('decks').select('*').order('hsk_level', { ascending: true }),
-        supabase.from('cards').select('hsk_level'),
+      const [available, lastDeckRaw] = await Promise.all([
+        fetchAvailableDecks(),
         AsyncStorage.getItem(LAST_DECK_KEY),
       ]);
       setLoading(false);
+      setDecks(available);
 
-      if (allDecks && cardLevels) {
-        const levelsWithCards = new Set(cardLevels.map(c => c.hsk_level));
-        const available = allDecks.filter(d => levelsWithCards.has(d.hsk_level)) as Deck[];
-        setDecks(available);
-
-        if (lastDeckRaw) {
-          try {
-            const lastDeck = JSON.parse(lastDeckRaw) as Deck;
-            if (available.find(d => d.id === lastDeck.id)) {
-              setConfig(c => ({ ...c, deck: lastDeck }));
-            } else {
-              setConfig(c => ({ ...c, deck: available[0] ?? null }));
-            }
-          } catch {}
-        } else {
-          setConfig(c => ({ ...c, deck: available[0] ?? null }));
-        }
+      if (lastDeckRaw) {
+        try {
+          const lastDeck = JSON.parse(lastDeckRaw) as Deck;
+          if (available.find(d => d.id === lastDeck.id)) {
+            setConfig(c => ({ ...c, deck: lastDeck }));
+          } else {
+            setConfig(c => ({ ...c, deck: available[0] ?? null }));
+          }
+        } catch {}
+      } else {
+        setConfig(c => ({ ...c, deck: available[0] ?? null }));
       }
     }
     init();

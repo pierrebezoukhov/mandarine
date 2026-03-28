@@ -11,8 +11,7 @@ import { Icon } from '@/theme/icons';
 import { Button } from '@/components/Button';
 import { Badge } from '@/components/Badge';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
-import { fetchCardDetail, CardDetail } from '@/lib/search';
-import { supabase } from '@/lib/supabase';
+import { fetchCardDetail, markCardForReview, CardDetail } from '@/lib/search';
 
 export default function CardDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -37,11 +36,7 @@ export default function CardDetailScreen() {
     if (!user?.id || !id || marking) return;
     setMarking(true);
     try {
-      await supabase.rpc('upsert_card_progress', {
-        p_user_id: user.id,
-        p_card_id: id,
-        p_result: 'forgot',
-      });
+      await markCardForReview(user.id, id);
       const updated = await fetchCardDetail(id, user.id);
       if (updated) setCard(updated);
     } finally {

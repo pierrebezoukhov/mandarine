@@ -185,3 +185,14 @@ export async function addRecentSearch(query: string): Promise<void> {
 export async function clearRecentSearches(): Promise<void> {
   await AsyncStorage.removeItem(RECENT_SEARCHES_KEY);
 }
+
+// ── Card progress ────────────────────────────────────────────────────────────
+
+export async function markCardForReview(userId: string, cardId: string): Promise<void> {
+  const { error } = await supabase.rpc('upsert_card_progress', {
+    p_user_id: userId,
+    p_card_id: cardId,
+    p_result: 'forgot',
+  });
+  if (error) console.warn('[search] markCardForReview:', error.message);
+}

@@ -7,7 +7,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
-import type { SessionConfig, DifficultyFilter } from '@/app/session-setup';
+import type { SessionConfig, DifficultyFilter } from '@/lib/types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

@@ -14,7 +14,9 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { Scanlines } from '@/components/Scanlines';
-import type { SessionConfig } from './session-setup';
+import { CornerOrnament } from '@/components/CornerOrnament';
+import { TypewriterText } from '@/components/TypewriterText';
+import type { SessionConfig } from '@/lib/types';
 import {
   fetchCardsForSession, loadResumeState,
   upsertResumeSession, deleteResumeSession, writeSessionResults,
@@ -67,69 +69,6 @@ function SessionComplete({ got, forgot, total, onRestart }: {
       </View>
       </ResponsiveShell>
     </SafeAreaView>
-  );
-}
-
-// ── Corner ornament ────────────────────────────────────────────────────────────
-function CornerOrnament({ position, size = 10, opacity = 0.5, offset = 10, offsetH = 14 }: {
-  position: 'tl' | 'tr' | 'bl' | 'br';
-  size?: number; opacity?: number; offset?: number; offsetH?: number;
-}) {
-  const { colors } = useTheme();
-  const posStyle = {
-    tl: { top: offset, left: offsetH },
-    tr: { top: offset, right: offsetH },
-    bl: { bottom: offset, left: offsetH },
-    br: { bottom: offset, right: offsetH },
-  }[position];
-
-  return (
-    <Text style={[{
-      position: 'absolute',
-      fontFamily: MONO,
-      fontSize: size,
-      color: colors.inkRedDim,
-      opacity: opacity,
-    }, posStyle]}>+</Text>
-  );
-}
-
-// ── Typewriter text — characters appear one by one ───────────────────────────
-function TypewriterText({ text, active, delay = 30, startDelay = 0, style }: {
-  text: string; active: boolean; delay?: number; startDelay?: number; style?: any;
-}) {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const hasPlayed = useRef(false);
-
-  useEffect(() => {
-    if (active && !hasPlayed.current) {
-      hasPlayed.current = true;
-      const startTyping = () => {
-        let i = 0;
-        const interval = setInterval(() => {
-          i++;
-          setVisibleCount(i);
-          if (i >= text.length) clearInterval(interval);
-        }, delay);
-      };
-      if (startDelay > 0) {
-        setTimeout(startTyping, startDelay);
-      } else {
-        startTyping();
-      }
-    }
-  }, [active]);
-
-  useEffect(() => {
-    hasPlayed.current = false;
-    setVisibleCount(0);
-  }, [text]);
-
-  return (
-    <Text style={style}>
-      {text.slice(0, visibleCount)}
-      {visibleCount < text.length && <Text style={{ opacity: 0 }}>{text.slice(visibleCount)}</Text>}
-    </Text>
   );
 }
 
