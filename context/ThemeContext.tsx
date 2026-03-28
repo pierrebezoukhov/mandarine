@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useMemo, R
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorTheme, lightTheme, darkTheme } from '@/theme/colors';
-import { HanziFontId, DEFAULT_HANZI_FONT, resolveHanziFontFamily } from '@/theme/fonts';
+import { HanziFontId, DEFAULT_HANZI_FONT, HANZI_FONTS, resolveHanziFontFamily } from '@/theme/fonts';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
         setModeState(storedTheme);
       }
-      if (storedFont) {
+      if (storedFont && HANZI_FONTS.some(f => f.id === storedFont)) {
         setHanziFontIdState(storedFont as HanziFontId);
       }
       setLoaded(true);

@@ -23,6 +23,9 @@ export interface ColorTheme {
   textFaint:      string;
   textHanzi:      string;
 
+  // Text on Accent
+  textOnAccent:   string;
+
   // Semantic Colors
   green:          string;
   greenBright:    string;
@@ -78,6 +81,8 @@ const light = {
   textFaint:       '#887a68',
   textHanzi:       '#1a1610',
 
+  textOnAccent:    '#faf6ed',
+
   green:           '#2d6e38',
   greenBright:     '#3a8a42',
   greenDim:        'rgba(45,110,56,0.08)',
@@ -111,6 +116,8 @@ const dark = {
   textSecondary:   '#8a8070',
   textFaint:       '#6b6055',
   textHanzi:       '#f0e8d8',
+
+  textOnAccent:    '#f0e8d8',
 
   green:           '#3a7a44',
   greenBright:     '#4fa858',

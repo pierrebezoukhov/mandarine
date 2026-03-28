@@ -36,8 +36,8 @@ export function ResponsiveShell({
           alignSelf: isStart ? 'flex-start' : 'center',
         },
         isStart && {
-          paddingLeft: space.giant,
-          paddingRight: space.giant,
+          paddingLeft: space.xxxl,
+          paddingRight: space.xxxl,
         },
         fill && { flex: 1 },
         style,

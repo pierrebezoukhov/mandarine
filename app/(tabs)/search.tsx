@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
@@ -35,6 +35,15 @@ export default function SearchScreen() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hskLevelsRef = useRef(activeHskLevels);
+  hskLevelsRef.current = activeHskLevels;
+
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   // Load recent searches on focus
   useFocusEffect(
@@ -70,9 +79,9 @@ export default function SearchScreen() {
     setQuery(v);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      doSearch(v, activeHskLevels);
+      doSearch(v, hskLevelsRef.current);
     }, DEBOUNCE_MS);
-  }, [doSearch, activeHskLevels]);
+  }, [doSearch]);
 
   const handleClear = useCallback(() => {
     setQuery('');

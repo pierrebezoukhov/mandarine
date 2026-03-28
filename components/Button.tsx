@@ -58,7 +58,7 @@ export function Button({
       {...webHoverProps}
     >
       {loading
-        ? <ActivityIndicator color={variant === 'primary' ? '#fff' : colors.textSecondary} />
+        ? <ActivityIndicator color={variant === 'primary' ? colors.textOnAccent : colors.textSecondary} />
         : <View style={s.inner}>
             {icon}
             <Text style={[
@@ -113,11 +113,11 @@ const makeStyles = (t: ColorTheme, isDark: boolean) => StyleSheet.create({
   } as any : {},
   hoverSecondary: Platform.OS === 'web' ? {
     borderColor: t.inkRed,
-    backgroundColor: isDark ? 'rgba(200,56,42,0.06)' : 'rgba(184,48,30,0.03)',
+    backgroundColor: t.inkRedGlow,
     boxShadow: `0 0 12px ${t.inkRedGlow}`,
   } as any : {},
   hoverGhost: Platform.OS === 'web' ? {
-    backgroundColor: isDark ? 'rgba(200,56,42,0.06)' : 'rgba(184,48,30,0.03)',
+    backgroundColor: t.inkRedGlow,
   } as any : {},
 
   disabled: { opacity: 0.18 },
@@ -128,7 +128,7 @@ const makeStyles = (t: ColorTheme, isDark: boolean) => StyleSheet.create({
     fontFamily: MONO,
   },
   labelPrimary: {
-    color: '#fff',
+    color: t.textOnAccent,
     fontSize: FS.ctaLabel,
     fontWeight: FW.medium,
     textTransform: 'uppercase',
