@@ -588,6 +588,7 @@ export default function SessionScreen() {
                     ? colors.greenBright
                     : colors.inkRedText,
                   opacity: flashAnim,
+                  // TODO: extract flash glow colors to theme tokens
                   ...(Platform.OS === 'web' ? {
                     boxShadow: flashColor.current === 'got'
                       ? `0 0 30px rgba(${isDark ? '79,168,88' : '58,138,66'},0.5), inset 0 0 20px rgba(${isDark ? '79,168,88' : '58,138,66'},0.15)`
@@ -607,7 +608,7 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnForgot,
             hoveredBtn === 'forgot' && {
-              backgroundColor: isDark ? 'rgba(122,30,20,0.25)' : 'rgba(184,48,30,0.16)',
+              backgroundColor: colors.forgotBtnHover,
               borderColor: colors.inkRed,
               ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.inkRedGlow}` } as any : {}),
             },
@@ -631,9 +632,9 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnGot,
             hoveredBtn === 'got' && {
-              backgroundColor: isDark ? 'rgba(58,122,68,0.25)' : 'rgba(45,110,56,0.16)',
+              backgroundColor: colors.gotBtnHover,
               borderColor: colors.greenBright,
-              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px rgba(${isDark ? '58,122,68' : '45,110,56'},0.2)` } as any : {}),
+              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.gotGlow}` } as any : {}),
             },
             { width: dk.rateBtnSize, height: dk.rateBtnSize },
           ]}

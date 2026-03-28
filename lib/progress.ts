@@ -305,5 +305,4 @@ export async function writeSessionResults(params: {
 
 // ── AsyncStorage key constants (re-exported for screens to use) ────────────────
 export const RESUME_SESSION_KEY  = 'hanziflash_resume_session';
-export const SESSION_KEY         = 'hanziflash_active_session';
 export const SESSION_CONFIG_KEY  = 'hanziflash_session_config';

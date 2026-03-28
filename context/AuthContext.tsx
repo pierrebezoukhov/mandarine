@@ -12,7 +12,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Session keys scoped to a user — cleared when a DIFFERENT user signs in
 const USER_SESSION_KEYS = [
-  'hanziflash_active_session',
   'hanziflash_resume_session',
   'hanziflash_session_config',
   'hanziflash_last_deck',

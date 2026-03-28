@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 // import { Scanlines } from '@/components/Scanlines';
 import { DialRoot } from 'dialkit';
 import 'dialkit/styles.css';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {
   IBMPlexMono_400Regular,
 } from '@expo-google-fonts/ibm-plex-mono/400Regular';
@@ -83,6 +84,7 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
+    <ErrorBoundary>
     <ThemeProvider>
       <AuthProvider>
         <RouteGuard />
@@ -100,5 +102,6 @@ export default function RootLayout() {
       </AuthProvider>
       {Platform.OS === 'web' && <DialRoot />}
     </ThemeProvider>
+    </ErrorBoundary>
   );
 }

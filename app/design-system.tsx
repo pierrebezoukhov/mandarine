@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
-import { MONO, SERIF, FS, FSDisplay, FSBody, FSContent, LH, LS, FW } from '@/theme/tokens';
+import { MONO, SERIF, FS, FSDisplay, FSContent, LH, LS, FW } from '@/theme/tokens';
 import { Icon } from '@/theme/icons';
 import { space, radius } from '@/theme/spacing';
 import { Button } from '@/components/Button';

@@ -106,7 +106,7 @@ Two breakpoints: `mobile` (< 768px) and `desktop` (>= 768px). No CSS media queri
 
 **`hooks/useResponsive.ts`** — `useResponsive()` returns `{ bp, isMobile, isDesktop, width }`. Call directly from any screen or component — no context provider needed.
 
-**`components/ResponsiveShell.tsx`** — Convenience wrapper that constrains content width on desktop and passes through unchanged on mobile. Props: `children`, `maxWidth?` (default 520), `fill?` (default true), `style?`.
+**`components/ResponsiveShell.tsx`** — Convenience wrapper that constrains content width on desktop and passes through unchanged on mobile. Props: `children`, `maxWidth?` (default 520), `align?` (`'center'` | `'start'`, default `'center'`), `fill?` (default true), `style?`. Use `align="start"` for screens inside the tab layout (left-aligned with sidebar padding). Use `align="center"` (default) for auth screens and modals.
 
 Default `maxWidth` values:
 - **Form screens** (auth, session-setup, home, profile): `520`

@@ -120,7 +120,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     backgroundColor: t.inkRedGlow,
     borderColor: t.inkRedDim,
   },
-  segmentText:       { fontFamily: MONO, fontSize: 15, color: t.textSecondary, fontWeight: FW.light, letterSpacing: LS.wide * 15 },
+  segmentText:       { fontFamily: MONO, fontSize: FS.definition, color: t.textSecondary, fontWeight: FW.light, letterSpacing: LS.wide * FS.definition },
   segmentTextActive: { color: t.textPrimary },
 
   customInput: {
@@ -132,9 +132,9 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     color: t.textPrimary,
-    fontSize: 15,
+    fontSize: FS.definition,
     fontWeight: FW.light,
-    letterSpacing: LS.wide * 15,
+    letterSpacing: LS.wide * FS.definition,
     textAlign: 'center',
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' } as any : {}),
   },

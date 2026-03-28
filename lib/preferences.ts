@@ -22,11 +22,12 @@ export async function fetchPreferences(userId: string): Promise<UserPreferences>
   return data.preferences as UserPreferences;
 }
 
-export async function savePreference<K extends keyof UserPreferences>(
+/** Fire-and-forget: resolves immediately, Supabase write happens in background. */
+export function savePreference<K extends keyof UserPreferences>(
   userId: string,
   key: K,
   value: UserPreferences[K],
-): Promise<void> {
+): void {
   // Fallback merge: read current prefs, merge the key, write back.
   // Race window is narrow (single user, infrequent changes) and acceptable.
   // Can be replaced with an atomic RPC (jsonb_set) when one is created.
