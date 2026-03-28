@@ -153,8 +153,8 @@ export default function SessionScreen() {
   const cardMaxHeight = windowHeight - 252;
 
   const { user }        = useAuth();
-  const { colors, isDark } = useTheme();
-  const s = useMemo(() => makeStyles(colors), [colors]);
+  const { colors, isDark, fonts } = useTheme();
+  const s = useMemo(() => makeStyles(colors, fonts.hanzi, fonts.hanziWeight), [colors, fonts.hanzi, fonts.hanziWeight]);
 
   const dk = useDialKit('Flashcard', {
     // Card container
@@ -719,7 +719,7 @@ export default function SessionScreen() {
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
-const makeStyles = (t: ColorTheme) => StyleSheet.create({
+const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => StyleSheet.create({
   root:    { flex: 1, backgroundColor: t.bg },
   centered:{ alignItems: 'center', justifyContent: 'center' },
 
@@ -773,9 +773,9 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 
   // Hanzi — serif font, light weight, ink-bleed shadow
   hanziChar: {
-    fontFamily: SERIF,
+    fontFamily: hanziFont,
     fontSize: FS.hanzi,
-    fontWeight: FW.light,
+    fontWeight: hanziWeight as any,
     color: t.textHanzi,
     alignSelf: 'center',
     lineHeight: FS.hanzi * LH.single,
@@ -827,7 +827,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.md,
   },
   exHanzi: {
-    fontFamily: SERIF, fontSize: FS.formTitle, fontWeight: FW.light, color: t.textPrimary,
+    fontFamily: hanziFont, fontSize: FS.formTitle, fontWeight: hanziWeight as any, color: t.textPrimary,
     lineHeight: FS.formTitle * LH.single, letterSpacing: 1, marginBottom: space.sm,
   },
   exPinyin: {

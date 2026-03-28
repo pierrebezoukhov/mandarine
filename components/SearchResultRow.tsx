@@ -28,8 +28,8 @@ export function SearchResultRow({
   onPress,
   style,
 }: SearchResultRowProps) {
-  const { colors } = useTheme();
-  const s = useMemo(() => makeStyles(colors), [colors]);
+  const { colors, fonts } = useTheme();
+  const s = useMemo(() => makeStyles(colors, fonts.hanzi), [colors, fonts.hanzi]);
   const [hovered, setHovered] = useState(false);
 
   const webHoverProps = Platform.OS === 'web' ? {
@@ -68,7 +68,7 @@ export function SearchResultRow({
   );
 }
 
-const makeStyles = (t: ColorTheme) => StyleSheet.create({
+const makeStyles = (t: ColorTheme, hanziFont: string) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -101,7 +101,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   dotHard:   { backgroundColor: t.inkRed },
 
   hanzi: {
-    fontFamily: SERIF,
+    fontFamily: hanziFont,
     fontSize: FS.pinyin,
     color: t.textHanzi,
     lineHeight: FS.pinyin * LH.single,

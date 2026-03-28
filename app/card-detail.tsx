@@ -17,9 +17,9 @@ import { supabase } from '@/lib/supabase';
 export default function CardDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
-  const { colors } = useTheme();
+  const { colors, fonts } = useTheme();
   const { isDesktop } = useResponsive();
-  const s = useMemo(() => makeStyles(colors, isDesktop), [colors, isDesktop]);
+  const s = useMemo(() => makeStyles(colors, isDesktop, fonts.hanzi), [colors, isDesktop, fonts.hanzi]);
 
   const [card, setCard] = useState<CardDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -180,7 +180,7 @@ export default function CardDetailScreen() {
   );
 }
 
-const makeStyles = (t: ColorTheme, isDesktop: boolean) => StyleSheet.create({
+const makeStyles = (t: ColorTheme, isDesktop: boolean, hanziFont: string) => StyleSheet.create({
   root: { flex: 1, backgroundColor: t.bg },
 
   scroll: {
@@ -227,7 +227,7 @@ const makeStyles = (t: ColorTheme, isDesktop: boolean) => StyleSheet.create({
     paddingHorizontal: space.xxl,
   },
   hanzi: {
-    fontFamily: SERIF,
+    fontFamily: hanziFont,
     fontSize: FS.hanzi,
     fontWeight: FW.light,
     color: t.textHanzi,
@@ -270,7 +270,7 @@ const makeStyles = (t: ColorTheme, isDesktop: boolean) => StyleSheet.create({
     marginBottom: space.md,
   },
   exHanzi: {
-    fontFamily: SERIF,
+    fontFamily: hanziFont,
     fontSize: FS.definition,
     color: t.textHanzi,
     lineHeight: FS.definition * LH.normal,
