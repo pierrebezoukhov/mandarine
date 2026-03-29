@@ -23,6 +23,19 @@ function parseEnv(filePath) {
   return env;
 }
 
+// ── Pinyin normalization ─────────────────────────────────────────────────────
+function normalizePinyin(pinyin) {
+  const map = {
+    'ā':'a','á':'a','ǎ':'a','à':'a',
+    'ē':'e','é':'e','ě':'e','è':'e',
+    'ī':'i','í':'i','ǐ':'i','ì':'i',
+    'ō':'o','ó':'o','ǒ':'o','ò':'o',
+    'ū':'u','ú':'u','ǔ':'u','ù':'u',
+    'ǖ':'u','ǘ':'u','ǚ':'u','ǜ':'u','ü':'u',
+  };
+  return pinyin.split('').map(c => map[c] || c).join('').toLowerCase();
+}
+
 const envPath = path.join(__dirname, '..', '.env.local');
 if (!fs.existsSync(envPath)) {
   console.error('.env.local not found');
@@ -974,6 +987,7 @@ async function main() {
     const rows = newWords.map(([hanzi, pinyin, meaning, part_of_speech], i) => ({
       hanzi,
       pinyin,
+      pinyin_normalized: normalizePinyin(pinyin),
       meaning,
       part_of_speech,
       hsk_level: level,
