@@ -1,3 +1,28 @@
+# [1.6.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.5.0...v1.6.0) (2026-03-29)
+
+
+### Bug Fixes
+
+* address code review findings for font customization ([7dc552a](https://github.com/pierrebezoukhov/mandarine/commit/7dc552a7500557c2824a0a4442544b43f0df5025))
+* address important code review findings ([bb1a80d](https://github.com/pierrebezoukhov/mandarine/commit/bb1a80d87af1198acfe74da5072bb1fdff0b9df5)), closes [faf6ed/#f0e8d8](https://github.com/pierrebezoukhov/mandarine/issues/f0e8d8) [#fff](https://github.com/pierrebezoukhov/mandarine/issues/fff)
+* search filter injection and preferences JSONB overwrite ([1eb7d36](https://github.com/pierrebezoukhov/mandarine/commit/1eb7d36675f853fdceacc0909ba42dfafd608b77))
+* sloppy patterns and tech debt cleanup ([e92ea56](https://github.com/pierrebezoukhov/mandarine/commit/e92ea56a05aa4a2e77ae9bdae483d5ba17eadf0e))
+
+
+### Features
+
+* add FlashcardPreview design system component ([f49705f](https://github.com/pierrebezoukhov/mandarine/commit/f49705f95dcc304675d23af10a6f746ad1f714c9))
+* add font picker screen with live preview ([1ed70f6](https://github.com/pierrebezoukhov/mandarine/commit/1ed70f6f434e863815186a7436a0a012953e889a))
+* add FontOptionRow design system component ([79fa36e](https://github.com/pierrebezoukhov/mandarine/commit/79fa36e911832f4dd1442c94dd8f7856feec46b2))
+* add hanzi font registry with 5 font definitions ([ae0c851](https://github.com/pierrebezoukhov/mandarine/commit/ae0c8517891090f9a81dcc6e275de72ef319b104))
+* add Hanzi Font row to settings appearance section ([cf35c9e](https://github.com/pierrebezoukhov/mandarine/commit/cf35c9ec8a5b1306c5148a908647ac1582ac773c))
+* add preferences sync lib with Supabase JSONB ([b7d459f](https://github.com/pierrebezoukhov/mandarine/commit/b7d459f1e24a226f5feef14f296cfea06cbe8628))
+* extend ThemeContext with hanzi font state and persistence ([98806ed](https://github.com/pierrebezoukhov/mandarine/commit/98806ed31b4cacbbea2763c5a7a8b4f31341b9d0))
+* load all hanzi fonts on web, register font-picker route ([2652162](https://github.com/pierrebezoukhov/mandarine/commit/26521622cacedc906893e14a171e3e87c6dd5b81))
+* replace static SERIF with dynamic fonts.hanzi from ThemeContext ([df2da6b](https://github.com/pierrebezoukhov/mandarine/commit/df2da6bfbf6150dc93fd09d33f7fd8b1976e89de))
+* search, responsive nav, and desktop layout ([c1e2141](https://github.com/pierrebezoukhov/mandarine/commit/c1e214112cceb1907998ce022f13feaea3cbfe76))
+* sync font preferences from Supabase on login ([eff1210](https://github.com/pierrebezoukhov/mandarine/commit/eff121076e53408f5e063aa813b1e5877a451ace))
+
 # [1.5.0](https://github.com/pierrebezoukhov/mandarine/compare/v1.4.1...v1.5.0) (2026-03-25)
 
 
