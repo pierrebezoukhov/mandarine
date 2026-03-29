@@ -149,7 +149,13 @@ The CJK branch (hanzi search) is unchanged. The meaning branch is unchanged (Eng
 
 ---
 
-## 7. Out of Scope
+## 7. Future Reference: Database Trigger
+
+When import features are built (YouTube, photo), a Postgres trigger can auto-populate `pinyin_normalized` on any insert/update, removing the need for application-level normalization. Saved at `scripts/reference/normalize-pinyin-trigger.sql` for later use.
+
+---
+
+## 8. Out of Scope
 
 - Typo tolerance (Levenshtein distance) — future
 - "Did you mean?" suggestions — future
