@@ -40,6 +40,20 @@ function escapeFilterValue(s: string): string {
   return s.replace(/[.,()\\]/g, '');
 }
 
+/** Strip pinyin tone diacritics to plain ASCII for fuzzy matching */
+const TONE_MAP: Record<string, string> = {
+  'ā':'a','á':'a','ǎ':'a','à':'a',
+  'ē':'e','é':'e','ě':'e','è':'e',
+  'ī':'i','í':'i','ǐ':'i','ì':'i',
+  'ō':'o','ó':'o','ǒ':'o','ò':'o',
+  'ū':'u','ú':'u','ǔ':'u','ù':'u',
+  'ǖ':'u','ǘ':'u','ǚ':'u','ǜ':'u','ü':'u',
+};
+
+function normalizePinyin(s: string): string {
+  return s.split('').map(c => TONE_MAP[c] || c).join('').toLowerCase();
+}
+
 // ── Search ────────────────────────────────────────────────────────────────────
 
 export async function searchCards(
@@ -56,6 +70,7 @@ export async function searchCards(
 
   // Build query with sanitized input
   const isCJK = hasCJK(safe);
+  const normalizedSafe = normalizePinyin(safe);
 
   let q = supabase
     .from('cards')
@@ -63,7 +78,7 @@ export async function searchCards(
     .or(
       isCJK
         ? `hanzi.ilike.%${safe}%`
-        : `pinyin.ilike.%${safe}%,meaning.ilike.%${safe}%`
+        : `pinyin_normalized.ilike.%${normalizedSafe}%,meaning.ilike.%${safe}%`
     )
     .limit(limit);
 
