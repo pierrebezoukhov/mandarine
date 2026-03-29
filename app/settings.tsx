@@ -13,6 +13,8 @@ import { Field } from '@/components/Field';
 import { Button } from '@/components/Button';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { Section } from '@/components/Section';
+import { Icon } from '@/theme/icons';
+import { getHanziFont } from '@/theme/fonts';
 import { fetchProfile, updateProfile } from '@/lib/profile';
 
 const HSK_OPTIONS = [1, 2, 3, 4, 5, 6].map(n => ({ label: String(n), value: n }));
@@ -29,8 +31,9 @@ const THEME_OPTIONS = [
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
-  const { colors, mode, setMode } = useTheme();
+  const { colors, mode, setMode, hanziFontId } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
+  const currentFontLabel = getHanziFont(hanziFontId).label;
 
   const [displayName, setDisplayName] = useState('');
   const [nativeLang,  setNativeLang]  = useState('fr');
@@ -93,6 +96,18 @@ export default function SettingsScreen() {
             value={mode}
             onChange={v => setMode(v as ThemeMode)}
           />
+
+          <TouchableOpacity
+            style={s.fontRow}
+            onPress={() => router.push('/font-picker')}
+            activeOpacity={0.75}
+          >
+            <Text style={s.fontRowLabel}>HANZI FONT</Text>
+            <View style={s.fontRowRight}>
+              <Text style={s.fontRowValue}>{currentFontLabel}</Text>
+              <Text style={s.fontRowArrow}>{Icon.right}</Text>
+            </View>
+          </TouchableOpacity>
         </Section>
 
         <Section label="PERSONAL INFO">
@@ -167,4 +182,36 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   },
 
   email: { fontFamily: MONO, fontSize: FS.definition, fontWeight: FW.light, color: t.textSecondary },
+
+  fontRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: space.lg,
+    marginTop: space.lg,
+    borderTopWidth: 1,
+    borderTopColor: t.borderDim,
+  },
+  fontRowLabel: {
+    fontFamily: MONO,
+    fontSize: FS.label,
+    letterSpacing: LS.widest * FS.label,
+    color: t.textFaint,
+    textTransform: 'uppercase',
+  },
+  fontRowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+  },
+  fontRowValue: {
+    fontFamily: MONO,
+    fontSize: FS.body,
+    color: t.textSecondary,
+  },
+  fontRowArrow: {
+    fontFamily: MONO,
+    fontSize: FS.body,
+    color: t.textSecondary,
+  },
 });

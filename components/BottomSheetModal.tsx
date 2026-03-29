@@ -3,6 +3,7 @@ import {
   Modal, View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { FS, FW, MONO } from '@/theme/tokens';
+import { space, radius } from '@/theme/spacing';
 import { useTheme } from '@/context/ThemeContext';
 import { useResponsive } from '@/hooks/useResponsive';
 import { ColorTheme } from '@/theme/colors';
@@ -62,15 +63,15 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 
   sheet: {
     backgroundColor: t.bgCard,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 20,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+    borderTopLeftRadius: radius.modal,
+    borderTopRightRadius: radius.modal,
+    paddingHorizontal: space.xl,
+    paddingBottom: Platform.OS === 'ios' ? space.huge : space.xl,
   },
   sheetDesktop: {
     maxWidth: 480,
     width: 480,
-    borderRadius: 20,
+    borderRadius: radius.modal,
   },
 
   handle: {
@@ -79,15 +80,15 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     borderRadius: 2,
     backgroundColor: t.border,
     alignSelf: 'center',
-    marginTop: 12,
-    marginBottom: 4,
+    marginTop: space.md,
+    marginBottom: space.xs,
   },
 
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: space.lg,
   },
   title: { fontFamily: MONO, fontSize: FS.definition, color: t.textPrimary, fontWeight: FW.medium },
   done:  { fontFamily: MONO, fontSize: FS.body, color: t.inkRed, fontWeight: FW.medium },

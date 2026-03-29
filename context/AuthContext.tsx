@@ -5,13 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
+import { syncPreferencesToLocal } from '@/lib/preferences';
 
 // Required on native: completes the auth session when the browser redirects back
 WebBrowser.maybeCompleteAuthSession();
 
 // Session keys scoped to a user — cleared when a DIFFERENT user signs in
 const USER_SESSION_KEYS = [
-  'hanziflash_active_session',
   'hanziflash_resume_session',
   'hanziflash_session_config',
   'hanziflash_last_deck',
@@ -59,6 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await AsyncStorage.multiRemove(USER_SESSION_KEYS);
         }
         await AsyncStorage.setItem(LAST_USER_KEY, session.user.id);
+
+        // Fire-and-forget: sync font preferences from Supabase to local storage
+        syncPreferencesToLocal(session.user.id).catch(() => {});
       }
     });
 

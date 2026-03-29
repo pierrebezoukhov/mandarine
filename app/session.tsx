@@ -8,13 +8,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
-import { MONO, MONO_MEDIUM, SERIF, FS, FW, LH, LS } from '@/theme/tokens';
+import { MONO, MONO_MEDIUM, FS, FW, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { Scanlines } from '@/components/Scanlines';
-import type { SessionConfig } from './session-setup';
+import { CornerOrnament } from '@/components/CornerOrnament';
+import { TypewriterText } from '@/components/TypewriterText';
+import type { SessionConfig } from '@/lib/types';
 import {
   fetchCardsForSession, loadResumeState,
   upsertResumeSession, deleteResumeSession, writeSessionResults,
@@ -70,69 +72,6 @@ function SessionComplete({ got, forgot, total, onRestart }: {
   );
 }
 
-// ── Corner ornament ────────────────────────────────────────────────────────────
-function CornerOrnament({ position, size = 10, opacity = 0.5, offset = 10, offsetH = 14 }: {
-  position: 'tl' | 'tr' | 'bl' | 'br';
-  size?: number; opacity?: number; offset?: number; offsetH?: number;
-}) {
-  const { colors } = useTheme();
-  const posStyle = {
-    tl: { top: offset, left: offsetH },
-    tr: { top: offset, right: offsetH },
-    bl: { bottom: offset, left: offsetH },
-    br: { bottom: offset, right: offsetH },
-  }[position];
-
-  return (
-    <Text style={[{
-      position: 'absolute',
-      fontFamily: MONO,
-      fontSize: size,
-      color: colors.inkRedDim,
-      opacity: opacity,
-    }, posStyle]}>+</Text>
-  );
-}
-
-// ── Typewriter text — characters appear one by one ───────────────────────────
-function TypewriterText({ text, active, delay = 30, startDelay = 0, style }: {
-  text: string; active: boolean; delay?: number; startDelay?: number; style?: any;
-}) {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const hasPlayed = useRef(false);
-
-  useEffect(() => {
-    if (active && !hasPlayed.current) {
-      hasPlayed.current = true;
-      const startTyping = () => {
-        let i = 0;
-        const interval = setInterval(() => {
-          i++;
-          setVisibleCount(i);
-          if (i >= text.length) clearInterval(interval);
-        }, delay);
-      };
-      if (startDelay > 0) {
-        setTimeout(startTyping, startDelay);
-      } else {
-        startTyping();
-      }
-    }
-  }, [active]);
-
-  useEffect(() => {
-    hasPlayed.current = false;
-    setVisibleCount(0);
-  }, [text]);
-
-  return (
-    <Text style={style}>
-      {text.slice(0, visibleCount)}
-      {visibleCount < text.length && <Text style={{ opacity: 0 }}>{text.slice(visibleCount)}</Text>}
-    </Text>
-  );
-}
-
 // ── Main Session Screen ───────────────────────────────────────────────────────
 export default function SessionScreen() {
   const { resume }            = useLocalSearchParams<{ resume?: string }>();
@@ -153,8 +92,8 @@ export default function SessionScreen() {
   const cardMaxHeight = windowHeight - 252;
 
   const { user }        = useAuth();
-  const { colors, isDark } = useTheme();
-  const s = useMemo(() => makeStyles(colors), [colors]);
+  const { colors, isDark, fonts } = useTheme();
+  const s = useMemo(() => makeStyles(colors, fonts.hanzi, fonts.hanziWeight), [colors, fonts.hanzi, fonts.hanziWeight]);
 
   const dk = useDialKit('Flashcard', {
     // Card container
@@ -649,6 +588,7 @@ export default function SessionScreen() {
                     ? colors.greenBright
                     : colors.inkRedText,
                   opacity: flashAnim,
+                  // TODO: extract flash glow colors to theme tokens
                   ...(Platform.OS === 'web' ? {
                     boxShadow: flashColor.current === 'got'
                       ? `0 0 30px rgba(${isDark ? '79,168,88' : '58,138,66'},0.5), inset 0 0 20px rgba(${isDark ? '79,168,88' : '58,138,66'},0.15)`
@@ -668,7 +608,7 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnForgot,
             hoveredBtn === 'forgot' && {
-              backgroundColor: isDark ? 'rgba(122,30,20,0.25)' : 'rgba(184,48,30,0.16)',
+              backgroundColor: colors.forgotBtnHover,
               borderColor: colors.inkRed,
               ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.inkRedGlow}` } as any : {}),
             },
@@ -692,9 +632,9 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnGot,
             hoveredBtn === 'got' && {
-              backgroundColor: isDark ? 'rgba(58,122,68,0.25)' : 'rgba(45,110,56,0.16)',
+              backgroundColor: colors.gotBtnHover,
               borderColor: colors.greenBright,
-              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px rgba(${isDark ? '58,122,68' : '45,110,56'},0.2)` } as any : {}),
+              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.gotGlow}` } as any : {}),
             },
             { width: dk.rateBtnSize, height: dk.rateBtnSize },
           ]}
@@ -719,7 +659,7 @@ export default function SessionScreen() {
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
-const makeStyles = (t: ColorTheme) => StyleSheet.create({
+const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => StyleSheet.create({
   root:    { flex: 1, backgroundColor: t.bg },
   centered:{ alignItems: 'center', justifyContent: 'center' },
 
@@ -773,9 +713,9 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
 
   // Hanzi — serif font, light weight, ink-bleed shadow
   hanziChar: {
-    fontFamily: SERIF,
+    fontFamily: hanziFont,
     fontSize: FS.hanzi,
-    fontWeight: FW.light,
+    fontWeight: hanziWeight as any,
     color: t.textHanzi,
     alignSelf: 'center',
     lineHeight: FS.hanzi * LH.single,
@@ -827,7 +767,7 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
     width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.md,
   },
   exHanzi: {
-    fontFamily: SERIF, fontSize: FS.formTitle, fontWeight: FW.light, color: t.textPrimary,
+    fontFamily: hanziFont, fontSize: FS.formTitle, fontWeight: hanziWeight as any, color: t.textPrimary,
     lineHeight: FS.formTitle * LH.single, letterSpacing: 1, marginBottom: space.sm,
   },
   exPinyin: {

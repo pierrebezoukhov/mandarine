@@ -1,17 +1,5 @@
 import { Platform } from 'react-native';
 
-// ── Colour tokens ─────────────────────────────────────────────────────────────
-// DEPRECATED: Use `useTheme()` from `@/context/ThemeContext` instead.
-// This static export is the dark palette only and exists for backward compat
-// during the migration to dual-theme support. It will be removed once all
-// screens and components have been converted to `useTheme()`.
-//
-// New code should import: import { useTheme } from '@/context/ThemeContext';
-// and use: const { colors } = useTheme();
-
-import { darkTheme } from '@/theme/colors';
-export const T = darkTheme;
-
 // ── Typography helpers ────────────────────────────────────────────────────────
 // Serif — Noto Serif SC for Hanzi display (loaded via expo-font in _layout.tsx)
 export const SERIF: string = Platform.OS === 'web'
@@ -49,9 +37,6 @@ export const FSContent = {
   label:        10,  // form labels, dividers, section headers (uppercase)
   micro:         9,  // tap hints, rating button labels (uppercase)
 } as const;
-
-// Backward compat alias
-export const FSBody = FSContent;
 
 // Combined — all FS.* references work
 export const FS = { ...FSDisplay, ...FSContent } as const;

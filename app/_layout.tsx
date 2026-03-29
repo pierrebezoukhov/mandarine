@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 // import { Scanlines } from '@/components/Scanlines';
 import { DialRoot } from 'dialkit';
 import 'dialkit/styles.css';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {
   IBMPlexMono_400Regular,
 } from '@expo-google-fonts/ibm-plex-mono/400Regular';
@@ -22,8 +23,18 @@ SplashScreen.preventAutoHideAsync();
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300&family=Noto+Sans+SC:wght@400&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC:wght@400&display=swap';
   document.head.appendChild(link);
+
+  const link2 = document.createElement('link');
+  link2.rel = 'stylesheet';
+  link2.href = 'https://fonts.cdnfonts.com/css/harmonyos-sans';
+  document.head.appendChild(link2);
+
+  const link3 = document.createElement('link');
+  link3.rel = 'stylesheet';
+  link3.href = 'https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1/style.css';
+  document.head.appendChild(link3);
 }
 
 function RouteGuard() {
@@ -73,6 +84,7 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
+    <ErrorBoundary>
     <ThemeProvider>
       <AuthProvider>
         <RouteGuard />
@@ -81,6 +93,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
           <Stack.Screen name="session-setup" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="session"       options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="card-detail"   options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="font-picker" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="profile"       options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="settings"       options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="design-system" options={{ animation: 'fade' }} />
@@ -88,5 +102,6 @@ export default function RootLayout() {
       </AuthProvider>
       {Platform.OS === 'web' && <DialRoot />}
     </ThemeProvider>
+    </ErrorBoundary>
   );
 }

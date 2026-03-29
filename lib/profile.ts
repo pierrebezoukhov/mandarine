@@ -7,6 +7,20 @@
 
 import { supabase } from '@/lib/supabase';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Extract 1-2 character initials from a Supabase user object. */
+export function getInitials(user: { user_metadata?: { full_name?: string }; email?: string } | null): string {
+  return (
+    user?.user_metadata?.full_name
+      ?.split(' ')
+      .map((n: string) => n[0])
+      .join('')
+      .slice(0, 2) ??
+    (user?.email?.[0] ?? '?')
+  ).toUpperCase();
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type Profile = {

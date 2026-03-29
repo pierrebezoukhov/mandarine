@@ -584,6 +584,53 @@ Slide-up sheet (mobile) / centered dialog (desktop). `bgCard` background, `borde
 
 ---
 
+### FontOptionRow
+
+**File:** `components/FontOptionRow.tsx`
+
+Selectable row with a visual preview character. Used in the font picker screen.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `character` | `string` | — | Preview character rendered in `fontFamily` |
+| `fontFamily` | `string` | — | CSS/native font family for the character |
+| `fontWeight` | `string` | `'400'` | Weight for the preview character |
+| `label` | `string` | — | Option name |
+| `description` | `string` | — | Short descriptors |
+| `active` | `boolean` | — | Whether currently selected |
+| `onPress` | `() => void` | — | Selection handler |
+
+**States:** Default → `bgCard` bg, `border`. Hover (web) → `inkRed` border, `inkRedGlow` bg. Active → `inkRedGlow` bg, `inkRedDim` border, checkmark visible in `inkRed`. Pressed → `activeOpacity: 0.75`.
+
+**Layout:** `[character 36×36 center] [gap 14] [label + description flex:1] [checkmark ✓]`. Square corners, 1px border. Character renders at 28px in its own font. Label/description in MONO.
+
+---
+
+### FlashcardPreview
+
+**File:** `components/FlashcardPreview.tsx`
+
+Read-only flashcard preview — hero hanzi, pinyin, meaning, optional example. Pure display, no interactive states.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `hanzi` | `string` | — | Chinese character(s) |
+| `pinyin` | `string` | — | Romanization |
+| `meaning` | `string` | — | English translation |
+| `exHanzi` | `string?` | — | Example sentence characters |
+| `exPinyin` | `string?` | — | Example sentence pinyin |
+| `exMeaning` | `string?` | — | Example sentence translation |
+| `fontFamily` | `string?` | Theme's `fonts.hanzi` | Override hanzi font (reads from `useTheme()` by default; prop overrides for font picker preview) |
+| `fontWeight` | `string?` | Theme's `fonts.hanziWeight` | Override hanzi weight |
+| `size` | `'default' \| 'compact'` | `'default'` | `default` = 108px hanzi, `compact` = 72px |
+| `showOrnaments` | `boolean` | `true` | Corner `+` ornaments |
+
+**Sizes:** Default renders hanzi at 108px (flashcard session scale). Compact renders at 72px (font picker, card detail). Pinyin and meaning sizes scale accordingly.
+
+**Visual:** `bgCard` background, 1.5px `border`. Corner ornaments in `inkRedDim`. Hanzi in `textHanzi`, pinyin italic in `inkRedText`, meaning in `textPrimary`. Example section separated by `borderDim` divider.
+
+---
+
 ### ProgressBar
 
 **File:** `components/ProgressBar.tsx`

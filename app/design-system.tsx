@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
-import { MONO, SERIF, FS, FSDisplay, FSBody, FSContent, LH, LS, FW } from '@/theme/tokens';
+import { MONO, SERIF, FS, FSDisplay, FSContent, LH, LS, FW } from '@/theme/tokens';
 import { Icon } from '@/theme/icons';
 import { space, radius } from '@/theme/spacing';
 import { Button } from '@/components/Button';
@@ -19,6 +19,12 @@ import { TabSwitcher } from '@/components/TabSwitcher';
 import { Avatar } from '@/components/Avatar';
 import { BottomSheetModal } from '@/components/BottomSheetModal';
 import { GoogleIcon } from '@/components/GoogleIcon';
+import { FlashcardPreview } from '@/components/FlashcardPreview';
+import { FontOptionRow } from '@/components/FontOptionRow';
+import { Badge } from '@/components/Badge';
+import { SearchField } from '@/components/SearchField';
+import { EmptyState } from '@/components/EmptyState';
+import { HANZI_FONTS, resolveHanziFontFamily } from '@/theme/fonts';
 
 // ── Nav anchors ───────────────────────────────────────────────────────────────
 const NAV_ITEMS = ['Colors', 'Typography', 'Icons', 'Rules', 'Spacing', 'Components', 'Examples'] as const;
@@ -47,6 +53,10 @@ export default function DesignSystemScreen() {
   const [fieldPass, setFieldPass]       = useState('secret');
   // BottomSheetModal demo state
   const [sheetOpen, setSheetOpen]     = useState(false);
+  // SearchField demo state
+  const [searchDemo, setSearchDemo]   = useState('');
+  // FontOptionRow demo state
+  const [selectedFont, setSelectedFont] = useState('lxgw-wenkai');
   // Nav
   const [activeNav, setActiveNav]     = useState<typeof NAV_ITEMS[number]>('Colors');
 
@@ -1279,6 +1289,158 @@ export default function DesignSystemScreen() {
                   <Avatar initials="AB" size={36} onPress={() => {}} />
                   <Text style={t.avatarLabel}>tappable · 36px</Text>
                 </View>
+              </View>
+            </ComponentSection>
+
+            {/* ── Badge ────────────────────────────────────────────────── */}
+            <ComponentSection
+              name="Badge"
+              file="components/Badge.tsx"
+              description="Small inline label with variant-driven colors. Used for HSK level tags, status indicators, and category labels."
+              props={[
+                { name: 'label',   type: 'string', desc: 'Badge text' },
+                { name: 'variant', type: "'default' | 'accent' | 'success' | 'muted'", desc: 'Color scheme (default: default)' },
+              ]}
+              usedIn={[
+                { screen: 'search.tsx', context: 'HSK level badge on search result rows' },
+                { screen: 'card-detail.tsx', context: 'HSK level + part of speech badges' },
+              ]}
+              colors={colors}
+            >
+              <View style={{ flexDirection: 'row', gap: space.md, flexWrap: 'wrap' }}>
+                <Badge label="HSK 3" />
+                <Badge label="Active" variant="accent" />
+                <Badge label="Mastered" variant="success" />
+                <Badge label="noun" variant="muted" />
+              </View>
+            </ComponentSection>
+
+            {/* ── SearchField ─────────────────────────────────────────── */}
+            <ComponentSection
+              name="SearchField"
+              file="components/SearchField.tsx"
+              description="Terminal-style search input with >_ prompt, clear button, and auto-focus. Square corners, matches Field focus states."
+              props={[
+                { name: 'value',       type: 'string',           desc: 'Current query text' },
+                { name: 'onChange',     type: '(v: string) => void', desc: 'Text change handler' },
+                { name: 'onClear',     type: '() => void',       desc: 'Clear button handler' },
+                { name: 'onSubmit',    type: '() => void',       desc: 'Submit/return key handler' },
+                { name: 'placeholder', type: 'string',           desc: 'Hint text (default: "Search hanzi, pinyin...")' },
+                { name: 'autoFocus',   type: 'boolean',          desc: 'Focus input on mount' },
+              ]}
+              usedIn={[
+                { screen: 'search.tsx', context: 'Main search input at top of search tab' },
+              ]}
+              colors={colors}
+            >
+              <SearchField
+                value={searchDemo}
+                onChange={setSearchDemo}
+                onClear={() => setSearchDemo('')}
+                placeholder="Search hanzi, pinyin, or meaning…"
+              />
+            </ComponentSection>
+
+            {/* ── EmptyState ──────────────────────────────────────────── */}
+            <ComponentSection
+              name="EmptyState"
+              file="components/EmptyState.tsx"
+              description="Centered empty state message with optional icon. Reusable across search, stories, and any screen with no content."
+              props={[
+                { name: 'icon',     type: 'string',  desc: 'ASCII character rendered large (optional)' },
+                { name: 'title',    type: 'string',  desc: 'Primary message' },
+                { name: 'subtitle', type: 'string',  desc: 'Secondary hint text (optional)' },
+              ]}
+              usedIn={[
+                { screen: 'search.tsx', context: 'Empty search state + no results state' },
+                { screen: 'stories.tsx', context: '"Coming soon" placeholder' },
+              ]}
+              colors={colors}
+            >
+              <EmptyState
+                icon={Icon.search}
+                title="No results found"
+                subtitle="Try a different query or adjust your filters"
+              />
+            </ComponentSection>
+
+            {/* ── FlashcardPreview ────────────────────────────────────── */}
+            <ComponentSection
+              name="FlashcardPreview"
+              file="components/FlashcardPreview.tsx"
+              description="Read-only flashcard preview — hero hanzi, pinyin, meaning, optional example. Pure display, no interactive states. Reads fonts.hanzi from ThemeContext; fontFamily prop overrides for previewing different fonts."
+              props={[
+                { name: 'hanzi',          type: 'string',                       desc: 'Chinese character(s)' },
+                { name: 'pinyin',         type: 'string',                       desc: 'Romanization' },
+                { name: 'meaning',        type: 'string',                       desc: 'English translation' },
+                { name: 'exHanzi',        type: 'string?',                      desc: 'Example sentence characters' },
+                { name: 'exPinyin',       type: 'string?',                      desc: 'Example sentence pinyin' },
+                { name: 'exMeaning',      type: 'string?',                      desc: 'Example sentence translation' },
+                { name: 'fontFamily',     type: 'string?',                      desc: "Override hanzi font (default: theme's fonts.hanzi)" },
+                { name: 'size',           type: "'default' | 'compact'",        desc: 'default = 108px, compact = 72px' },
+                { name: 'showOrnaments',  type: 'boolean',                      desc: 'Corner + ornaments (default: true)' },
+              ]}
+              usedIn={[
+                { screen: 'font-picker.tsx', context: 'Live preview of selected font' },
+              ]}
+              colors={colors}
+            >
+              <View style={{ gap: space.xl }}>
+                <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 2, textTransform: 'uppercase' }}>DEFAULT SIZE</Text>
+                <FlashcardPreview
+                  hanzi="永"
+                  pinyin="yǒng"
+                  meaning="eternal, forever"
+                  size="default"
+                />
+                <Text style={{ fontFamily: MONO, fontSize: FS.label, color: colors.textFaint, letterSpacing: 2, textTransform: 'uppercase', marginTop: space.lg }}>COMPACT + EXAMPLE</Text>
+                <FlashcardPreview
+                  hanzi="你好"
+                  pinyin="nǐ hǎo"
+                  meaning="hello"
+                  exHanzi="你好吗？"
+                  exPinyin="nǐ hǎo ma?"
+                  exMeaning="How are you?"
+                  size="compact"
+                />
+              </View>
+            </ComponentSection>
+
+            {/* ── FontOptionRow ───────────────────────────────────────── */}
+            <ComponentSection
+              name="FontOptionRow"
+              file="components/FontOptionRow.tsx"
+              description="Selectable row with a preview character rendered in its own font. Used in the font picker screen. Active state shows inkRed checkmark."
+              props={[
+                { name: 'character',   type: 'string',           desc: 'Preview character rendered in fontFamily' },
+                { name: 'fontFamily',  type: 'string',           desc: 'CSS/native font family for the character' },
+                { name: 'fontWeight',  type: 'string',           desc: 'Weight for preview character (default: 400)' },
+                { name: 'label',       type: 'string',           desc: 'Option name' },
+                { name: 'description', type: 'string',           desc: 'Short descriptors' },
+                { name: 'active',      type: 'boolean',          desc: 'Whether currently selected' },
+                { name: 'onPress',     type: '() => void',       desc: 'Selection handler' },
+              ]}
+              usedIn={[
+                { screen: 'font-picker.tsx', context: 'Font selection list — 5 font options' },
+              ]}
+              colors={colors}
+            >
+              <View style={{ gap: space.sm }}>
+                {HANZI_FONTS.slice(0, 3).map(font => {
+                  const { family } = resolveHanziFontFamily(font.id);
+                  return (
+                    <FontOptionRow
+                      key={font.id}
+                      character={font.preview}
+                      fontFamily={family}
+                      fontWeight={font.weight}
+                      label={font.label}
+                      description={font.description}
+                      active={selectedFont === font.id}
+                      onPress={() => setSelectedFont(font.id)}
+                    />
+                  );
+                })}
               </View>
             </ComponentSection>
 

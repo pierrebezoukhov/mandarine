@@ -10,13 +10,15 @@ import { space } from '@/theme/spacing';
 import { Card } from '@/components/Card';
 import { Avatar } from '@/components/Avatar';
 import { hasActiveResumeSession, RESUME_SESSION_KEY } from '@/lib/progress';
-import { fetchProfile, updateProfile } from '@/lib/profile';
+import { fetchProfile, updateProfile, getInitials } from '@/lib/profile';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
   const { colors } = useTheme();
-  const s = useMemo(() => makeStyles(colors), [colors]);
+  const { isDesktop } = useResponsive();
+  const s = useMemo(() => makeStyles(colors, isDesktop), [colors, isDesktop]);
   const [hasSession,   setHasSession]   = useState(false);
   const [displayName,  setDisplayName]  = useState<string | null>(null);
   const [nameLoaded,   setNameLoaded]   = useState(false);
@@ -64,21 +66,20 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={s.root}>
-      <ResponsiveShell maxWidth={520}>
+      <ResponsiveShell maxWidth={isDesktop ? 640 : 520} align="start">
         {/* Header */}
         <View style={s.header}>
           <View>
             <Text style={s.logoHanzi}>漢字</Text>
             <Text style={s.logoLabel}>MANDARINE</Text>
           </View>
-          <Avatar
-            initials={(
-              user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) ??
-              user?.email?.[0] ?? '?'
-            ).toUpperCase()}
-            size={36}
-            onPress={() => router.push('/profile')}
-          />
+          {!isDesktop && (
+            <Avatar
+              initials={getInitials(user)}
+              size={36}
+              onPress={() => router.push('/profile')}
+            />
+          )}
         </View>
 
         {/* Greeting — hidden until profile name is loaded to prevent flash */}
@@ -97,6 +98,7 @@ export default function HomeScreen() {
             subtitle="Start a fresh round of flashcards"
             variant="primary"
             onPress={startNew}
+            style={isDesktop && s.cardHalf}
           />
           <Card
             icon="续"
@@ -105,6 +107,16 @@ export default function HomeScreen() {
             variant="secondary"
             onPress={resumeSession}
             disabled={!hasSession}
+            style={isDesktop && s.cardHalf}
+          />
+          <Card
+            icon="+"
+            title="Import cards"
+            subtitle="From YouTube or a photo"
+            variant="secondary"
+            onPress={() => {}}
+            disabled
+            style={isDesktop && s.cardHalf}
           />
         </View>
       </ResponsiveShell>
@@ -112,7 +124,7 @@ export default function HomeScreen() {
   );
 }
 
-const makeStyles = (t: ColorTheme) => StyleSheet.create({
+const makeStyles = (t: ColorTheme, isDesktop: boolean) => StyleSheet.create({
   root: { flex: 1, backgroundColor: t.bg },
 
   header: {
@@ -126,5 +138,16 @@ const makeStyles = (t: ColorTheme) => StyleSheet.create({
   greetTitle: { fontFamily: MONO, fontSize: FS.formTitle, color: t.textPrimary, fontWeight: FW.medium, marginBottom: 6, letterSpacing: LS.tighter * FS.formTitle },
   greetSub:   { fontFamily: MONO, fontSize: FS.body, color: t.textSecondary },
 
-  actions: { paddingHorizontal: space.xl, gap: space.md },
+  actions: {
+    paddingHorizontal: space.xl,
+    gap: space.md,
+    ...(isDesktop ? {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    } : {}),
+  },
+  cardHalf: {
+    flexBasis: '48%',
+    flexGrow: 0,
+  },
 });

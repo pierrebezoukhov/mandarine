@@ -23,12 +23,20 @@ export interface ColorTheme {
   textFaint:      string;
   textHanzi:      string;
 
+  // Text on Accent
+  textOnAccent:   string;
+
   // Semantic Colors
   green:          string;
   greenBright:    string;
   greenDim:       string;
   redBtn:         string;
   redBtnBright:   string;
+
+  // Rating button hover states
+  forgotBtnHover: string;
+  gotBtnHover:    string;
+  gotGlow:        string;
 
   // Overlay
   overlay:        string;
@@ -39,23 +47,6 @@ export interface ColorTheme {
 
   // Noise / Grain
   noiseOpacity:   number;
-
-  // ── Backward-compat aliases (remove once migration complete) ──────────────
-  accent:         string;
-  accentDim:      string;
-  accentBorder:   string;
-  surface:        string;
-  surface2:       string;
-  surfaceCard:    string;
-  bgDeep:         string;
-  borderFocus:    string;
-  textMuted:      string;
-  error:          string;
-  errorDim:       string;
-  errorMuted:     string;
-  errorBright:    string;
-  success:        string;
-  successBright:  string;
 }
 
 // ── Light palette — "Red Ink on Aged Parchment" ─────────────────────────────
@@ -78,11 +69,17 @@ const light = {
   textFaint:       '#887a68',
   textHanzi:       '#1a1610',
 
+  textOnAccent:    '#faf6ed',
+
   green:           '#2d6e38',
   greenBright:     '#3a8a42',
   greenDim:        'rgba(45,110,56,0.08)',
   redBtn:          '#c45a4e',
   redBtnBright:    '#b8301e',
+
+  forgotBtnHover:  'rgba(184,48,30,0.16)',
+  gotBtnHover:     'rgba(45,110,56,0.16)',
+  gotGlow:         'rgba(45,110,56,0.2)',
 
   overlay:         'rgba(0,0,0,0.6)',
 
@@ -112,11 +109,17 @@ const dark = {
   textFaint:       '#6b6055',
   textHanzi:       '#f0e8d8',
 
+  textOnAccent:    '#f0e8d8',
+
   green:           '#3a7a44',
   greenBright:     '#4fa858',
   greenDim:        'rgba(58,122,68,0.12)',
   redBtn:          '#7a1e14',
   redBtnBright:    '#c8382a',
+
+  forgotBtnHover:  'rgba(122,30,20,0.25)',
+  gotBtnHover:     'rgba(58,122,68,0.25)',
+  gotGlow:         'rgba(58,122,68,0.2)',
 
   overlay:         'rgba(0,0,0,0.6)',
 
@@ -126,37 +129,7 @@ const dark = {
   noiseOpacity:    0.04,
 } as const;
 
-// ── Alias layer ─────────────────────────────────────────────────────────────
-// Maps old T.* token names to new palette keys so existing code keeps working
-// during the migration. Remove these once every call-site uses new names.
-
-function withAliases(palette: typeof light | typeof dark): ColorTheme {
-  return {
-    ...palette,
-    // old accent → new ink red system
-    accent:        palette.inkRed,
-    accentDim:     palette.inkRedGlow,
-    accentBorder:  palette.inkRedDim,
-    // old surfaces → new bg system
-    surface:       palette.bgCard,
-    surface2:      palette.bgCard2,
-    surfaceCard:   palette.bgCard,
-    bgDeep:        palette.bg,
-    // old border focus → ink red based
-    borderFocus:   palette.inkRed,
-    // old text
-    textMuted:     palette.textSecondary,
-    // old semantic → new semantic
-    error:         palette.redBtn,
-    errorDim:      palette.inkRedGlow,
-    errorMuted:    palette.inkRedDim,
-    errorBright:   palette.inkRedText,
-    success:       palette.green,
-    successBright: palette.greenBright,
-  };
-}
-
 // ── Exports ─────────────────────────────────────────────────────────────────
 
-export const lightTheme: ColorTheme = withAliases(light);
-export const darkTheme:  ColorTheme = withAliases(dark);
+export const lightTheme: ColorTheme = light;
+export const darkTheme:  ColorTheme = dark;
