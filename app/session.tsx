@@ -101,7 +101,7 @@ export default function SessionScreen() {
     cardPaddingH:     [24, 8, 48],
     cardPaddingTop:   [28, 8, 56],
     cardPaddingBot:   [16, 8, 48],
-    cardBorderWidth:  [1.5, 0.5, 4],
+    cardBorderWidth:  [0, 0, 0],
     shadowRadius:     [32, 0, 64],
     shadowOffsetY:    [8, 0, 24],
 
@@ -479,7 +479,6 @@ export default function SessionScreen() {
               shadowRadius: dk.shadowRadius,
             }),
           }]}>
-            <Scanlines color={colors.scanline} gap={4} />
 
             {/* Corner ornaments */}
             <CornerOrnament position="tl" size={dk.ornamentSize} opacity={dk.ornamentOpacity} offset={dk.ornamentOffset} offsetH={dk.ornamentOffsetH} />
@@ -687,20 +686,26 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     paddingHorizontal: 20, paddingBottom: 16,
   },
 
-  // Card container — explicit bordered box
+  // Card container — elevation shadow (dark), no border (light)
   cardContainer: {
     width: '100%', maxWidth: 340,
     backgroundColor: t.bgCard,
-    borderWidth: 1.5,
-    borderColor: t.border,
+    borderWidth: 0,
     paddingHorizontal: space.xxl,
     paddingTop: 28,
     paddingBottom: space.lg,
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
-    // Shadow — controlled by dk overrides in the render
-    elevation: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: `0 2px 16px ${t.cardElevation}, 0 0 0 1px ${t.cardHairline}`,
+    } as any : {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: t.cardElevation === 'rgba(0,0,0,0)' ? 0 : 0.5,
+      shadowRadius: 16,
+      elevation: t.cardElevation === 'rgba(0,0,0,0)' ? 0 : 12,
+    }),
   },
 
   hskBadge: {
