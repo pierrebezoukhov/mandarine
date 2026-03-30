@@ -8,7 +8,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
-import { MONO, MONO_MEDIUM, FS, FW, LH, LS } from '@/theme/tokens';
+import { INCONSOLATA, INCONSOLATA_MEDIUM, MONO, FS, FW, LH, LS } from '@/theme/tokens';
 import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
@@ -522,11 +522,17 @@ export default function SessionScreen() {
                   ? meaningAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
                   : dk.revealTranslY }],
               }]}>
-                <View style={[s.divider, { height: dk.dividerHeight, marginBottom: dk.dividerMarginBot }]} />
-                {card.part_of_speech && <Text style={[s.posTag, { fontSize: dk.posSize, letterSpacing: dk.posLetterSpacing, marginBottom: dk.posMarginBot, color: dk.posColor }]}>{card.part_of_speech}</Text>}
+                {card.part_of_speech && <Text style={[s.posTag, { fontSize: dk.posSize, letterSpacing: dk.posLetterSpacing, marginBottom: dk.posMarginBot, color: dk.posColor }]}>{card.part_of_speech.charAt(0).toUpperCase()}</Text>}
                 <Text style={[s.meaningText, { fontSize: dk.meaningSize, lineHeight: dk.meaningSize * dk.meaningLineHeight, letterSpacing: dk.meaningLetterSp, color: dk.meaningColor }]}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
               </Animated.View>
             </View>
+
+            {/* Divider between meaning and example */}
+            <Animated.View style={[{ width: '100%' }, {
+              opacity: reveal >= 2 ? meaningAnim : 0,
+            }]}>
+              <View style={[s.divider, { height: dk.dividerHeight, marginBottom: dk.dividerMarginBot }]} />
+            </Animated.View>
 
             {/* Example sentence — inline, no separate surface */}
             {card._example && (
@@ -668,17 +674,17 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   },
   iconBtn:         { padding: space.sm },
   iconBtnDisabled: { opacity: 0.2 },
-  iconBtnText:     { fontSize: 18, fontFamily: MONO, letterSpacing: LS.tighter * 18, color: t.textSecondary },
+  iconBtnText:     { fontSize: FS.small, fontFamily: INCONSOLATA, letterSpacing: LS.tighter * FS.small, color: t.textSecondary },
 
   scoreStrip: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: FS.label, fontWeight: FW.medium },
-  scoreForgot: { color: t.inkRedDim },
-  scoreGot:    { color: t.green },
-  scorePending:{ color: t.textFaint },
-  scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: 10 },
+  scoreItem:   { fontFamily: INCONSOLATA, fontSize: FS.small, fontWeight: FW.regular },
+  scoreForgot: { color: t.scoreForgot },
+  scoreGot:    { color: t.scoreGot },
+  scorePending:{ color: t.scoreRemaining },
+  scoreSep:    { fontFamily: INCONSOLATA, color: t.textFaint, fontSize: FS.small },
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
@@ -712,19 +718,19 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     position: 'absolute', top: 10, right: 14,
   },
   hskBadgeText: {
-    fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
-    letterSpacing: 1.5, opacity: 0.6,
+    fontFamily: INCONSOLATA, fontSize: FS.micro, color: t.textPrimary,
+    letterSpacing: 1.5, opacity: t.opHskBadge,
   },
 
   // Hanzi — serif font, light weight, ink-bleed shadow
   hanziChar: {
     fontFamily: hanziFont,
-    fontSize: FS.hanzi,
+    fontSize: FS.display,
     fontWeight: hanziWeight as any,
     color: t.textHanzi,
     alignSelf: 'center',
-    lineHeight: FS.hanzi * LH.single,
-    letterSpacing: LS.tighter * FS.hanzi,
+    lineHeight: FS.display * LH.single,
+    letterSpacing: LS.tighter * FS.display,
     textAlign: 'center',
     maxWidth: '100%',
     textShadowColor: t.inkRedGlow,
@@ -739,14 +745,12 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     marginBottom: space.lg,
   },
   pinyinText: {
-    fontFamily: MONO, fontSize: FS.pinyin, letterSpacing: LS.wider * FS.pinyin,
-    color: t.inkRedText, fontStyle: 'italic', opacity: 0.9,
-    textShadowColor: t.inkRedGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
+    fontFamily: INCONSOLATA_MEDIUM, fontSize: FS.body, fontWeight: '500',
+    letterSpacing: LS.wider * FS.body,
+    color: t.textPrimary, opacity: t.opPinyin,
   },
   pinyinAudio: {
-    fontFamily: MONO, fontSize: 12, color: t.textFaint, opacity: 0.6,
+    fontFamily: INCONSOLATA, fontSize: FS.small, color: t.textFaint, opacity: 0.5,
   },
 
   // Divider
@@ -758,13 +762,15 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   // Meaning block (POS + definition)
   meaningBlock: { width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.lg },
   posTag: {
-    fontFamily: MONO, fontSize: FS.label,
-    color: t.textFaint, letterSpacing: 2, textTransform: 'uppercase',
-    marginBottom: space.xs,
+    fontFamily: INCONSOLATA, fontSize: FS.micro,
+    color: t.textPrimary, opacity: t.opDecorative,
+    letterSpacing: 2, textTransform: 'uppercase',
+    marginBottom: 1,
   },
   meaningText: {
-    fontFamily: MONO, fontSize: FS.definition, fontWeight: FW.light, color: t.textSecondary,
-    lineHeight: FS.definition * LH.normal, letterSpacing: 0.5,
+    fontFamily: INCONSOLATA, fontSize: FS.body, fontWeight: FW.regular, color: t.textPrimary,
+    opacity: t.opMeaning,
+    lineHeight: FS.body * LH.normal, letterSpacing: LS.wide * FS.body,
   },
 
   // Example sentence — inline on card surface
@@ -772,31 +778,35 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.md,
   },
   exHanzi: {
-    fontFamily: hanziFont, fontSize: FS.formTitle, fontWeight: hanziWeight as any, color: t.textPrimary,
-    lineHeight: FS.formTitle * LH.single, letterSpacing: 1, marginBottom: space.sm,
+    fontFamily: hanziFont, fontSize: FS.large, fontWeight: hanziWeight as any,
+    color: t.textPrimary,
+    lineHeight: FS.large * LH.single, letterSpacing: LS.example * FS.large,
+    marginBottom: space.sm,
   },
   exPinyin: {
-    fontFamily: MONO, fontSize: FS.exPinyin, color: t.inkRedText,
-    fontStyle: 'italic', letterSpacing: LS.example * FS.exPinyin, lineHeight: FS.exPinyin * LH.normal,
+    fontFamily: INCONSOLATA, fontSize: FS.body, color: t.textPrimary,
+    opacity: t.opMeaning,
+    letterSpacing: LS.example * FS.body, lineHeight: FS.body * LH.normal,
     marginBottom: space.xs,
   },
   exTranslation: {
-    fontFamily: MONO, fontSize: FS.progress, color: t.textSecondary,
-    letterSpacing: LS.wide * FS.progress,
+    fontFamily: INCONSOLATA, fontSize: FS.small, color: t.textPrimary,
+    opacity: t.opExampleEnglish,
   },
   translateHint: {
     marginTop: space.sm,
   },
   translateHintText: {
-    fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
+    fontFamily: INCONSOLATA, fontSize: FS.micro, color: t.textFaint,
     letterSpacing: LS.widest * FS.micro, textTransform: 'uppercase',
   },
 
   // Tap hint (inside card surface)
   tapHint: {
     marginTop: space.md, alignSelf: 'center',
-    fontFamily: MONO, fontSize: FS.micro, color: t.textFaint,
-    letterSpacing: LS.extreme * 9, textTransform: 'uppercase',
+    fontFamily: INCONSOLATA, fontSize: FS.micro, color: t.textPrimary,
+    opacity: t.opDecorative,
+    letterSpacing: LS.extreme * FS.micro, textTransform: 'uppercase',
   },
 
   // Rating buttons — square-ish with text labels
