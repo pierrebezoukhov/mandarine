@@ -613,9 +613,9 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnForgot,
             hoveredBtn === 'forgot' && {
-              backgroundColor: colors.forgotBtnHover,
-              borderColor: colors.inkRed,
-              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.inkRedGlow}` } as any : {}),
+              backgroundColor: colors.forgotBtnBorder,
+              borderColor: colors.forgotBtn,
+              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.forgotBtnBorder}` } as any : {}),
             },
             { width: dk.rateBtnSize, height: dk.rateBtnSize },
           ]}
@@ -626,9 +626,8 @@ export default function SessionScreen() {
             onMouseLeave: () => setHoveredBtn(null),
           } as any : {})}
         >
-          <Scanlines color={colors.scanline} gap={4} />
           <Text style={[s.rateBtnIcon, {
-            color: hoveredBtn === 'forgot' ? colors.inkRed : colors.inkRedDim,
+            color: colors.forgotBtn,
             fontSize: dk.rateBtnIconSize,
           }]}>×</Text>
         </TouchableOpacity>
@@ -637,9 +636,9 @@ export default function SessionScreen() {
           style={[
             s.rateBtn, s.rateBtnGot,
             hoveredBtn === 'got' && {
-              backgroundColor: colors.gotBtnHover,
-              borderColor: colors.greenBright,
-              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.gotGlow}` } as any : {}),
+              backgroundColor: colors.gotBtnBorder,
+              borderColor: colors.gotBtn,
+              ...(Platform.OS === 'web' ? { boxShadow: `0 0 12px ${colors.gotBtnBorder}` } as any : {}),
             },
             { width: dk.rateBtnSize, height: dk.rateBtnSize },
           ]}
@@ -650,9 +649,8 @@ export default function SessionScreen() {
             onMouseLeave: () => setHoveredBtn(null),
           } as any : {})}
         >
-          <Scanlines color={colors.scanline} gap={4} />
           <Text style={[s.rateBtnIcon, {
-            color: hoveredBtn === 'got' ? colors.greenBright : colors.green,
+            color: colors.gotBtn,
             fontSize: dk.rateBtnIconSize,
           }]}>✓</Text>
         </TouchableOpacity>
@@ -824,12 +822,12 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     ...(Platform.OS === 'web' ? { transition: 'background-color 150ms, border-color 150ms, box-shadow 200ms' } as any : {}),
   },
   rateBtnForgot: {
-    backgroundColor: t.inkRedGlow,
-    borderColor: t.inkRedDim,
+    backgroundColor: 'transparent',
+    borderColor: t.forgotBtnBorder,
   },
   rateBtnGot: {
-    backgroundColor: t.greenDim,
-    borderColor: t.green,
+    backgroundColor: 'transparent',
+    borderColor: t.gotBtnBorder,
   },
   rateBtnIcon: { fontFamily: MONO, fontSize: 20 },
 });
