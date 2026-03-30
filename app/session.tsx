@@ -13,7 +13,6 @@ import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
-import { Scanlines } from '@/components/Scanlines';
 import { CornerOrnament } from '@/components/CornerOrnament';
 import { TypewriterText } from '@/components/TypewriterText';
 import type { SessionConfig } from '@/lib/types';
@@ -421,7 +420,6 @@ export default function SessionScreen() {
 
   return (
     <SafeAreaView style={s.root}>
-      <Scanlines color={colors.scanline} />
       <ResponsiveShell maxWidth={640}>
 
       {/* Top bar */}
