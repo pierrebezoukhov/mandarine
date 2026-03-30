@@ -106,12 +106,12 @@ export default function SessionScreen() {
     shadowOffsetY:    [8, 0, 24],
 
     // Hanzi hero
-    hanziSize:        [108, 48, 180],
+    hanziSize:        [76, 48, 120],
     hanziMarginBot:   [20, 4, 48],
     hanziGlowRadius:  [40, 0, 80],
 
     // Pinyin
-    pinyinSize:       [18, 10, 28],
+    pinyinSize:       [13, 10, 22],
     pinyinGap:        [6, 0, 20],
     pinyinMarginBot:  [16, 4, 32],
     pinyinOpacity:    [0.9, 0.3, 1],
@@ -122,12 +122,12 @@ export default function SessionScreen() {
     dividerMarginBot: [16, 4, 32],
 
     // POS tag
-    posSize:          [10, 8, 16],
+    posSize:          [8, 6, 12],
     posLetterSpacing: [2, 0.5, 5],
     posMarginBot:     [4, 0, 12],
 
     // Meaning
-    meaningSize:      [15, 10, 22],
+    meaningSize:      [13, 10, 18],
     meaningLineHeight:[1.5, 1.0, 2.0],
     meaningLetterSp:  [0.5, 0, 2],
     meaningMarginBot: [16, 4, 32],
@@ -137,30 +137,30 @@ export default function SessionScreen() {
     hintPaddingH:     [12, 4, 24],
     hintPaddingV:     [8, 4, 20],
     hintDividerH:     [1, 0.5, 3],
-    exHanziSize:      [18, 12, 28],
-    exPinyinSize:     [11, 8, 18],
-    exTranslSize:     [10, 8, 16],
+    exHanziSize:      [22, 14, 32],
+    exPinyinSize:     [13, 10, 18],
+    exTranslSize:     [10, 8, 14],
 
     // Tap hint
-    tapHintSize:      [9, 7, 14],
+    tapHintSize:      [8, 6, 12],
     tapHintMarginTop: [12, 0, 24],
 
     // Corner ornaments
     ornamentSize:     [10, 6, 18],
-    ornamentOpacity:  [0.5, 0.1, 1],
+    ornamentOpacity:  [colors.opOrnament, 0.05, 1],
     ornamentOffset:   [10, 4, 24],
     ornamentOffsetH:  [14, 4, 24],
 
     // HSK badge
-    badgeSize:        [9, 7, 14],
+    badgeSize:        [8, 6, 12],
     badgeLetterSp:    [1.5, 0.5, 4],
     badgeOpacity:     [0.6, 0.1, 1],
     badgeTop:         [10, 4, 24],
     badgeRight:       [14, 4, 24],
 
     // Score strip
-    scoreSize:        [10, 8, 16],
-    scoreSepSize:     [10, 6, 16],
+    scoreSize:        [10, 8, 14],
+    scoreSepSize:     [10, 6, 14],
     scoreGap:         [12, 4, 24],
     scorePaddingBot:  [10, 4, 24],
 
