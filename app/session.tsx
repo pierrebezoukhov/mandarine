@@ -590,14 +590,13 @@ export default function SessionScreen() {
                 {
                   borderWidth: 2,
                   borderColor: flashColor.current === 'got'
-                    ? colors.greenBright
-                    : colors.inkRedText,
+                    ? colors.flashGotBorder
+                    : colors.flashForgotBorder,
                   opacity: flashAnim,
-                  // TODO: extract flash glow colors to theme tokens
                   ...(Platform.OS === 'web' ? {
                     boxShadow: flashColor.current === 'got'
-                      ? `0 0 30px rgba(${isDark ? '79,168,88' : '58,138,66'},0.5), inset 0 0 20px rgba(${isDark ? '79,168,88' : '58,138,66'},0.15)`
-                      : `0 0 30px rgba(${isDark ? '200,56,42' : '184,48,30'},0.5), inset 0 0 20px rgba(${isDark ? '200,56,42' : '184,48,30'},0.15)`,
+                      ? `0 0 30px ${colors.flashGotGlow}, inset 0 0 20px ${colors.flashGotInset}`
+                      : `0 0 30px ${colors.flashForgotGlow}, inset 0 0 20px ${colors.flashForgotInset}`,
                   } as any : {}),
                 },
               ]}
