@@ -16,6 +16,15 @@ import {
 import {
   IBMPlexMono_500Medium,
 } from '@expo-google-fonts/ibm-plex-mono/500Medium';
+import {
+  Inconsolata_300Light,
+} from '@expo-google-fonts/inconsolata/300Light';
+import {
+  Inconsolata_400Regular,
+} from '@expo-google-fonts/inconsolata/400Regular';
+import {
+  Inconsolata_500Medium,
+} from '@expo-google-fonts/inconsolata/500Medium';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,7 +32,7 @@ SplashScreen.preventAutoHideAsync();
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300&family=Noto+Sans+SC:wght@400&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC:wght@400&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Inconsolata:wght@300;400;500&family=Noto+Serif+SC:wght@300&family=Noto+Sans+SC:wght@400&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC:wght@400&display=swap';
   document.head.appendChild(link);
 
   const link2 = document.createElement('link');
@@ -64,6 +73,9 @@ export default function RootLayout() {
   const fontMap: Record<string, any> = {
     'IBMPlexMono-Regular': IBMPlexMono_400Regular,
     'IBMPlexMono-Medium': IBMPlexMono_500Medium,
+    'Inconsolata-Light': Inconsolata_300Light,
+    'Inconsolata-Regular': Inconsolata_400Regular,
+    'Inconsolata-Medium': Inconsolata_500Medium,
   };
   if (Platform.OS !== 'web') {
     fontMap['NotoSerifSC-Light'] = require('../assets/fonts/NotoSerifSC-Light.otf');

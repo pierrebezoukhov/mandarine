@@ -14,6 +14,17 @@ export const MONO_MEDIUM: string = Platform.OS === 'web'
   ? '"IBM Plex Mono", monospace'
   : 'IBMPlexMono-Medium';
 
+// Inconsolata — primary UI font for flashcard session (replaces IBM Plex Mono on card)
+export const INCONSOLATA: string = Platform.OS === 'web'
+  ? '"Inconsolata", monospace'
+  : 'Inconsolata-Regular';
+export const INCONSOLATA_LIGHT: string = Platform.OS === 'web'
+  ? '"Inconsolata", monospace'
+  : 'Inconsolata-Light';
+export const INCONSOLATA_MEDIUM: string = Platform.OS === 'web'
+  ? '"Inconsolata", monospace'
+  : 'Inconsolata-Medium';
+
 // ── Font-size tokens ────────────────────────────────────────────────────────
 // Role-based values from the design spec. Grouped by function, not by
 // mathematical ratio. Sizes were chosen by the designer for visual hierarchy
