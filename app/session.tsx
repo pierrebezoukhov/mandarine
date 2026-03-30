@@ -124,7 +124,7 @@ export default function SessionScreen() {
     // POS tag
     posSize:          [8, 6, 12],
     posLetterSpacing: [2, 0.5, 5],
-    posMarginBot:     [4, 0, 12],
+    posMarginBot:     [1, 0, 12],
 
     // Meaning
     meaningSize:      [13, 10, 18],
@@ -154,7 +154,7 @@ export default function SessionScreen() {
     // HSK badge
     badgeSize:        [8, 6, 12],
     badgeLetterSp:    [1.5, 0.5, 4],
-    badgeOpacity:     [0.6, 0.1, 1],
+    badgeOpacity:     [colors.opHskBadge, 0.1, 1],
     badgeTop:         [10, 4, 24],
     badgeRight:       [14, 4, 24],
 
