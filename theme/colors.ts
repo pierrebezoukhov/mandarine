@@ -38,6 +38,27 @@ export interface ColorTheme {
   gotBtnHover:    string;
   gotGlow:        string;
 
+  // Terminal Scholar — warm button palette
+  forgotBtn:       string;
+  forgotBtnBorder: string;
+  gotBtn:          string;
+  gotBtnBorder:    string;
+  scoreForgot:     string;
+  scoreGot:        string;
+  scoreRemaining:  string;
+
+  // Card flash feedback
+  flashForgotBorder: string;
+  flashForgotGlow:   string;
+  flashForgotInset:  string;
+  flashGotBorder:    string;
+  flashGotGlow:      string;
+  flashGotInset:     string;
+
+  // Card surface (dark elevation)
+  cardElevation:    string;
+  cardHairline:     string;
+
   // Overlay
   overlay:        string;
 
@@ -81,6 +102,24 @@ const light = {
   gotBtnHover:     'rgba(45,110,56,0.16)',
   gotGlow:         'rgba(45,110,56,0.2)',
 
+  forgotBtn:       'rgba(168,40,24,0.6)',
+  forgotBtnBorder: 'rgba(168,40,24,0.25)',
+  gotBtn:          'rgba(45,110,56,0.6)',
+  gotBtnBorder:    'rgba(45,110,56,0.25)',
+  scoreForgot:     'rgba(168,40,24,0.70)',
+  scoreGot:        'rgba(45,110,56,0.70)',
+  scoreRemaining:  'rgba(42,36,26,0.50)',
+
+  flashForgotBorder: 'rgba(168,40,24,1.0)',
+  flashForgotGlow:   'rgba(168,40,24,0.4)',
+  flashForgotInset:  'rgba(168,40,24,0.1)',
+  flashGotBorder:    'rgba(45,110,56,1.0)',
+  flashGotGlow:      'rgba(45,110,56,0.4)',
+  flashGotInset:     'rgba(45,110,56,0.1)',
+
+  cardElevation:    'rgba(0,0,0,0)',
+  cardHairline:     'rgba(0,0,0,0)',
+
   overlay:         'rgba(0,0,0,0.6)',
 
   cardShadow:      'rgba(120,100,60,0.08)',
@@ -120,6 +159,24 @@ const dark = {
   forgotBtnHover:  'rgba(122,30,20,0.25)',
   gotBtnHover:     'rgba(58,122,68,0.25)',
   gotGlow:         'rgba(58,122,68,0.2)',
+
+  forgotBtn:       'rgba(180,120,70,0.7)',
+  forgotBtnBorder: 'rgba(180,120,70,0.3)',
+  gotBtn:          'rgba(140,160,100,0.7)',
+  gotBtnBorder:    'rgba(140,160,100,0.3)',
+  scoreForgot:     'rgba(180,120,70,0.75)',
+  scoreGot:        'rgba(140,160,100,0.75)',
+  scoreRemaining:  'rgba(232,224,208,0.50)',
+
+  flashForgotBorder: 'rgba(180,120,70,1.0)',
+  flashForgotGlow:   'rgba(180,120,70,0.5)',
+  flashForgotInset:  'rgba(180,120,70,0.15)',
+  flashGotBorder:    'rgba(140,160,100,1.0)',
+  flashGotGlow:      'rgba(140,160,100,0.5)',
+  flashGotInset:     'rgba(140,160,100,0.15)',
+
+  cardElevation:    'rgba(0,0,0,0.5)',
+  cardHairline:     'rgba(232,224,208,0.04)',
 
   overlay:         'rgba(0,0,0,0.6)',
 
