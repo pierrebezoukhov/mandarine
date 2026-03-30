@@ -59,6 +59,15 @@ export interface ColorTheme {
   cardElevation:    string;
   cardHairline:     string;
 
+  // Opacity scale — used for text hierarchy within the card
+  opPinyin:         number;
+  opMeaning:        number;
+  opExampleEnglish: number;
+  opDecorative:     number;
+  opScoreColor:     number;
+  opHskBadge:       number;
+  opOrnament:       number;
+
   // Overlay
   overlay:        string;
 
@@ -120,6 +129,14 @@ const light = {
   cardElevation:    'rgba(0,0,0,0)',
   cardHairline:     'rgba(0,0,0,0)',
 
+  opPinyin:         0.65,
+  opMeaning:        0.58,
+  opExampleEnglish: 0.30,
+  opDecorative:     0.12,
+  opScoreColor:     0.70,
+  opHskBadge:       0.20,
+  opOrnament:       0.12,
+
   overlay:         'rgba(0,0,0,0.6)',
 
   cardShadow:      'rgba(120,100,60,0.08)',
@@ -177,6 +194,14 @@ const dark = {
 
   cardElevation:    'rgba(0,0,0,0.5)',
   cardHairline:     'rgba(232,224,208,0.04)',
+
+  opPinyin:         0.55,
+  opMeaning:        0.55,
+  opExampleEnglish: 0.30,
+  opDecorative:     0.15,
+  opScoreColor:     0.75,
+  opHskBadge:       0.30,
+  opOrnament:       0.20,
 
   overlay:         'rgba(0,0,0,0.6)',
 
