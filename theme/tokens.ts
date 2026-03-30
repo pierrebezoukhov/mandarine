@@ -25,32 +25,59 @@ export const INCONSOLATA_MEDIUM: string = Platform.OS === 'web'
   ? '"Inconsolata", monospace'
   : 'Inconsolata-Medium';
 
-// ── Font-size tokens ────────────────────────────────────────────────────────
-// Role-based values from the design spec. Grouped by function, not by
-// mathematical ratio. Sizes were chosen by the designer for visual hierarchy
-// — each value is tuned to its specific text role.
+// ── Font-size tokens — 5-tier scale ─────────────────────────────────────────
+// Consolidated from 11 sizes to 5. Each tier has a single role-based value.
+// Hierarchy within a tier is created by opacity and weight, not by size.
 
-// Display — large, structural hierarchy
+export const FS = {
+  // Display — hero elements
+  display:    76,   // hero hanzi character (Noto Serif SC, weight 300)
+
+  // Large — secondary focal point
+  large:      22,   // example sentence hanzi (Noto Serif SC, weight 300)
+
+  // Body — readable text
+  body:       13,   // pinyin, english meaning, example pinyin (Inconsolata)
+
+  // Small — supporting text
+  small:      10,   // score strip, example english, ♪ icon, top bar icons
+
+  // Micro — decorative / metadata
+  micro:       8,   // HSK badge, POS tag, tap hint, corner ornaments
+
+  // Legacy aliases — used by screens outside session.tsx
+  // These map old token names to the new scale for backward compat.
+  // Remove as other screens migrate.
+  hanzi:      76,   // → display
+  formTitle:  24,   // unchanged — used by session-setup, home, auth
+  pinyin:     13,   // → body
+  definition: 13,   // → body
+  input:      14,   // unchanged — used by form fields
+  body13:     13,   // → body (renamed to avoid collision with body)
+  ctaLabel:   12,   // unchanged — used by Button component
+  progress:   12,   // unchanged — used outside session
+  exPinyin:   13,   // → body (was 11)
+  label:      10,   // → small
+  micro8:      8,   // → micro (renamed to avoid collision)
+} as const;
+
+// Legacy named exports — kept for backward compat (type references, spreads)
 export const FSDisplay = {
-  hanzi:      108,  // flashcard hero character (Noto Serif SC, weight 300)
-  formTitle:   24,  // form/screen headings (MONO, uppercase, weight 500)
+  hanzi:     FS.hanzi,
+  formTitle: FS.formTitle,
 } as const;
 
-// Content — readable text, UI controls, labels
 export const FSContent = {
-  pinyin:       18,  // pinyin romanization (MONO, italic, inkRedText)
-  definition:   15,  // card meaning/translation text (MONO, weight 300)
-  input:        14,  // form input text (MONO, weight 400)
-  body:         13,  // body secondary, descriptions, subtitles
-  ctaLabel:     12,  // primary CTA button labels (MONO, uppercase, weight 500)
-  progress:     12,  // progress counter, example translation
-  exPinyin:     11,  // example sentence pinyin (MONO, italic)
-  label:        10,  // form labels, dividers, section headers (uppercase)
-  micro:         9,  // tap hints, rating button labels (uppercase)
+  pinyin:     FS.pinyin,
+  definition: FS.definition,
+  input:      FS.input,
+  body:       FS.body13,
+  ctaLabel:   FS.ctaLabel,
+  progress:   FS.progress,
+  exPinyin:   FS.exPinyin,
+  label:      FS.label,
+  micro:      FS.micro8,
 } as const;
-
-// Combined — all FS.* references work
-export const FS = { ...FSDisplay, ...FSContent } as const;
 
 // ── Letter-spacing scale ──────────────────────────────────────────────────────
 // Unitless em multipliers. Usage: letterSpacing: LS.wide * FS.definition
