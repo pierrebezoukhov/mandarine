@@ -632,11 +632,11 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: FS.body, fontWeight: '500' },
+  scoreItem:   { fontFamily: MONO, fontSize: 14, fontWeight: '500' },
   scoreForgot: { color: t.scoreForgot, opacity: 0.7 },
   scoreGot:    { color: t.scoreGot, opacity: 0.7 },
   scorePending:{ color: t.scoreRemaining, opacity: 0.5 },
-  scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: FS.body, opacity: 0.4 },
+  scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: 14, opacity: 0.4 },
 
   cardStage: { position: 'relative' },
   cardTouchable: {
