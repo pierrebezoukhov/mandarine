@@ -632,11 +632,11 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: INCONSOLATA_MEDIUM, fontSize: FS.body, fontWeight: '500' },
+  scoreItem:   { fontFamily: INCONSOLATA_MEDIUM, fontSize: FS.small, fontWeight: '500' },
   scoreForgot: { color: t.scoreForgot, opacity: 0.7 },
   scoreGot:    { color: t.scoreGot, opacity: 0.7 },
   scorePending:{ color: t.scoreRemaining, opacity: 0.5 },
-  scoreSep:    { fontFamily: INCONSOLATA, color: t.textFaint, fontSize: FS.body, opacity: 0.4 },
+  scoreSep:    { fontFamily: INCONSOLATA, color: t.textFaint, fontSize: FS.small, opacity: 0.4 },
 
   cardStage: { position: 'relative' },
   cardTouchable: {
