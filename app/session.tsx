@@ -106,7 +106,7 @@ export default function SessionScreen() {
 
     // Hanzi hero
     hanziSize:        76,
-    hanziMarginBot:   12,
+    hanziMarginBot:   20,
     hanziGlowRadius:  40,
 
     // Pinyin
