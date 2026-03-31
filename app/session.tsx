@@ -466,57 +466,51 @@ export default function SessionScreen() {
               <Text style={[s.hskBadgeText, { fontSize: dk.badgeSize, letterSpacing: dk.badgeLetterSp, opacity: dk.badgeOpacity }]}>HSK {card.hsk_level}</Text>
             </View>
 
-            {/* ── Zone 1: Definition (flex:2) — hanzi + pinyin + meaning ── */}
-            <View style={s.zone1}>
-              {/* Hanzi — serif, light weight, ink bleed */}
-              <Text
-                style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH }, {
-                  fontSize: compact ? hanziSize : dk.hanziSize,
-                  lineHeight: compact ? hanziLH : dk.hanziSize * LH.single,
-                  color: dk.hanziColor,
-                  textShadowRadius: dk.hanziGlowRadius,
-                }]}
-                adjustsFontSizeToFit numberOfLines={1}
-              >{card.hanzi}</Text>
+            {/* Card content — flat layout with fixed margins matching mockup */}
+            <View style={{ width: '100%' }}>
+            {/* Hanzi — serif, light weight, ink bleed */}
+            <Text
+              style={[s.hanziChar, compact && { fontSize: hanziSize, lineHeight: hanziLH }, {
+                fontSize: compact ? hanziSize : dk.hanziSize,
+                lineHeight: compact ? hanziLH : dk.hanziSize * LH.single,
+                color: dk.hanziColor,
+                textShadowRadius: dk.hanziGlowRadius,
+              }]}
+              adjustsFontSizeToFit numberOfLines={1}
+            >{card.hanzi}</Text>
 
-              {/* Stage 1: Pinyin + audio icon — spring-animated reveal */}
-              <Animated.View style={[s.pinyinRow, { gap: dk.pinyinGap }, {
-                opacity: reveal >= 1 ? pinyinAnim : 0,
-                transform: [{ translateY: reveal >= 1
-                  ? pinyinAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
-                  : dk.revealTranslY }],
-              }]}>
-                <Text style={[s.pinyinText, { fontSize: dk.pinyinSize, opacity: dk.pinyinOpacity, color: dk.pinyinColor }]}>{card.pinyin}</Text>
-                <Text style={s.pinyinAudio}>♪</Text>
-              </Animated.View>
+            {/* Stage 1: Pinyin + audio icon — spring-animated reveal */}
+            <Animated.View style={[s.pinyinRow, { gap: dk.pinyinGap }, {
+              opacity: reveal >= 1 ? pinyinAnim : 0,
+              transform: [{ translateY: reveal >= 1
+                ? pinyinAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
+                : dk.revealTranslY }],
+            }]}>
+              <Text style={[s.pinyinText, { fontSize: dk.pinyinSize, opacity: dk.pinyinOpacity, color: dk.pinyinColor }]}>{card.pinyin}</Text>
+              <Text style={s.pinyinAudio}>♪</Text>
+            </Animated.View>
 
-              {/* Stage 2: POS + definition — staggered reveal */}
-              <Animated.View style={[s.meaningBlock, {
-                opacity: reveal >= 2 ? meaningAnim : 0,
-                transform: [{ translateY: reveal >= 2
-                  ? meaningAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
-                  : dk.revealTranslY }],
-              }]}>
-                {card.part_of_speech && <Text style={[s.posTag, { fontSize: dk.posSize, letterSpacing: dk.posLetterSpacing, marginBottom: dk.posMarginBot, color: dk.posColor }]}>{card.part_of_speech.charAt(0).toUpperCase()}</Text>}
-                <Text style={[s.meaningText, { fontSize: dk.meaningSize, lineHeight: dk.meaningSize * dk.meaningLineHeight, letterSpacing: dk.meaningLetterSp, color: dk.meaningColor }]}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
-              </Animated.View>
+            {/* Stage 2: POS + definition — staggered reveal */}
+            <Animated.View style={[s.meaningBlock, {
+              opacity: reveal >= 2 ? meaningAnim : 0,
+              transform: [{ translateY: reveal >= 2
+                ? meaningAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
+                : dk.revealTranslY }],
+            }]}>
+              {card.part_of_speech && <Text style={[s.posTag, { fontSize: dk.posSize, letterSpacing: dk.posLetterSpacing, marginBottom: dk.posMarginBot, color: dk.posColor }]}>{card.part_of_speech.charAt(0).toUpperCase()}</Text>}
+              <Text style={[s.meaningText, { fontSize: dk.meaningSize, lineHeight: dk.meaningSize * dk.meaningLineHeight, letterSpacing: dk.meaningLetterSp, color: dk.meaningColor }]}>{card.meaning.replace(/; /g, '  ·  ')}</Text>
+            </Animated.View>
 
-              {/* Tap hint — inside zone 1 */}
-              <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }, { fontSize: dk.tapHintSize }]} pointerEvents="none">
-                {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
-              </Text>
-            </View>
-
-            {/* ── Divider ── */}
+            {/* Divider between meaning and example */}
             <Animated.View style={[{ width: '100%' }, {
               opacity: reveal >= 2 ? meaningAnim : 0,
             }]}>
               <View style={[s.divider, { height: dk.dividerHeight }]} />
             </Animated.View>
 
-            {/* ── Zone 2: Example (flex:1) ── */}
-            <View style={s.zone2}>
-              {card._example && (
+            {/* Example sentence */}
+            {card._example && (
+              <View style={s.exampleBlock}>
                 <Animated.View style={{
                   width: '100%',
                   opacity: reveal >= 2 ? hintAnim : 0,
@@ -553,7 +547,13 @@ export default function SessionScreen() {
                     <Text style={s.translateHintText}>▸ tap to translate</Text>
                   </TouchableOpacity>
                 </Animated.View>
-              )}
+              </View>
+            )}
+
+            {/* Tap hint — inside card surface */}
+            <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }, { fontSize: dk.tapHintSize }]} pointerEvents="none">
+              {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
+            </Text>
             </View>
 
             {/* Feedback flash — outline + glow */}
@@ -694,17 +694,6 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   },
 
   // Hanzi — serif font, light weight, ink-bleed shadow
-  // Two-zone card layout
-  zone1: {
-    flex: 2, width: '100%',
-    alignItems: 'center', justifyContent: 'center',
-    gap: 16,
-  },
-  zone2: {
-    flex: 1, width: '100%',
-    alignItems: 'flex-start', justifyContent: 'flex-start',
-  },
-
   hanziChar: {
     fontFamily: hanziFont,
     fontSize: FS.display,
@@ -718,11 +707,13 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     textShadowColor: t.inkRedGlow,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 40,
+    marginBottom: 12,
   },
 
   // Pinyin row (pinyin + audio icon)
   pinyinRow: {
     flexDirection: 'row', alignItems: 'center', alignSelf: 'center', gap: 6,
+    marginBottom: 14,
   },
   pinyinText: {
     fontFamily: INCONSOLATA_MEDIUM, fontSize: FS.body, fontWeight: '500',
@@ -736,11 +727,11 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   // Divider
   divider: {
     width: '100%', height: 1,
-    backgroundColor: t.dividerSubtle, marginVertical: 4,
+    backgroundColor: t.dividerSubtle, marginBottom: 16,
   },
 
   // Meaning block (POS + definition)
-  meaningBlock: { width: '100%', alignItems: 'flex-start' },
+  meaningBlock: { width: '100%', alignItems: 'flex-start', marginBottom: 16 },
   posTag: {
     fontFamily: INCONSOLATA, fontSize: FS.micro,
     color: t.textPrimary, opacity: t.opDecorative,
@@ -783,7 +774,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
 
   // Tap hint (inside card surface)
   tapHint: {
-    alignSelf: 'center',
+    marginTop: 14, alignSelf: 'center',
     fontFamily: INCONSOLATA, fontSize: FS.micro, color: t.textPrimary,
     opacity: t.opDecorative,
     letterSpacing: LS.extreme * FS.micro, textTransform: 'uppercase',
