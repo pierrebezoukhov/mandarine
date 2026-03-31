@@ -100,9 +100,9 @@ export default function SessionScreen() {
   const dk = {
     // Card container
     cardMaxWidth:     420,
-    cardPaddingH:     28,
-    cardPaddingTop:   36,
-    cardPaddingBot:   36,
+    cardPaddingH:     24,
+    cardPaddingTop:   28,
+    cardPaddingBot:   20,
 
     // Hanzi hero
     hanziSize:        76,
