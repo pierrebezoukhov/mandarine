@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ColorTheme } from '@/theme/colors';
 import { INCONSOLATA, INCONSOLATA_MEDIUM, MONO, FS, FW, LH, LS } from '@/theme/tokens';
+import { Icon } from '@/theme/icons';
 import { space } from '@/theme/spacing';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
@@ -113,8 +114,8 @@ export default function SessionScreen() {
     pinyinSize:       [13, 10, 22],
     pinyinGap:        [6, 0, 20],
     pinyinMarginBot:  [16, 4, 32],
-    pinyinOpacity:    [0.9, 0.3, 1],
-    pinyinGlowRadius: [12, 0, 30],
+    pinyinOpacity:    [colors.opPinyin, 0.1, 1],
+    pinyinGlowRadius: [0, 0, 30],
 
     // Divider
     dividerHeight:    [1, 0.5, 4],
@@ -131,11 +132,7 @@ export default function SessionScreen() {
     meaningLetterSp:  [0.5, 0, 2],
     meaningMarginBot: [16, 4, 32],
 
-    // Hint block
-    hintBorderWidth:  [1, 0.5, 3],
-    hintPaddingH:     [12, 4, 24],
-    hintPaddingV:     [8, 4, 20],
-    hintDividerH:     [1, 0.5, 3],
+    // Example block
     exHanziSize:      [22, 14, 32],
     exPinyinSize:     [13, 10, 18],
     exTranslSize:     [10, 8, 14],
@@ -185,13 +182,9 @@ export default function SessionScreen() {
 
     // Colors
     hanziColor:       colors.textHanzi,
-    pinyinColor:      colors.inkRedText,
-    meaningColor:     colors.textSecondary,
-    posColor:         colors.textFaint,
-    bgCardColor:      colors.bgCard,
-    cardBorderColor:  colors.border,
-    hintBgColor:      colors.bgCard2,
-    hintBorderColor:  colors.borderDim,
+    pinyinColor:      colors.textPrimary,
+    meaningColor:     colors.textPrimary,
+    posColor:         colors.textPrimary,
   });
 
   const startedAt       = useRef<string>(new Date().toISOString());
@@ -465,17 +458,6 @@ export default function SessionScreen() {
             paddingHorizontal: dk.cardPaddingH,
             paddingTop: dk.cardPaddingTop,
             paddingBottom: dk.cardPaddingBot,
-            borderWidth: dk.cardBorderWidth,
-            backgroundColor: dk.bgCardColor,
-            borderColor: dk.cardBorderColor,
-            ...(Platform.OS === 'web' ? {
-              boxShadow: `0 ${dk.shadowOffsetY}px ${dk.shadowRadius}px ${colors.cardShadow}`,
-            } as any : {
-              shadowColor: colors.cardShadow,
-              shadowOffset: { width: 0, height: dk.shadowOffsetY },
-              shadowOpacity: 1,
-              shadowRadius: dk.shadowRadius,
-            }),
           }]}>
 
             {/* Corner ornaments */}
@@ -508,7 +490,7 @@ export default function SessionScreen() {
                 ? pinyinAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
                 : dk.revealTranslY }],
             }]}>
-              <Text style={[s.pinyinText, { fontSize: dk.pinyinSize, opacity: dk.pinyinOpacity, color: dk.pinyinColor, textShadowRadius: dk.pinyinGlowRadius }]}>{card.pinyin}</Text>
+              <Text style={[s.pinyinText, { fontSize: dk.pinyinSize, opacity: dk.pinyinOpacity, color: dk.pinyinColor }]}>{card.pinyin}</Text>
               <Text style={s.pinyinAudio}>♪</Text>
             </Animated.View>
 
@@ -626,7 +608,7 @@ export default function SessionScreen() {
           <Text style={[s.rateBtnIcon, {
             color: colors.forgotBtn,
             fontSize: dk.rateBtnIconSize,
-          }]}>×</Text>
+          }]}>{Icon.close}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -649,7 +631,7 @@ export default function SessionScreen() {
           <Text style={[s.rateBtnIcon, {
             color: colors.gotBtn,
             fontSize: dk.rateBtnIconSize,
-          }]}>✓</Text>
+          }]}>{Icon.correct}</Text>
         </TouchableOpacity>
       </View>
 
@@ -751,7 +733,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   // Divider
   divider: {
     width: '100%', height: 1,
-    backgroundColor: t.border, marginBottom: space.lg,
+    backgroundColor: t.dividerSubtle, marginBottom: space.lg,
   },
 
   // Meaning block (POS + definition)
@@ -806,7 +788,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
 
   // Rating buttons — square-ish with text labels
   buttonRow: {
-    flexDirection: 'row', justifyContent: 'space-between',
+    flexDirection: 'row', justifyContent: 'center',
     paddingHorizontal: 40, paddingBottom: 24,
     gap: space.lg,
   },

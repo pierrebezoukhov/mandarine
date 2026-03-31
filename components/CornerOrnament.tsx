@@ -1,5 +1,5 @@
 import { Text } from 'react-native';
-import { MONO } from '@/theme/tokens';
+import { INCONSOLATA } from '@/theme/tokens';
 import { useTheme } from '@/context/ThemeContext';
 
 interface CornerOrnamentProps {
@@ -10,12 +10,19 @@ interface CornerOrnamentProps {
   offsetH?: number;
 }
 
+const ORNAMENT_CHARS = {
+  tl: '┌─',
+  tr: '─┐',
+  bl: '└─',
+  br: '─┘',
+} as const;
+
 export function CornerOrnament({
   position,
-  size = 10,
-  opacity = 0.5,
-  offset = 10,
-  offsetH = 14,
+  size = 8,
+  opacity = 0.2,
+  offset = 6,
+  offsetH = 10,
 }: CornerOrnamentProps) {
   const { colors } = useTheme();
   const posStyle = {
@@ -28,10 +35,10 @@ export function CornerOrnament({
   return (
     <Text style={[{
       position: 'absolute',
-      fontFamily: MONO,
+      fontFamily: INCONSOLATA,
       fontSize: size,
-      color: colors.inkRedDim,
+      color: colors.textPrimary,
       opacity: opacity,
-    }, posStyle]}>+</Text>
+    }, posStyle]}>{ORNAMENT_CHARS[position]}</Text>
   );
 }
