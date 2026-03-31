@@ -23,7 +23,7 @@ import {
   RESUME_SESSION_KEY, SESSION_CONFIG_KEY,
   type Card, type Results, type ResumeState,
 } from '@/lib/progress';
-import { useDialKit } from 'dialkit';
+// import { useDialKit } from 'dialkit'; // disabled — using fixed values
 
 
 // ── Session Complete ───────────────────────────────────────────────────────────
@@ -95,97 +95,95 @@ export default function SessionScreen() {
   const { colors, isDark, fonts } = useTheme();
   const s = useMemo(() => makeStyles(colors, fonts.hanzi, fonts.hanziWeight), [colors, fonts.hanzi, fonts.hanziWeight]);
 
-  const dk = useDialKit('Flashcard', {
+  // DialKit disabled — using fixed values matched to mockup
+  // TODO: re-enable DialKit once design is finalized
+  const dk = {
     // Card container
-    cardMaxWidth:     [340, 240, 480],
-    cardPaddingH:     [24, 8, 48],
-    cardPaddingTop:   [28, 8, 56],
-    cardPaddingBot:   [16, 8, 48],
-    cardBorderWidth:  [0, 0, 0],
-    shadowRadius:     [32, 0, 64],
-    shadowOffsetY:    [8, 0, 24],
+    cardMaxWidth:     340,
+    cardPaddingH:     24,
+    cardPaddingTop:   28,
+    cardPaddingBot:   20,
 
     // Hanzi hero
-    hanziSize:        [76, 48, 120],
-    hanziMarginBot:   [20, 4, 48],
-    hanziGlowRadius:  [40, 0, 80],
+    hanziSize:        76,
+    hanziMarginBot:   12,
+    hanziGlowRadius:  40,
 
     // Pinyin
-    pinyinSize:       [13, 10, 22],
-    pinyinGap:        [6, 0, 20],
-    pinyinMarginBot:  [16, 4, 32],
-    pinyinOpacity:    [colors.opPinyin, 0.1, 1],
-    pinyinGlowRadius: [0, 0, 30],
+    pinyinSize:       FS.body,
+    pinyinGap:        6,
+    pinyinMarginBot:  14,
+    pinyinOpacity:    colors.opPinyin,
+    pinyinColor:      colors.textPrimary,
 
     // Divider
-    dividerHeight:    [1, 0.5, 4],
-    dividerMarginBot: [16, 4, 32],
+    dividerHeight:    1,
+    dividerMarginBot: 16,
 
     // POS tag
-    posSize:          [8, 6, 12],
-    posLetterSpacing: [2, 0.5, 5],
-    posMarginBot:     [1, 0, 12],
+    posSize:          FS.micro,
+    posLetterSpacing: 2,
+    posMarginBot:     1,
+    posColor:         colors.textPrimary,
 
     // Meaning
-    meaningSize:      [13, 10, 18],
-    meaningLineHeight:[1.5, 1.0, 2.0],
-    meaningLetterSp:  [0.5, 0, 2],
-    meaningMarginBot: [16, 4, 32],
+    meaningSize:      FS.body,
+    meaningLineHeight:LH.normal,
+    meaningLetterSp:  LS.wide * FS.body,
+    meaningMarginBot: 16,
+    meaningColor:     colors.textPrimary,
 
     // Example block
-    exHanziSize:      [22, 14, 32],
-    exPinyinSize:     [13, 10, 18],
-    exTranslSize:     [10, 8, 14],
+    exHanziSize:      FS.large,
+    exPinyinSize:     FS.body,
+    exTranslSize:     FS.small,
 
     // Tap hint
-    tapHintSize:      [8, 6, 12],
-    tapHintMarginTop: [12, 0, 24],
+    tapHintSize:      FS.micro,
+    tapHintMarginTop: 14,
 
     // Corner ornaments
-    ornamentSize:     [10, 6, 18],
-    ornamentOpacity:  [colors.opOrnament, 0.05, 1],
-    ornamentOffset:   [10, 4, 24],
-    ornamentOffsetH:  [14, 4, 24],
+    ornamentSize:     8,
+    ornamentOpacity:  colors.opOrnament,
+    ornamentOffset:   6,
+    ornamentOffsetH:  10,
 
     // HSK badge
-    badgeSize:        [8, 6, 12],
-    badgeLetterSp:    [1.5, 0.5, 4],
-    badgeOpacity:     [colors.opHskBadge, 0.1, 1],
-    badgeTop:         [10, 4, 24],
-    badgeRight:       [14, 4, 24],
+    badgeSize:        FS.micro,
+    badgeLetterSp:    1.5,
+    badgeOpacity:     colors.opHskBadge,
+    badgeTop:         8,
+    badgeRight:       14,
 
     // Score strip
-    scoreSize:        [10, 8, 14],
-    scoreSepSize:     [10, 6, 14],
-    scoreGap:         [12, 4, 24],
-    scorePaddingBot:  [10, 4, 24],
+    scoreSize:        FS.small,
+    scoreSepSize:     FS.small,
+    scoreGap:         10,
+    scorePaddingBot:  14,
 
     // Rating buttons
-    rateBtnSize:      [64, 40, 96],
-    rateBtnIconSize:  [20, 12, 32],
-    rateBtnGap:       [16, 4, 32],
-    rateBtnPaddingH:  [40, 16, 80],
-    rateBtnPaddingBot:[24, 8, 48],
+    rateBtnSize:      64,
+    rateBtnIconSize:  20,
+    rateBtnGap:       16,
+    rateBtnPaddingH:  40,
+    rateBtnPaddingBot:24,
 
     // Animations
-    entranceDamping:  [18, 5, 40],
-    entranceStiffness:[200, 50, 500],
-    entranceTranslY:  [20, 0, 60],
-    entranceScale:    [0.96, 0.8, 1.0],
-    revealDamping:    [18, 5, 40],
-    revealStiffness:  [200, 50, 500],
-    revealTranslY:    [10, 0, 30],
-    staggerDelay:     [80, 0, 200],
-    flashDuration:    [600, 200, 1200],
-    exitDelay:        [150, 0, 500],
-    exitDuration:     [250, 100, 600],
+    entranceDamping:  18,
+    entranceStiffness:200,
+    entranceTranslY:  20,
+    entranceScale:    0.96,
+    revealDamping:    18,
+    revealStiffness:  200,
+    revealTranslY:    10,
+    staggerDelay:     80,
+    flashDuration:    600,
+    exitDelay:        150,
+    exitDuration:     250,
 
     // Colors
     hanziColor:       colors.textHanzi,
-    pinyinColor:      colors.textPrimary,
-    meaningColor:     colors.textPrimary,
-    posColor:         colors.textPrimary,
-  });
+  };
 
   const startedAt       = useRef<string>(new Date().toISOString());
   const sessionConfig   = useRef<SessionConfig | null>(null);
@@ -758,7 +756,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     fontFamily: hanziFont, fontSize: FS.large, fontWeight: hanziWeight as any,
     color: t.textPrimary,
     lineHeight: FS.large * LH.single, letterSpacing: LS.example * FS.large,
-    marginBottom: space.sm,
+    marginBottom: 6,
   },
   exPinyin: {
     fontFamily: INCONSOLATA, fontSize: FS.body, color: t.textPrimary,

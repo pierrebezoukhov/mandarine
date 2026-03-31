@@ -68,6 +68,9 @@ export interface ColorTheme {
   opHskBadge:       number;
   opOrnament:       number;
 
+  // Divider
+  dividerSubtle:    string;
+
   // Overlay
   overlay:        string;
 
@@ -137,6 +140,8 @@ const light = {
   opHskBadge:       0.20,
   opOrnament:       0.12,
 
+  dividerSubtle:    'rgba(42,36,26,0.04)',
+
   overlay:         'rgba(0,0,0,0.6)',
 
   cardShadow:      'rgba(120,100,60,0.08)',
@@ -149,7 +154,7 @@ const light = {
 
 const dark = {
   bg:              '#0c0b09',
-  bgCard:          '#111008',
+  bgCard:          '#131210',
   bgCard2:         '#161410',
   border:          '#2a2620',
   borderDim:       '#1e1c18',
@@ -202,6 +207,8 @@ const dark = {
   opScoreColor:     0.75,
   opHskBadge:       0.30,
   opOrnament:       0.20,
+
+  dividerSubtle:    'rgba(232,224,208,0.06)',
 
   overlay:         'rgba(0,0,0,0.6)',
 
