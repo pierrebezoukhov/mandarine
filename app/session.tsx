@@ -421,7 +421,7 @@ export default function SessionScreen() {
           style={s.iconBtn}
           onPress={() => router.replace('/(tabs)/home')}
         >
-          <Text style={s.iconBtnText}>×</Text>
+          <Text style={s.iconBtnText}>{Icon.close}</Text>
         </TouchableOpacity>
 
         <ProgressBar current={idx + 1} total={cards.length} style={{ flex: 1 }} />
@@ -436,11 +436,11 @@ export default function SessionScreen() {
 
       {/* Score strip: wrong · remaining · right */}
       <View style={[s.scoreStrip, { gap: dk.scoreGap, paddingBottom: dk.scorePaddingBot }]}>
-        <Text style={[s.scoreItem, s.scoreForgot, { fontSize: dk.scoreSize }]}>× {forgotCount}</Text>
-        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>·</Text>
+        <Text style={[s.scoreItem, s.scoreForgot, { fontSize: dk.scoreSize }]}>{Icon.close} {forgotCount}</Text>
+        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>{Icon.separator}</Text>
         <Text style={[s.scoreItem, s.scorePending, { fontSize: dk.scoreSize }]}>{remaining}</Text>
-        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>·</Text>
-        <Text style={[s.scoreItem, s.scoreGot, { fontSize: dk.scoreSize }]}>✓ {gotCount}</Text>
+        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>{Icon.separator}</Text>
+        <Text style={[s.scoreItem, s.scoreGot, { fontSize: dk.scoreSize }]}>{Icon.correct} {gotCount}</Text>
       </View>
 
       {/* Card */}

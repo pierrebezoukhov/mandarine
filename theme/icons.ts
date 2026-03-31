@@ -3,7 +3,7 @@
 // font and inherit their color from semantic context.
 
 export const Icon = {
-  close:     '\u00D7',   // ×
+  close:     '\u2715',   // ✕
   next:      '\u203A',   // ›
   ornament:  '+',        // +
   dropdown:  '\u25BE',   // ▾
