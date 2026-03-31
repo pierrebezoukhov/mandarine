@@ -657,11 +657,11 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: INCONSOLATA, fontSize: FS.small, fontWeight: FW.regular },
+  scoreItem:   { fontSize: FS.small, fontWeight: FW.regular },
   scoreForgot: { color: t.scoreForgot },
   scoreGot:    { color: t.scoreGot },
   scorePending:{ color: t.scoreRemaining },
-  scoreSep:    { fontFamily: INCONSOLATA, color: t.textFaint, fontSize: FS.small },
+  scoreSep:    { color: t.textFaint, fontSize: FS.small },
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
@@ -808,7 +808,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     backgroundColor: 'transparent',
     borderColor: t.gotBtnBorder,
   },
-  rateBtnIcon: { fontFamily: MONO, fontSize: 20 },
+  rateBtnIcon: { fontSize: 20 },
 });
 
 // ── Session Complete Styles ────────────────────────────────────────────────────
