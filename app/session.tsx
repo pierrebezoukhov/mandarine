@@ -650,7 +650,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
 
   cardStage: { position: 'relative' },
   cardTouchable: {
-    paddingHorizontal: space.xl,
+    paddingHorizontal: space.xl + space.sm, // 20 + 8 = 28, aligns card edge with icon glyphs
   },
 
   // Card container — elevation shadow (dark), no border (light)
