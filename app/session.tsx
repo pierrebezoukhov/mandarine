@@ -99,10 +99,10 @@ export default function SessionScreen() {
   // TODO: re-enable DialKit once design is finalized
   const dk = {
     // Card container
-    cardMaxWidth:     340,
-    cardPaddingH:     24,
-    cardPaddingTop:   28,
-    cardPaddingBot:   28,
+    cardMaxWidth:     420,
+    cardPaddingH:     28,
+    cardPaddingTop:   36,
+    cardPaddingBot:   36,
 
     // Hanzi hero
     hanziSize:        76,
@@ -451,7 +451,6 @@ export default function SessionScreen() {
         >
           {/* Card container */}
           <View style={[s.cardContainer, {
-            maxHeight: cardMaxHeight,
             maxWidth: dk.cardMaxWidth,
             paddingHorizontal: dk.cardPaddingH,
             paddingTop: dk.cardPaddingTop,
@@ -669,7 +668,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
 
   // Card container — elevation shadow (dark), no border (light)
   cardContainer: {
-    width: '100%', maxWidth: 340,
+    width: '100%', maxWidth: 420,
     backgroundColor: t.bgCard,
     borderWidth: 0,
     paddingHorizontal: space.xxl,
@@ -787,7 +786,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   // Rating buttons — square-ish with text labels
   buttonRow: {
     flexDirection: 'row', justifyContent: 'center',
-    paddingHorizontal: 40, paddingTop: 14, paddingBottom: 24,
+    paddingHorizontal: 40, paddingTop: 14, paddingBottom: 40,
     gap: space.lg,
   },
   rateBtn: {
