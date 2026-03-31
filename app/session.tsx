@@ -194,6 +194,7 @@ export default function SessionScreen() {
   const pinyinAnim = useRef(new Animated.Value(0)).current;
   const meaningAnim = useRef(new Animated.Value(0)).current;
   const hintAnim = useRef(new Animated.Value(0)).current;
+  const exReadingAnim = useRef(new Animated.Value(0)).current;
 
   // Load session: resume from saved state (DB first, then AsyncStorage) OR fetch fresh
   useEffect(() => {
@@ -273,7 +274,7 @@ export default function SessionScreen() {
 
   const handleTap = useCallback(() => {
     setReveal(r => {
-      if (r >= 2) return r;  // already fully revealed — do nothing
+      if (r >= 3) return r;  // already fully revealed — do nothing
       const next = r + 1;
       if (next === 1) {
         pinyinAnim.setValue(0);
@@ -282,7 +283,6 @@ export default function SessionScreen() {
         }).start();
       }
       if (next === 2) {
-
         meaningAnim.setValue(0);
         hintAnim.setValue(0);
         Animated.stagger(dk.staggerDelay, [
@@ -293,6 +293,12 @@ export default function SessionScreen() {
             toValue: 1, useNativeDriver: true, damping: dk.revealDamping, stiffness: dk.revealStiffness,
           }),
         ]).start();
+      }
+      if (next === 3) {
+        exReadingAnim.setValue(0);
+        Animated.spring(exReadingAnim, {
+          toValue: 1, useNativeDriver: true, damping: dk.revealDamping, stiffness: dk.revealStiffness,
+        }).start();
       }
       return next;
     });
@@ -345,7 +351,7 @@ export default function SessionScreen() {
           flashAnim.setValue(0);  // kill leftover flash before new card
           pinyinAnim.setValue(0);
           meaningAnim.setValue(0);
-          hintAnim.setValue(0);
+          hintAnim.setValue(0); exReadingAnim.setValue(0);
           setIdx(nextIdx);
           setReveal(0);
 
@@ -365,7 +371,7 @@ export default function SessionScreen() {
     AsyncStorage.removeItem(RESUME_SESSION_KEY);
     if (user?.id) deleteResumeSession(user.id);  // fire-and-forget
     setCards(c => [...c].sort(() => Math.random() - 0.5));
-    pinyinAnim.setValue(0); meaningAnim.setValue(0); hintAnim.setValue(0);
+    pinyinAnim.setValue(0); meaningAnim.setValue(0); hintAnim.setValue(0); exReadingAnim.setValue(0);
     setIdx(0); setReveal(0); setResults({}); setDone(false);
   }, [user?.id]);
 
@@ -507,23 +513,28 @@ export default function SessionScreen() {
             {/* Example sentence */}
             {card._example && (
               <View style={s.exampleBlock}>
+                {/* Example hanzi — reveals at stage 2 */}
                 <Animated.View style={{
                   width: '100%',
                   opacity: reveal >= 2 ? hintAnim : 0,
                   transform: [{ translateY: reveal >= 2
                     ? hintAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
                     : dk.revealTranslY }],
-                  pointerEvents: reveal < 2 ? 'none' as const : 'auto' as const,
                 }}>
-                  {/* Example hanzi — prominent */}
                   <Text style={[s.exHanzi, { fontSize: dk.exHanziSize, lineHeight: dk.exHanziSize * LH.single }]}>{card._example.hanzi}</Text>
+                </Animated.View>
 
-                  {/* Pinyin — always rendered, opacity-controlled */}
+                {/* Example pinyin + english — reveals at stage 3 */}
+                <Animated.View style={{
+                  width: '100%',
+                  opacity: reveal >= 3 ? exReadingAnim : 0,
+                  transform: [{ translateY: reveal >= 3
+                    ? exReadingAnim.interpolate({ inputRange: [0, 1], outputRange: [dk.revealTranslY, 0] })
+                    : dk.revealTranslY }],
+                }}>
                   {card._example.pinyin && (
                     <Text style={s.exPinyin}>{card._example.pinyin}</Text>
                   )}
-
-                  {/* Translation — plain text */}
                   {card._example.meaning && (
                     <Text style={s.exTranslation}>{card._example.meaning}</Text>
                   )}
@@ -532,8 +543,8 @@ export default function SessionScreen() {
             )}
 
             {/* Tap hint — inside card surface */}
-            <Text style={[s.tapHint, reveal >= 2 && { opacity: 0 }, { fontSize: dk.tapHintSize }]} pointerEvents="none">
-              {reveal === 0 ? 'tap · pinyin' : 'tap · meaning'}
+            <Text style={[s.tapHint, reveal >= 3 && { opacity: 0 }, { fontSize: dk.tapHintSize }]} pointerEvents="none">
+              {reveal === 0 ? 'tap · pinyin' : reveal === 1 ? 'tap · meaning' : 'tap · reading'}
             </Text>
             </View>
 
