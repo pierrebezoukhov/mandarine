@@ -102,7 +102,7 @@ export default function SessionScreen() {
     cardMaxWidth:     340,
     cardPaddingH:     24,
     cardPaddingTop:   28,
-    cardPaddingBot:   20,
+    cardPaddingBot:   28,
 
     // Hanzi hero
     hanziSize:        76,
@@ -664,7 +664,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
     flex: 1, alignItems: 'center', justifyContent: 'flex-start',
-    paddingHorizontal: 20, paddingBottom: 16,
+    paddingHorizontal: 20, paddingBottom: 14,
   },
 
   // Card container — elevation shadow (dark), no border (light)
@@ -674,7 +674,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     borderWidth: 0,
     paddingHorizontal: space.xxl,
     paddingTop: 28,
-    paddingBottom: space.lg,
+    paddingBottom: 20,
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
