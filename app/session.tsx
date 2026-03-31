@@ -446,7 +446,7 @@ export default function SessionScreen() {
         style={[s.cardStage, { opacity: cardAnim, transform: [{ scale: cardScale }, { translateY: cardTranslateY }] }]}
       >
         <TouchableOpacity
-          style={[s.cardTouchable, compact && { paddingBottom: 8 }]}
+          style={s.cardTouchable}
           onPress={handleTap} activeOpacity={1}
         >
           {/* Card container */}
@@ -661,10 +661,10 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   scorePending:{ color: t.scoreRemaining },
   scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: FS.small },
 
-  cardStage: { flex: 1, position: 'relative' },
+  cardStage: { position: 'relative' },
   cardTouchable: {
     alignItems: 'center',
-    paddingHorizontal: 20, paddingBottom: 14,
+    paddingHorizontal: 20,
   },
 
   // Card container — elevation shadow (dark), no border (light)
@@ -787,7 +787,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   // Rating buttons — square-ish with text labels
   buttonRow: {
     flexDirection: 'row', justifyContent: 'center',
-    paddingHorizontal: 40, paddingBottom: 24,
+    paddingHorizontal: 40, paddingTop: 14, paddingBottom: 24,
     gap: space.lg,
   },
   rateBtn: {
