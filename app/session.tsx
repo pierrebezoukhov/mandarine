@@ -453,7 +453,6 @@ export default function SessionScreen() {
         >
           {/* Card container */}
           <View style={[s.cardContainer, {
-            maxWidth: dk.cardMaxWidth,
             paddingHorizontal: dk.cardPaddingH,
             paddingTop: dk.cardPaddingTop,
             paddingBottom: dk.cardPaddingBot,
@@ -651,13 +650,12 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
 
   cardStage: { position: 'relative' },
   cardTouchable: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: space.xl,
   },
 
   // Card container — elevation shadow (dark), no border (light)
   cardContainer: {
-    width: '100%', maxWidth: 420,
+    width: '100%',
     backgroundColor: t.bgCard,
     borderWidth: 0,
     paddingHorizontal: space.xxl,
