@@ -10,9 +10,11 @@ interface ProgressBarProps {
   current: number;
   total: number;
   style?: StyleProp<ViewStyle>;
+  /** Hide the numeric counter (e.g. "3 / 20") */
+  hideCounter?: boolean;
 }
 
-export function ProgressBar({ current, total, style }: ProgressBarProps) {
+export function ProgressBar({ current, total, style, hideCounter }: ProgressBarProps) {
   const { colors } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
   const progress = total > 0 ? Math.min(current / total, 1) : 0;
@@ -25,10 +27,12 @@ export function ProgressBar({ current, total, style }: ProgressBarProps) {
       </View>
 
       {/* Counter */}
-      <Text style={s.counter}>
-        {current}
-        <Text style={s.counterTotal}> / {total}</Text>
-      </Text>
+      {!hideCounter && (
+        <Text style={s.counter}>
+          {current}
+          <Text style={s.counterTotal}> / {total}</Text>
+        </Text>
+      )}
     </View>
   );
 }

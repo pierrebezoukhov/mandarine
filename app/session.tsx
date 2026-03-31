@@ -15,7 +15,6 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { Button } from '@/components/Button';
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { CornerOrnament } from '@/components/CornerOrnament';
-import { TypewriterText } from '@/components/TypewriterText';
 import type { SessionConfig } from '@/lib/types';
 import {
   fetchCardsForSession, loadResumeState,
@@ -82,7 +81,6 @@ export default function SessionScreen() {
   const [reveal, setReveal]   = useState(0);
   const [results, setResults] = useState<Results>({});
   const [done, setDone]       = useState(false);
-  const [translationRevealed, setTranslationRevealed] = useState(false);
   const [hoveredBtn, setHoveredBtn] = useState<'forgot' | 'got' | null>(null);
 
   const { height: windowHeight } = useWindowDimensions();
@@ -350,7 +348,7 @@ export default function SessionScreen() {
           hintAnim.setValue(0);
           setIdx(nextIdx);
           setReveal(0);
-          setTranslationRevealed(false);
+
         }
       });
     }, dk.exitDelay);
@@ -360,7 +358,6 @@ export default function SessionScreen() {
     if (idx === 0) return;
     setIdx(i => i - 1);
     setReveal(0);
-    setTranslationRevealed(false);
   }, [idx]);
 
   const restart = useCallback(() => {
@@ -370,7 +367,6 @@ export default function SessionScreen() {
     setCards(c => [...c].sort(() => Math.random() - 0.5));
     pinyinAnim.setValue(0); meaningAnim.setValue(0); hintAnim.setValue(0);
     setIdx(0); setReveal(0); setResults({}); setDone(false);
-    setTranslationRevealed(false);
   }, [user?.id]);
 
   // ── Loading / error states ────────────────────────────────────────────────
@@ -422,7 +418,7 @@ export default function SessionScreen() {
           <Text style={s.iconBtnText}>{Icon.close}</Text>
         </TouchableOpacity>
 
-        <ProgressBar current={idx + 1} total={cards.length} style={{ flex: 1 }} />
+        <ProgressBar current={idx + 1} total={cards.length} style={{ flex: 1 }} hideCounter />
 
         <TouchableOpacity
           style={[s.iconBtn, idx === 0 && s.iconBtnDisabled]}
@@ -432,13 +428,13 @@ export default function SessionScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Score strip: wrong · remaining · right */}
+      {/* Score strip */}
       <View style={[s.scoreStrip, { gap: dk.scoreGap, paddingBottom: dk.scorePaddingBot }]}>
-        <Text style={[s.scoreItem, s.scoreForgot, { fontSize: dk.scoreSize }]}>{Icon.close} {forgotCount}</Text>
-        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>{Icon.separator}</Text>
-        <Text style={[s.scoreItem, s.scorePending, { fontSize: dk.scoreSize }]}>{remaining}</Text>
-        <Text style={[s.scoreSep, { fontSize: dk.scoreSepSize }]}>{Icon.separator}</Text>
-        <Text style={[s.scoreItem, s.scoreGot, { fontSize: dk.scoreSize }]}>{Icon.correct} {gotCount}</Text>
+        <Text style={[s.scoreItem, s.scoreForgot]}>{Icon.close} {forgotCount}</Text>
+        <Text style={s.scoreSep}>{Icon.separator}</Text>
+        <Text style={[s.scoreItem, s.scorePending]}>{remaining}</Text>
+        <Text style={s.scoreSep}>{Icon.separator}</Text>
+        <Text style={[s.scoreItem, s.scoreGot]}>{Icon.correct} {gotCount}</Text>
       </View>
 
       {/* Card */}
@@ -524,28 +520,13 @@ export default function SessionScreen() {
 
                   {/* Pinyin — always rendered, opacity-controlled */}
                   {card._example.pinyin && (
-                    <Text style={[s.exPinyin, !translationRevealed && { opacity: 0 }]}>{card._example.pinyin}</Text>
+                    <Text style={s.exPinyin}>{card._example.pinyin}</Text>
                   )}
 
-                  {/* Translation — typewriter reveal, starts after pinyin */}
+                  {/* Translation — plain text */}
                   {card._example.meaning && (
-                    <TypewriterText
-                      text={card._example.meaning}
-                      active={translationRevealed}
-                      delay={30}
-                      startDelay={400}
-                      style={s.exTranslation}
-                    />
+                    <Text style={s.exTranslation}>{card._example.meaning}</Text>
                   )}
-
-                  {/* Tap hint — opacity-controlled to prevent layout shift */}
-                  <TouchableOpacity
-                    onPress={(e) => { e.stopPropagation(); if (!translationRevealed) setTranslationRevealed(true); }}
-                    activeOpacity={0.7}
-                    style={[s.translateHint, translationRevealed && { opacity: 0, pointerEvents: 'none' as const }]}
-                  >
-                    <Text style={s.translateHintText}>▸ tap to translate</Text>
-                  </TouchableOpacity>
                 </Animated.View>
               </View>
             )}
@@ -651,11 +632,11 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: space.md, paddingBottom: 10,
   },
-  scoreItem:   { fontFamily: MONO, fontSize: FS.small, fontWeight: FW.regular },
-  scoreForgot: { color: t.scoreForgot },
-  scoreGot:    { color: t.scoreGot },
-  scorePending:{ color: t.scoreRemaining },
-  scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: FS.small },
+  scoreItem:   { fontFamily: MONO, fontSize: FS.body, fontWeight: '500' },
+  scoreForgot: { color: t.scoreForgot, opacity: 0.7 },
+  scoreGot:    { color: t.scoreGot, opacity: 0.7 },
+  scorePending:{ color: t.scoreRemaining, opacity: 0.5 },
+  scoreSep:    { fontFamily: MONO, color: t.textFaint, fontSize: FS.body, opacity: 0.4 },
 
   cardStage: { position: 'relative' },
   cardTouchable: {
@@ -764,14 +745,6 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
     fontFamily: INCONSOLATA, fontSize: FS.small, color: t.textPrimary,
     opacity: t.opExampleEnglish,
   },
-  translateHint: {
-    marginTop: space.sm,
-  },
-  translateHintText: {
-    fontFamily: INCONSOLATA, fontSize: FS.micro, color: t.textFaint,
-    letterSpacing: LS.widest * FS.micro, textTransform: 'uppercase',
-  },
-
   // Tap hint (inside card surface)
   tapHint: {
     marginTop: 14, alignSelf: 'center',
