@@ -735,7 +735,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
   },
 
   // Meaning block (POS + definition)
-  meaningBlock: { width: '100%', alignSelf: 'stretch', alignItems: 'flex-start', marginBottom: space.lg },
+  meaningBlock: { width: '100%', alignSelf: 'stretch', alignItems: 'flex-start' },
   posTag: {
     fontFamily: INCONSOLATA, fontSize: FS.micro,
     color: t.textPrimary, opacity: t.opDecorative,
