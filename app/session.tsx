@@ -663,7 +663,7 @@ const makeStyles = (t: ColorTheme, hanziFont: string, hanziWeight: string) => St
 
   cardStage: { flex: 1, position: 'relative' },
   cardTouchable: {
-    flex: 1, alignItems: 'center', justifyContent: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: 20, paddingBottom: 14,
   },
 
