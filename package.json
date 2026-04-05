@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "eslint 'app/**/*.tsx' 'components/**/*.tsx' --max-warnings 0"
+    "lint": "eslint 'app/**/*.tsx' 'components/**/*.tsx' --max-warnings 0",
+    "tokens:export": "node scripts/generate-figma-tokens.js"
   },
   "dependencies": {
     "@composiohq/skills": "github:composiohq/skills",
