@@ -165,14 +165,49 @@ function rgbaToHex8(str) {
   return `#${hex(r)}${hex(g)}${hex(b)}${hex(alpha)}`;
 }
 
+const colorDescriptions = {
+  bg:              'Main page background. Used on root screen containers and behind all content.',
+  bgCard:          'Card surface fill. Used on flashcard faces, form containers, and elevated panels.',
+  bgCard2:         'Secondary card/input background. Used on form inputs (Field), chips, and nested surfaces.',
+  border:          'Primary border color. Used on card edges, input outlines, and divider lines.',
+  borderDim:       'Subtle border color. Used on secondary dividers and inactive input borders.',
+  scanline:        'Decorative scanline overlay color. Used by the Scanlines component for the CRT/parchment effect.',
+  inkRed:          'Primary brand accent. Used on Button fills, active tab indicators, ProgressBar fills, and primary CTAs.',
+  inkRedDim:       'Muted red accent. Used on secondary/hover states of red elements and inactive red buttons.',
+  inkRedGlow:      'Red glow/halo effect. Used as box-shadow or background behind inkRed elements for emphasis.',
+  inkRedText:      'Red text color. Used specifically on pinyin text and red-colored inline text (not on backgrounds).',
+  textPrimary:     'Primary text color. Used on body text, headings, card definitions, and form input values.',
+  textSecondary:   'Secondary text color. Used on subtitles, descriptions, helper text, and less prominent labels.',
+  textFaint:       'Faint/hint text color. Used on placeholders, tap hints, disabled labels, and tertiary information.',
+  textHanzi:       'Hanzi character text color. Used exclusively on the hero flashcard character (108px display).',
+  textOnAccent:    'Text on colored backgrounds. Used on Button labels, badges, and any text placed over inkRed or green fills.',
+  green:           'Success/correct color. Used on "Got it" buttons, correct answer indicators, and positive feedback.',
+  greenBright:     'Bright success color. Used on hover/active state of green buttons and highlighted success states.',
+  greenDim:        'Subtle green background. Used as background tint behind "Got it" buttons and success regions.',
+  redBtn:          'Red button color. Used on "Forgot" button fill and negative/destructive secondary actions.',
+  redBtnBright:    'Bright red button color. Used on hover/active state of "Forgot" buttons.',
+  forgotBtnHover:  'Forgot button hover background. Used as background tint on hover for the "Forgot" rating button.',
+  gotBtnHover:     'Got it button hover background. Used as background tint on hover for the "Got it" rating button.',
+  gotGlow:         'Green glow effect. Used as shadow/halo behind "Got it" button when active or focused.',
+  overlay:         'Modal overlay backdrop. Used behind BottomSheetModal and any fullscreen overlay/dialog.',
+  cardShadow:      'Card drop shadow color. Used as the box-shadow color on Card components for elevation.',
+  cardInsetShadow: 'Card inset shadow color. Used as inner shadow on pressed/recessed card states.',
+  noiseOpacity:    'NoiseOverlay intensity. Controls the opacity of the paper grain texture overlay per theme.',
+};
+
 function buildColorSet(palette) {
   const colors = {};
   const opacity = {};
   for (const [key, value] of Object.entries(palette)) {
+    const desc = colorDescriptions[key];
     if (typeof value === 'number') {
-      opacity[key] = { $type: 'number', $value: value };
+      const token = { $type: 'number', $value: value };
+      if (desc) token.$description = desc;
+      opacity[key] = token;
     } else {
-      colors[key] = { $type: 'color', $value: rgbaToHex8(value) };
+      const token = { $type: 'color', $value: rgbaToHex8(value) };
+      if (desc) token.$description = desc;
+      colors[key] = token;
     }
   }
   return { color: colors, opacity };
